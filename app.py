@@ -744,5 +744,4 @@ elif page == "Progress":
                 st.write(f"**{m['name']}** — Meals: {len(meals)} | Followed: {sum(1 for x in meals if x['status']=='followed')} | Workouts: {sum(1 for x in workouts if x['status']=='completed')} | Minutes: {sum(x.get('minutes',0) for x in workouts)}")
         else:
             st.info("No logs yet.")
-'''
 
