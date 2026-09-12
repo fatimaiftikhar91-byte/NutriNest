@@ -16,131 +16,140 @@ st.set_page_config(
 # ---------------- YOUR EXACT THEME ----------------
 st.markdown("""
 <style>
-    /* ========== MAIN BACKGROUND ========== */
+    /* ========== GLOBAL ========== */
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    
     .stApp {
-        background-color: #FBF8F2;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(180deg, #F7F4EE 0%, #F2EFE8 100%);
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
+
+    /* Hide default Streamlit branding a bit */
+    #MainMenu, footer {visibility: hidden;}
 
     /* ========== SIDEBAR ========== */
     [data-testid="stSidebar"] {
-        background-color: #E8F0E3 !important;
-        border-right: 1px solid #d6e0d0;
+        background: linear-gradient(180deg, #1B4332 0%, #2D6A4F 100%) !important;
+        border-right: none;
     }
     [data-testid="stSidebar"] * {
-        color: #2B2B26 !important;
+        color: #F8F9FA !important;
     }
     [data-testid="stSidebar"] .stRadio label {
-        color: #2B2B26 !important;
+        color: #F8F9FA !important;
         font-weight: 500;
         font-size: 0.95rem;
+        padding: 0.3rem 0;
+    }
+    [data-testid="stSidebar"] .stRadio label:hover {
+        color: #D8F3DC !important;
     }
 
-    /* ========== TITLES ========== */
+    /* ========== HEADER ========== */
     .main-title {
-        font-size: 2.6rem;
+        font-size: 2.7rem;
         font-weight: 800;
-        color: #2B2B26;
-        margin-bottom: 0.15rem;
-        letter-spacing: -0.5px;
+        color: #1B4332;
+        margin-bottom: 0.1rem;
+        letter-spacing: -1px;
     }
     .sub-title {
-        color: #5a5a52;
-        font-size: 1.08rem;
-        margin-bottom: 2rem;
-        font-weight: 400;
+        color: #52796F;
+        font-size: 1.1rem;
+        margin-bottom: 2.2rem;
+        font-weight: 500;
     }
 
-    /* ========== MEMBER CARDS ========== */
+    /* ========== CARDS ========== */
     .member-card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 1.5rem;
-        border: 1px solid #e8e4db;
-        box-shadow: 0 4px 18px rgba(0,0,0,0.04);
-        margin-bottom: 1.2rem;
-        transition: all 0.2s ease;
+        background: #FFFFFF;
+        border-radius: 20px;
+        padding: 1.6rem;
+        border: 1px solid #E9ECEF;
+        box-shadow: 0 10px 30px rgba(27, 67, 50, 0.06);
+        margin-bottom: 1.3rem;
+        transition: all 0.25s ease;
     }
     .member-card:hover {
-        box-shadow: 0 6px 24px rgba(0,0,0,0.07);
-        transform: translateY(-2px);
+        transform: translateY(-4px);
+        box-shadow: 0 16px 40px rgba(27, 67, 50, 0.1);
     }
 
-    /* ========== PLATE / MEAL CARDS ========== */
     .plate-card {
-        background: #ffffff;
-        border-radius: 14px;
-        padding: 1.4rem 1.6rem;
-        border-left: 5px solid #D9971C;
-        box-shadow: 0 3px 14px rgba(0,0,0,0.04);
-        margin-bottom: 1.4rem;
-        color: #2B2B26;
+        background: #FFFFFF;
+        border-radius: 18px;
+        padding: 1.5rem 1.7rem;
+        border-left: 6px solid #D9971C;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+        margin-bottom: 1.5rem;
+        color: #212529;
     }
 
-    /* ========== MACRO BOXES ========== */
+    /* ========== MACRO PILLS ========== */
     .macro-box {
-        background: #F5EFE0;
-        color: #2B2B26;
-        border-radius: 8px;
-        padding: 0.4rem 0.75rem;
-        font-size: 0.86rem;
+        background: #E9F5EF;
+        color: #1B4332;
+        border-radius: 50px;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.84rem;
         font-weight: 600;
         display: inline-block;
-        margin-right: 6px;
-        margin-top: 5px;
-        border: 1px solid #ebe4d4;
+        margin-right: 7px;
+        margin-top: 6px;
+        border: 1px solid #D8F3DC;
     }
 
     /* ========== BUTTONS ========== */
     .stButton > button {
-        border-radius: 10px !important;
+        border-radius: 12px !important;
         font-weight: 600 !important;
-        background-color: #D9971C !important;
+        background: linear-gradient(135deg, #D9971C 0%, #C48412 100%) !important;
         color: white !important;
         border: none !important;
-        padding: 0.55rem 1.2rem !important;
+        padding: 0.65rem 1.4rem !important;
+        box-shadow: 0 4px 15px rgba(217, 151, 28, 0.25);
         transition: all 0.2s ease;
     }
     .stButton > button:hover {
-        background-color: #c48412 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(217, 151, 28, 0.35);
         color: white !important;
-        box-shadow: 0 4px 12px rgba(217, 151, 28, 0.25);
     }
 
     /* ========== METRICS ========== */
     [data-testid="stMetricValue"] {
-        color: #2B2B26 !important;
+        color: #1B4332 !important;
         font-weight: 700 !important;
-        font-size: 1.5rem !important;
+        font-size: 1.55rem !important;
     }
     [data-testid="stMetricLabel"] {
-        color: #5a5a52 !important;
+        color: #52796F !important;
         font-weight: 500 !important;
-    }
-
-    /* ========== GENERAL TEXT ========== */
-    p, h1, h2, h3, h4, h5, h6, label, span, div {
-        color: #2B2B26;
-    }
-
-    /* ========== EXPANDER ========== */
-    .streamlit-expanderHeader {
-        background-color: #ffffff;
-        border-radius: 10px;
-        font-weight: 600;
     }
 
     /* ========== INPUTS ========== */
     .stTextInput > div > div > input,
-    .stNumberInput > div > div > input,
+    .stNumberInput > div > div > input {
+        border-radius: 10px !important;
+        border: 1.5px solid #DEE2E6 !important;
+        padding: 0.6rem 0.9rem !important;
+    }
     .stSelectbox > div > div {
-        border-radius: 8px !important;
-        border: 1px solid #ddd8ce !important;
+        border-radius: 10px !important;
     }
 
-    /* ========== SUCCESS / INFO BOXES ========== */
-    .stSuccess, .stInfo, .stWarning {
-        border-radius: 10px;
+    /* ========== GENERAL ========== */
+    h1, h2, h3, h4, h5, h6, p, label, span, div {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    .stSuccess {
+        background-color: #D8F3DC;
+        border-radius: 12px;
+    }
+    .stInfo {
+        background-color: #E9F5EF;
+        border-radius: 12px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -165,8 +174,14 @@ def load_recipes():
                 st.warning(f"Error loading {path}: {e}")
     
     # Agar local file na mile to empty DataFrame return karo
+        # Debug ke liye
+    if df.empty:
+        st.warning("Recipes file empty hai ya load nahi hui. Check data/recipes.csv")
+    else:
+        st.success(f"{len(df)} recipes loaded successfully")
+    
+    return df
     return pd.DataFrame()
-recipes_df = load_recipes()
 
 # ---------------- GROQ CLIENT ----------------
 def get_client():
