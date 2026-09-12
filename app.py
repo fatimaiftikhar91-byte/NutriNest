@@ -18,144 +18,127 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-    /* ===== GLOBAL ===== */
+    /* Main App */
     .stApp {
-        background-color: #F4F1EB !important;
+        background-color: #F7F4EE !important;
         font-family: 'Inter', sans-serif !important;
-        color: #1A1A1A !important;
+        color: #1C1917 !important;
     }
 
-    /* Force dark text everywhere in main area */
+    /* Force dark text */
     .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, 
-    .stApp h5, .stApp h6, .stApp label, .stApp span, .stApp div {
-        color: #1A1A1A !important;
+    .stApp h5, .stApp h6, .stApp label, .stApp span, 
+    .stApp div, .stApp li {
+        color: #1C1917 !important;
     }
 
-    /* ===== SIDEBAR ===== */
+    /* Sidebar */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1B4332 0%, #2D6A4F 100%) !important;
+        background: linear-gradient(180deg, #14532D 0%, #166534 100%) !important;
     }
     [data-testid="stSidebar"] * {
-        color: #FFFFFF !important;
+        color: #F0FDF4 !important;
     }
     [data-testid="stSidebar"] .stRadio label {
-        color: #FFFFFF !important;
         font-weight: 500 !important;
         font-size: 0.95rem !important;
     }
-    [data-testid="stSidebar"] .stRadio label:hover {
-        color: #D8F3DC !important;
-    }
 
-    /* ===== TITLES ===== */
+    /* Titles */
     .main-title {
-        font-size: 2.6rem !important;
+        font-size: 2.7rem !important;
         font-weight: 800 !important;
-        color: #1B4332 !important;
-        margin-bottom: 0.2rem !important;
-        letter-spacing: -0.8px !important;
+        color: #14532D !important;
+        letter-spacing: -1px !important;
+        margin-bottom: 0.15rem !important;
     }
     .sub-title {
-        color: #4A5568 !important;
-        font-size: 1.05rem !important;
-        margin-bottom: 2rem !important;
+        color: #57534E !important;
+        font-size: 1.08rem !important;
+        margin-bottom: 2.2rem !important;
         font-weight: 500 !important;
     }
 
-    /* ===== CARDS ===== */
+    /* Cards */
     .member-card {
         background: #FFFFFF !important;
-        border-radius: 16px !important;
-        padding: 1.5rem !important;
-        border: 1px solid #E2E8F0 !important;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
-        margin-bottom: 1.2rem !important;
-        color: #1A1A1A !important;
+        border-radius: 18px !important;
+        padding: 1.6rem !important;
+        border: 1px solid #E7E5E4 !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
+        margin-bottom: 1.3rem !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .member-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.07) !important;
     }
     .member-card h3 {
-        color: #1B4332 !important;
-        margin: 0 !important;
-    }
-    .member-card p {
-        color: #4A5568 !important;
+        color: #14532D !important;
+        margin: 0 0 0.3rem 0 !important;
+        font-weight: 700 !important;
     }
 
     .plate-card {
         background: #FFFFFF !important;
-        border-radius: 14px !important;
-        padding: 1.4rem 1.6rem !important;
+        border-radius: 16px !important;
+        padding: 1.5rem 1.7rem !important;
         border-left: 5px solid #D97706 !important;
         box-shadow: 0 4px 18px rgba(0,0,0,0.04) !important;
-        margin-bottom: 1.3rem !important;
-        color: #1A1A1A !important;
+        margin-bottom: 1.4rem !important;
     }
     .plate-card h3 {
-        color: #1B4332 !important;
+        color: #14532D !important;
         margin-top: 0 !important;
+        font-weight: 700 !important;
     }
 
-    /* ===== MACRO BOXES ===== */
+    /* Macro pills */
     .macro-box {
         background: #ECFDF5 !important;
         color: #065F46 !important;
-        border-radius: 8px !important;
-        padding: 0.35rem 0.75rem !important;
+        border-radius: 50px !important;
+        padding: 0.35rem 0.85rem !important;
         font-size: 0.82rem !important;
         font-weight: 600 !important;
         display: inline-block !important;
-        margin-right: 6px !important;
-        margin-top: 5px !important;
+        margin: 4px 5px 0 0 !important;
         border: 1px solid #A7F3D0 !important;
     }
 
-    /* ===== BUTTONS ===== */
+    /* Buttons */
     .stButton > button {
+        background: #D97706 !important;
+        color: white !important;
         border-radius: 10px !important;
         font-weight: 600 !important;
-        background: #D97706 !important;
-        color: #FFFFFF !important;
         border: none !important;
-        padding: 0.6rem 1.3rem !important;
-        box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2) !important;
+        padding: 0.6rem 1.4rem !important;
+        box-shadow: 0 2px 10px rgba(217, 119, 6, 0.2) !important;
+        transition: all 0.2s ease;
     }
     .stButton > button:hover {
         background: #B45309 !important;
-        color: #FFFFFF !important;
-        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3) !important;
+        color: white !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3) !important;
     }
 
-    /* ===== METRICS ===== */
+    /* Metrics */
     [data-testid="stMetricValue"] {
-        color: #1B4332 !important;
+        color: #14532D !important;
         font-weight: 700 !important;
     }
     [data-testid="stMetricLabel"] {
-        color: #4A5568 !important;
+        color: #57534E !important;
     }
 
-    /* ===== INPUTS ===== */
+    /* Inputs */
     .stTextInput input, .stNumberInput input {
-        border-radius: 8px !important;
-        border: 1.5px solid #CBD5E1 !important;
-        color: #1A1A1A !important;
-        background: #FFFFFF !important;
-    }
-    .stSelectbox > div > div {
-        border-radius: 8px !important;
-        color: #1A1A1A !important;
-    }
-
-    /* ===== EXPANDER ===== */
-    .streamlit-expanderHeader {
-        background: #FFFFFF !important;
-        color: #1A1A1A !important;
-        border-radius: 10px !important;
-        font-weight: 600 !important;
-    }
-
-    /* ===== INFO / SUCCESS ===== */
-    .stSuccess, .stInfo, .stWarning {
-        border-radius: 10px !important;
+        border-radius: 9px !important;
+        border: 1.5px solid #D6D3D1 !important;
+        color: #1C1917 !important;
+        background: white !important;
     }
 </style>
 """, unsafe_allow_html=True)
