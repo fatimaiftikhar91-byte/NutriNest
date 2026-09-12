@@ -16,140 +16,146 @@ st.set_page_config(
 # ---------------- YOUR EXACT THEME ----------------
 st.markdown("""
 <style>
-    /* ========== GLOBAL ========== */
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    /* ===== GLOBAL ===== */
     .stApp {
-        background: linear-gradient(180deg, #F7F4EE 0%, #F2EFE8 100%);
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #F4F1EB !important;
+        font-family: 'Inter', sans-serif !important;
+        color: #1A1A1A !important;
     }
 
-    /* Hide default Streamlit branding a bit */
-    #MainMenu, footer {visibility: hidden;}
+    /* Force dark text everywhere in main area */
+    .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, 
+    .stApp h5, .stApp h6, .stApp label, .stApp span, .stApp div {
+        color: #1A1A1A !important;
+    }
 
-    /* ========== SIDEBAR ========== */
+    /* ===== SIDEBAR ===== */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #1B4332 0%, #2D6A4F 100%) !important;
-        border-right: none;
     }
     [data-testid="stSidebar"] * {
-        color: #F8F9FA !important;
+        color: #FFFFFF !important;
     }
     [data-testid="stSidebar"] .stRadio label {
-        color: #F8F9FA !important;
-        font-weight: 500;
-        font-size: 0.95rem;
-        padding: 0.3rem 0;
+        color: #FFFFFF !important;
+        font-weight: 500 !important;
+        font-size: 0.95rem !important;
     }
     [data-testid="stSidebar"] .stRadio label:hover {
         color: #D8F3DC !important;
     }
 
-    /* ========== HEADER ========== */
+    /* ===== TITLES ===== */
     .main-title {
-        font-size: 2.7rem;
-        font-weight: 800;
-        color: #1B4332;
-        margin-bottom: 0.1rem;
-        letter-spacing: -1px;
+        font-size: 2.6rem !important;
+        font-weight: 800 !important;
+        color: #1B4332 !important;
+        margin-bottom: 0.2rem !important;
+        letter-spacing: -0.8px !important;
     }
     .sub-title {
-        color: #52796F;
-        font-size: 1.1rem;
-        margin-bottom: 2.2rem;
-        font-weight: 500;
-    }
-
-    /* ========== CARDS ========== */
-    .member-card {
-        background: #FFFFFF;
-        border-radius: 20px;
-        padding: 1.6rem;
-        border: 1px solid #E9ECEF;
-        box-shadow: 0 10px 30px rgba(27, 67, 50, 0.06);
-        margin-bottom: 1.3rem;
-        transition: all 0.25s ease;
-    }
-    .member-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 16px 40px rgba(27, 67, 50, 0.1);
-    }
-
-    .plate-card {
-        background: #FFFFFF;
-        border-radius: 18px;
-        padding: 1.5rem 1.7rem;
-        border-left: 6px solid #D9971C;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.04);
-        margin-bottom: 1.5rem;
-        color: #212529;
-    }
-
-    /* ========== MACRO PILLS ========== */
-    .macro-box {
-        background: #E9F5EF;
-        color: #1B4332;
-        border-radius: 50px;
-        padding: 0.4rem 0.9rem;
-        font-size: 0.84rem;
-        font-weight: 600;
-        display: inline-block;
-        margin-right: 7px;
-        margin-top: 6px;
-        border: 1px solid #D8F3DC;
-    }
-
-    /* ========== BUTTONS ========== */
-    .stButton > button {
-        border-radius: 12px !important;
-        font-weight: 600 !important;
-        background: linear-gradient(135deg, #D9971C 0%, #C48412 100%) !important;
-        color: white !important;
-        border: none !important;
-        padding: 0.65rem 1.4rem !important;
-        box-shadow: 0 4px 15px rgba(217, 151, 28, 0.25);
-        transition: all 0.2s ease;
-    }
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(217, 151, 28, 0.35);
-        color: white !important;
-    }
-
-    /* ========== METRICS ========== */
-    [data-testid="stMetricValue"] {
-        color: #1B4332 !important;
-        font-weight: 700 !important;
-        font-size: 1.55rem !important;
-    }
-    [data-testid="stMetricLabel"] {
-        color: #52796F !important;
+        color: #4A5568 !important;
+        font-size: 1.05rem !important;
+        margin-bottom: 2rem !important;
         font-weight: 500 !important;
     }
 
-    /* ========== INPUTS ========== */
-    .stTextInput > div > div > input,
-    .stNumberInput > div > div > input {
-        border-radius: 10px !important;
-        border: 1.5px solid #DEE2E6 !important;
-        padding: 0.6rem 0.9rem !important;
+    /* ===== CARDS ===== */
+    .member-card {
+        background: #FFFFFF !important;
+        border-radius: 16px !important;
+        padding: 1.5rem !important;
+        border: 1px solid #E2E8F0 !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
+        margin-bottom: 1.2rem !important;
+        color: #1A1A1A !important;
     }
-    .stSelectbox > div > div {
-        border-radius: 10px !important;
+    .member-card h3 {
+        color: #1B4332 !important;
+        margin: 0 !important;
+    }
+    .member-card p {
+        color: #4A5568 !important;
     }
 
-    /* ========== GENERAL ========== */
-    h1, h2, h3, h4, h5, h6, p, label, span, div {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+    .plate-card {
+        background: #FFFFFF !important;
+        border-radius: 14px !important;
+        padding: 1.4rem 1.6rem !important;
+        border-left: 5px solid #D97706 !important;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.04) !important;
+        margin-bottom: 1.3rem !important;
+        color: #1A1A1A !important;
     }
-    
-    .stSuccess {
-        background-color: #D8F3DC;
-        border-radius: 12px;
+    .plate-card h3 {
+        color: #1B4332 !important;
+        margin-top: 0 !important;
     }
-    .stInfo {
-        background-color: #E9F5EF;
-        border-radius: 12px;
+
+    /* ===== MACRO BOXES ===== */
+    .macro-box {
+        background: #ECFDF5 !important;
+        color: #065F46 !important;
+        border-radius: 8px !important;
+        padding: 0.35rem 0.75rem !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        display: inline-block !important;
+        margin-right: 6px !important;
+        margin-top: 5px !important;
+        border: 1px solid #A7F3D0 !important;
+    }
+
+    /* ===== BUTTONS ===== */
+    .stButton > button {
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        background: #D97706 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        padding: 0.6rem 1.3rem !important;
+        box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2) !important;
+    }
+    .stButton > button:hover {
+        background: #B45309 !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3) !important;
+    }
+
+    /* ===== METRICS ===== */
+    [data-testid="stMetricValue"] {
+        color: #1B4332 !important;
+        font-weight: 700 !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #4A5568 !important;
+    }
+
+    /* ===== INPUTS ===== */
+    .stTextInput input, .stNumberInput input {
+        border-radius: 8px !important;
+        border: 1.5px solid #CBD5E1 !important;
+        color: #1A1A1A !important;
+        background: #FFFFFF !important;
+    }
+    .stSelectbox > div > div {
+        border-radius: 8px !important;
+        color: #1A1A1A !important;
+    }
+
+    /* ===== EXPANDER ===== */
+    .streamlit-expanderHeader {
+        background: #FFFFFF !important;
+        color: #1A1A1A !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+    }
+
+    /* ===== INFO / SUCCESS ===== */
+    .stSuccess, .stInfo, .stWarning {
+        border-radius: 10px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -157,31 +163,49 @@ st.markdown("""
 # ---------------- LOAD DATA ----------------
 @st.cache_data
 def load_recipes():
-    # Pehle local file try karo (GitHub pe jo humne daali hai)
-    local_paths = [
+    possible_paths = [
         "data/recipes.csv",
         "./data/recipes.csv",
         "recipes.csv"
     ]
     
-    for path in local_paths:
+    for path in possible_paths:
         if os.path.exists(path):
             try:
                 df = pd.read_csv(path)
-                df.columns = [c.lower().strip() for c in df.columns]
+                df.columns = [str(c).lower().strip().replace(" ", "_") for c in df.columns]
+                
+                # Column names ko standard banao
+                rename_map = {
+                    "recipe_name": "recipe_name",
+                    "name": "recipe_name",
+                    "recipe": "recipe_name",
+                    "meal_type": "meal_type",
+                    "mealtype": "meal_type",
+                    "cuisine": "cuisine",
+                    "calories": "calories",
+                    "calorie": "calories",
+                    "protein_g": "protein_g",
+                    "protein": "protein_g",
+                    "carbs_g": "carbs_g",
+                    "carbs": "carbs_g",
+                    "fat_g": "fat_g",
+                    "fat": "fat_g",
+                    "ingredients": "ingredients"
+                }
+                
+                df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
+                
+                if "recipe_name" not in df.columns and len(df.columns) > 0:
+                    df = df.rename(columns={df.columns[0]: "recipe_name"})
+                
                 return df
             except Exception as e:
-                st.warning(f"Error loading {path}: {e}")
+                st.error(f"Error loading {path}: {e}")
     
-    # Agar local file na mile to empty DataFrame return karo
-        # Debug ke liye
-    if df.empty:
-        st.warning("Recipes file empty hai ya load nahi hui. Check data/recipes.csv")
-    else:
-        st.success(f"{len(df)} recipes loaded successfully")
-    
-    return df
+    st.warning("No recipe file found. Please check data/recipes.csv")
     return pd.DataFrame()
+    recipes_df = load_recipes()
 
 # ---------------- GROQ CLIENT ----------------
 def get_client():
