@@ -16,14 +16,16 @@ st.set_page_config(
 # ---------------- YOUR EXACT THEME ----------------
 st.markdown("""
 <style>
-    /* Main background */
+    /* ========== MAIN BACKGROUND ========== */
     .stApp {
         background-color: #FBF8F2;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Sidebar */
+    /* ========== SIDEBAR ========== */
     [data-testid="stSidebar"] {
         background-color: #E8F0E3 !important;
+        border-right: 1px solid #d6e0d0;
     }
     [data-testid="stSidebar"] * {
         color: #2B2B26 !important;
@@ -31,75 +33,114 @@ st.markdown("""
     [data-testid="stSidebar"] .stRadio label {
         color: #2B2B26 !important;
         font-weight: 500;
+        font-size: 0.95rem;
     }
 
-    /* Titles */
+    /* ========== TITLES ========== */
     .main-title {
-        font-size: 2.4rem;
+        font-size: 2.6rem;
         font-weight: 800;
         color: #2B2B26;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.15rem;
+        letter-spacing: -0.5px;
     }
     .sub-title {
         color: #5a5a52;
-        font-size: 1.05rem;
-        margin-bottom: 1.8rem;
+        font-size: 1.08rem;
+        margin-bottom: 2rem;
+        font-weight: 400;
     }
 
-    /* Cards */
+    /* ========== MEMBER CARDS ========== */
     .member-card {
         background: #ffffff;
-        border-radius: 14px;
-        padding: 1.3rem;
-        border: 1px solid #e0dcd3;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        margin-bottom: 1rem;
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid #e8e4db;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+        margin-bottom: 1.2rem;
+        transition: all 0.2s ease;
     }
+    .member-card:hover {
+        box-shadow: 0 6px 24px rgba(0,0,0,0.07);
+        transform: translateY(-2px);
+    }
+
+    /* ========== PLATE / MEAL CARDS ========== */
     .plate-card {
         background: #ffffff;
-        border-radius: 12px;
-        padding: 1.2rem 1.4rem;
+        border-radius: 14px;
+        padding: 1.4rem 1.6rem;
         border-left: 5px solid #D9971C;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-        margin-bottom: 1.2rem;
+        box-shadow: 0 3px 14px rgba(0,0,0,0.04);
+        margin-bottom: 1.4rem;
         color: #2B2B26;
     }
 
-    /* Macro boxes */
+    /* ========== MACRO BOXES ========== */
     .macro-box {
         background: #F5EFE0;
         color: #2B2B26;
         border-radius: 8px;
-        padding: 0.45rem 0.7rem;
-        font-size: 0.88rem;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.86rem;
         font-weight: 600;
         display: inline-block;
         margin-right: 6px;
-        margin-top: 4px;
+        margin-top: 5px;
+        border: 1px solid #ebe4d4;
     }
 
-    /* Buttons */
+    /* ========== BUTTONS ========== */
     .stButton > button {
-        border-radius: 8px;
-        font-weight: 600;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
         background-color: #D9971C !important;
         color: white !important;
-        border: none;
+        border: none !important;
+        padding: 0.55rem 1.2rem !important;
+        transition: all 0.2s ease;
     }
     .stButton > button:hover {
         background-color: #c48412 !important;
         color: white !important;
+        box-shadow: 0 4px 12px rgba(217, 151, 28, 0.25);
     }
 
-    /* Metrics */
+    /* ========== METRICS ========== */
     [data-testid="stMetricValue"] {
         color: #2B2B26 !important;
-        font-weight: 700;
+        font-weight: 700 !important;
+        font-size: 1.5rem !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #5a5a52 !important;
+        font-weight: 500 !important;
     }
 
-    /* General text */
+    /* ========== GENERAL TEXT ========== */
     p, h1, h2, h3, h4, h5, h6, label, span, div {
         color: #2B2B26;
+    }
+
+    /* ========== EXPANDER ========== */
+    .streamlit-expanderHeader {
+        background-color: #ffffff;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    /* ========== INPUTS ========== */
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input,
+    .stSelectbox > div > div {
+        border-radius: 8px !important;
+        border: 1px solid #ddd8ce !important;
+    }
+
+    /* ========== SUCCESS / INFO BOXES ========== */
+    .stSuccess, .stInfo, .stWarning {
+        border-radius: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
