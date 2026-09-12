@@ -107,18 +107,24 @@ st.markdown("""
 # ---------------- LOAD DATA ----------------
 @st.cache_data
 def load_recipes():
-    paths = [
-        "/content/drive/MyDrive/NutriNest/cleaned/nutrinest_recipes_clean.csv",
-        "/content/drive/MyDrive/NutriNest/cleaned/nutrinest_recipes_clean.csv",
-        "/content/drive/MyDrive/NutriNest (1)/cleaned/nutrinest_recipes_clean.csv",
+    # Pehle local file try karo (GitHub pe jo humne daali hai)
+    local_paths = [
+        "data/recipes.csv",
+        "./data/recipes.csv",
+        "recipes.csv"
     ]
-    for p in paths:
-        if os.path.exists(p):
-            df = pd.read_csv(p)
-            df.columns = [c.lower().strip() for c in df.columns]
-            return df
+    
+    for path in local_paths:
+        if os.path.exists(path):
+            try:
+                df = pd.read_csv(path)
+                df.columns = [c.lower().strip() for c in df.columns]
+                return df
+            except Exception as e:
+                st.warning(f"Error loading {path}: {e}")
+    
+    # Agar local file na mile to empty DataFrame return karo
     return pd.DataFrame()
-
 recipes_df = load_recipes()
 
 # ---------------- GROQ CLIENT ----------------
