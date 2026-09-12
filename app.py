@@ -16,108 +16,134 @@ st.set_page_config(
 # ---------------- PROFESSIONAL UI ----------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
 
     .stApp {
-        background-color: #F7F4EE !important;
-        font-family: 'Inter', sans-serif !important;
+        background: #F3F0E9 !important;
         color: #1C1917 !important;
     }
 
-    /* Force dark text */
-    .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, 
-    .stApp h5, .stApp h6, .stApp label, .stApp span, .stApp div {
+    /* Dark text force */
+    .stApp p, .stApp span, .stApp label, .stApp div, 
+    .stApp h1, .stApp h2, .stApp h3, .stApp h4 {
         color: #1C1917 !important;
     }
 
-    /* Sidebar */
+    /* Sidebar - Deep Green */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #14532D 0%, #166534 100%) !important;
+        background: linear-gradient(180deg, #0F3D2E 0%, #1B5E4B 100%) !important;
+        border-right: none !important;
     }
     [data-testid="stSidebar"] * {
         color: #F0FDF4 !important;
     }
     [data-testid="stSidebar"] .stRadio label {
+        font-size: 0.97rem !important;
         font-weight: 500 !important;
-        font-size: 0.95rem !important;
+        padding: 4px 0 !important;
     }
 
-    /* Titles */
+    /* Main Title */
     .main-title {
-        font-size: 2.6rem !important;
+        font-size: 2.8rem !important;
         font-weight: 800 !important;
-        color: #14532D !important;
-        letter-spacing: -0.8px !important;
-        margin-bottom: 0.15rem !important;
+        color: #0F3D2E !important;
+        letter-spacing: -1.2px !important;
+        margin-bottom: 0.1rem !important;
     }
     .sub-title {
         color: #57534E !important;
-        font-size: 1.05rem !important;
-        margin-bottom: 2rem !important;
+        font-size: 1.1rem !important;
         font-weight: 500 !important;
+        margin-bottom: 2.3rem !important;
     }
 
-    /* Cards */
+    /* Member Cards */
     .member-card {
         background: #FFFFFF !important;
-        border-radius: 16px !important;
-        padding: 1.5rem !important;
+        border-radius: 20px !important;
+        padding: 1.7rem !important;
         border: 1px solid #E7E5E4 !important;
-        box-shadow: 0 4px 18px rgba(0,0,0,0.04) !important;
-        margin-bottom: 1.2rem !important;
+        box-shadow: 0 8px 30px rgba(15, 61, 46, 0.06) !important;
+        margin-bottom: 1.4rem !important;
+        transition: all 0.25s ease !important;
+    }
+    .member-card:hover {
+        transform: translateY(-4px) !important;
+        box-shadow: 0 14px 40px rgba(15, 61, 46, 0.1) !important;
     }
     .member-card h3 {
-        color: #14532D !important;
-        margin: 0 0 0.3rem 0 !important;
+        color: #0F3D2E !important;
+        font-weight: 700 !important;
+        margin: 0 0 0.4rem 0 !important;
     }
 
+    /* Plate Cards */
     .plate-card {
         background: #FFFFFF !important;
-        border-radius: 14px !important;
-        padding: 1.4rem 1.6rem !important;
-        border-left: 5px solid #D97706 !important;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.04) !important;
-        margin-bottom: 1.3rem !important;
+        border-radius: 18px !important;
+        padding: 1.6rem 1.8rem !important;
+        border-left: 6px solid #D97706 !important;
+        box-shadow: 0 6px 25px rgba(0,0,0,0.04) !important;
+        margin-bottom: 1.5rem !important;
     }
     .plate-card h3 {
-        color: #14532D !important;
+        color: #0F3D2E !important;
+        font-weight: 700 !important;
         margin-top: 0 !important;
     }
 
-    /* Macro pills */
+    /* Macro Pills */
     .macro-box {
         background: #ECFDF5 !important;
         color: #065F46 !important;
         border-radius: 50px !important;
-        padding: 0.35rem 0.8rem !important;
-        font-size: 0.82rem !important;
+        padding: 0.4rem 0.9rem !important;
+        font-size: 0.84rem !important;
         font-weight: 600 !important;
         display: inline-block !important;
-        margin: 4px 5px 0 0 !important;
+        margin: 5px 6px 0 0 !important;
         border: 1px solid #A7F3D0 !important;
     }
 
-    /* Buttons */
+    /* Buttons - Gold */
     .stButton > button {
-        background: #D97706 !important;
+        background: linear-gradient(135deg, #D97706, #B45309) !important;
         color: white !important;
-        border-radius: 10px !important;
-        font-weight: 600 !important;
         border: none !important;
-        padding: 0.55rem 1.3rem !important;
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        padding: 0.65rem 1.5rem !important;
+        box-shadow: 0 4px 15px rgba(217, 119, 6, 0.25) !important;
+        transition: all 0.2s ease !important;
     }
     .stButton > button:hover {
-        background: #B45309 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 20px rgba(217, 119, 6, 0.35) !important;
         color: white !important;
     }
 
     /* Metrics */
     [data-testid="stMetricValue"] {
-        color: #14532D !important;
+        color: #0F3D2E !important;
         font-weight: 700 !important;
+        font-size: 1.6rem !important;
     }
     [data-testid="stMetricLabel"] {
         color: #57534E !important;
+        font-weight: 500 !important;
+    }
+
+    /* Inputs */
+    .stTextInput input, .stNumberInput input {
+        border-radius: 10px !important;
+        border: 1.5px solid #D6D3D1 !important;
+        background: white !important;
+        color: #1C1917 !important;
     }
 </style>
 """, unsafe_allow_html=True)
