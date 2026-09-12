@@ -16,134 +16,98 @@ st.set_page_config(
 # ---------------- PROFESSIONAL UI ----------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-    html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
-    }
-
+    /* ===== FORCE RESET ===== */
     .stApp {
-        background: #F3F0E9 !important;
-        color: #1C1917 !important;
+        background-color: #F5F0E8 !important;
     }
 
-    /* Dark text force */
-    .stApp p, .stApp span, .stApp label, .stApp div, 
-    .stApp h1, .stApp h2, .stApp h3, .stApp h4 {
-        color: #1C1917 !important;
+    /* ===== FORCE DARK TEXT EVERYWHERE ===== */
+    .stApp, .stApp * {
+        color: #1A1A1A !important;
     }
 
-    /* Sidebar - Deep Green */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0F3D2E 0%, #1B5E4B 100%) !important;
-        border-right: none !important;
-    }
+    /* Sidebar exception - white text */
+    [data-testid="stSidebar"], 
     [data-testid="stSidebar"] * {
-        color: #F0FDF4 !important;
-    }
-    [data-testid="stSidebar"] .stRadio label {
-        font-size: 0.97rem !important;
-        font-weight: 500 !important;
-        padding: 4px 0 !important;
+        color: #FFFFFF !important;
+        background-color: #1B4332 !important;
     }
 
-    /* Main Title */
-    .main-title {
-        font-size: 2.8rem !important;
-        font-weight: 800 !important;
-        color: #0F3D2E !important;
-        letter-spacing: -1.2px !important;
-        margin-bottom: 0.1rem !important;
-    }
-    .sub-title {
-        color: #57534E !important;
-        font-size: 1.1rem !important;
-        font-weight: 500 !important;
-        margin-bottom: 2.3rem !important;
+    /* ===== CARDS ===== */
+    div[class*="member-card"], 
+    div[class*="plate-card"],
+    .member-card, .plate-card {
+        background-color: #FFFFFF !important;
+        color: #1A1A1A !important;
+        border-radius: 16px !important;
+        padding: 1.5rem !important;
+        border: 1px solid #E5E0D8 !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important;
+        margin-bottom: 1.2rem !important;
     }
 
-    /* Member Cards */
-    .member-card {
-        background: #FFFFFF !important;
-        border-radius: 20px !important;
-        padding: 1.7rem !important;
-        border: 1px solid #E7E5E4 !important;
-        box-shadow: 0 8px 30px rgba(15, 61, 46, 0.06) !important;
-        margin-bottom: 1.4rem !important;
-        transition: all 0.25s ease !important;
-    }
-    .member-card:hover {
-        transform: translateY(-4px) !important;
-        box-shadow: 0 14px 40px rgba(15, 61, 46, 0.1) !important;
-    }
-    .member-card h3 {
-        color: #0F3D2E !important;
+    .member-card h3, .plate-card h3,
+    div[class*="member-card"] h3, 
+    div[class*="plate-card"] h3 {
+        color: #1B4332 !important;
         font-weight: 700 !important;
-        margin: 0 0 0.4rem 0 !important;
     }
 
-    /* Plate Cards */
-    .plate-card {
-        background: #FFFFFF !important;
-        border-radius: 18px !important;
-        padding: 1.6rem 1.8rem !important;
-        border-left: 6px solid #D97706 !important;
-        box-shadow: 0 6px 25px rgba(0,0,0,0.04) !important;
-        margin-bottom: 1.5rem !important;
-    }
-    .plate-card h3 {
-        color: #0F3D2E !important;
-        font-weight: 700 !important;
-        margin-top: 0 !important;
-    }
-
-    /* Macro Pills */
+    /* ===== MACRO BOX ===== */
     .macro-box {
-        background: #ECFDF5 !important;
-        color: #065F46 !important;
-        border-radius: 50px !important;
-        padding: 0.4rem 0.9rem !important;
-        font-size: 0.84rem !important;
+        background-color: #E8F5E9 !important;
+        color: #1B4332 !important;
+        border-radius: 8px !important;
+        padding: 0.35rem 0.8rem !important;
+        font-size: 0.85rem !important;
         font-weight: 600 !important;
         display: inline-block !important;
-        margin: 5px 6px 0 0 !important;
-        border: 1px solid #A7F3D0 !important;
+        margin: 4px 5px 0 0 !important;
     }
 
-    /* Buttons - Gold */
+    /* ===== BUTTONS ===== */
     .stButton > button {
-        background: linear-gradient(135deg, #D97706, #B45309) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 12px !important;
+        background-color: #D97706 !important;
+        color: #FFFFFF !important;
+        border-radius: 10px !important;
         font-weight: 600 !important;
-        padding: 0.65rem 1.5rem !important;
-        box-shadow: 0 4px 15px rgba(217, 119, 6, 0.25) !important;
-        transition: all 0.2s ease !important;
+        border: none !important;
     }
     .stButton > button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px 20px rgba(217, 119, 6, 0.35) !important;
-        color: white !important;
+        background-color: #B45309 !important;
+        color: #FFFFFF !important;
+    }
+    .stButton > button * {
+        color: #FFFFFF !important;
     }
 
-    /* Metrics */
+    /* ===== METRICS ===== */
     [data-testid="stMetricValue"] {
-        color: #0F3D2E !important;
+        color: #1B4332 !important;
         font-weight: 700 !important;
-        font-size: 1.6rem !important;
     }
     [data-testid="stMetricLabel"] {
-        color: #57534E !important;
-        font-weight: 500 !important;
+        color: #4A5568 !important;
     }
 
-    /* Inputs */
-    .stTextInput input, .stNumberInput input {
-        border-radius: 10px !important;
-        border: 1.5px solid #D6D3D1 !important;
-        background: white !important;
-        color: #1C1917 !important;
+    /* ===== INPUTS ===== */
+    .stTextInput input, 
+    .stNumberInput input,
+    .stSelectbox div[data-baseweb="select"] {
+        background-color: #FFFFFF !important;
+        color: #1A1A1A !important;
+        border-radius: 8px !important;
+    }
+
+    /* ===== TITLES ===== */
+    .main-title {
+        color: #1B4332 !important;
+        font-size: 2.6rem !important;
+        font-weight: 800 !important;
+    }
+    .sub-title {
+        color: #4A5568 !important;
+        font-size: 1.05rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
