@@ -10,6 +10,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+st.markdown("""
+<div style="background: linear-gradient(90deg, #134E3A, #166534); 
+            color: white; 
+            padding: 12px 20px; 
+            border-radius: 12px; 
+            font-weight: 600; 
+            margin-bottom: 25px;
+            text-align: center;">
+    ✨ NutriNest — Fresh Professional Design Loaded
+</div>
+""", unsafe_allow_html=True)
 # ===================== FRESH PROFESSIONAL DESIGN =====================
 st.markdown("""
 <style>
