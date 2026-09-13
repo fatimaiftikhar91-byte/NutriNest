@@ -26,172 +26,141 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-html, body, [class*="css"]  {
+html, body, [class*="css"] {
     font-family: 'Inter', sans-serif !important;
 }
 
+/* ===== MAIN BACKGROUND (Soft Cream Pastel) ===== */
 .stApp {
-    background-color: #F8F6F1 !important;
+    background-color: #F7F3EB !important;
 }
 
-/* Force dark text */
+/* ===== FORCE DARK TEXT EVERYWHERE ===== */
 .stApp p, .stApp span, .stApp div, .stApp label,
-.stApp h1, .stApp h2, .stApp h3, .stApp h4 {
-    color: #1C1917 !important;
+.stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6 {
+    color: #1F1F1F !important;
 }
 
-/* Sidebar */
+/* ===== SIDEBAR (Deep Sage) ===== */
 section[data-testid="stSidebar"] {
-    background-color: #134E3A !important;
+    background-color: #2F5D50 !important;
 }
 section[data-testid="stSidebar"] * {
-    color: #F0FDF4 !important;
+    color: #F4F7F5 !important;
 }
 section[data-testid="stSidebar"] .stRadio label {
     font-size: 0.95rem !important;
     font-weight: 500 !important;
+    padding: 5px 0 !important;
+}
+section[data-testid="stSidebar"] label {
+    color: #F4F7F5 !important;
 }
 
-/* Header */
+/* ===== HEADER ===== */
 .big-title {
-    font-size: 2.6rem;
-    font-weight: 800;
-    color: #134E3A !important;
-    letter-spacing: -1px;
-    margin-bottom: 0.2rem;
+    font-size: 2.6rem !important;
+    font-weight: 800 !important;
+    color: #2F5D50 !important;
+    letter-spacing: -0.8px !important;
+    margin-bottom: 0.2rem !important;
 }
 .subtitle {
-    color: #57534E !important;
-    font-size: 1.05rem;
-    margin-bottom: 2.2rem;
+    color: #5C5C5C !important;
+    font-size: 1.05rem !important;
+    margin-bottom: 2.2rem !important;
+    font-weight: 500 !important;
 }
 
-/* Cards */
-.card {
-    background: white;
-    border-radius: 18px;
-    padding: 1.6rem;
-    border: 1px solid #E7E5E4;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    margin-bottom: 1.3rem;
+/* ===== CARDS (Soft Mint Pastel) ===== */
+.card, .meal-card {
+    background: #E8F0EB !important;
+    border-radius: 18px !important;
+    padding: 1.6rem !important;
+    border: 1px solid #D1E0D7 !important;
+    box-shadow: 0 4px 18px rgba(47, 93, 80, 0.06) !important;
+    margin-bottom: 1.3rem !important;
 }
-.card h3 {
-    color: #134E3A !important;
-    font-weight: 700;
-    margin: 0 0 0.4rem 0;
+.card h3, .meal-card h3 {
+    color: #2F5D50 !important;
+    font-weight: 700 !important;
+    margin: 0 0 0.4rem 0 !important;
 }
+
+/* Value text */
 .card-value {
-    font-size: 1.9rem;
-    font-weight: 700;
-    color: #D97706 !important;
-    margin: 0.6rem 0;
+    font-size: 1.85rem !important;
+    font-weight: 700 !important;
+    color: #C48A2A !important;
+    margin: 0.6rem 0 !important;
 }
 
-/* Pills */
+/* ===== PILLS ===== */
 .pill {
-    display: inline-block;
-    background: #ECFDF5;
-    color: #065F46 !important;
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin: 3px 4px 0 0;
-    border: 1px solid #A7F3D0;
+    display: inline-block !important;
+    background: #D8EBE0 !important;
+    color: #1F4A3C !important;
+    padding: 0.32rem 0.85rem !important;
+    border-radius: 20px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    margin: 4px 5px 0 0 !important;
+    border: 1px solid #B8D6C6 !important;
 }
 
-/* Meal card */
-.meal-card {
-    background: white;
-    border-radius: 16px;
-    padding: 1.5rem 1.7rem;
-    border-left: 6px solid #D97706;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.04);
-    margin-bottom: 1.4rem;
-}
-.meal-card h3 {
-    color: #134E3A !important;
-    margin-top: 0;
-    font-weight: 700;
-}
-
-/* Buttons */
+/* ===== BUTTONS (Soft Gold) ===== */
 .stButton > button {
-    background-color: #D97706 !important;
-    color: white !important;
+    background-color: #C48A2A !important;
+    color: #FFFFFF !important;
     border: none !important;
     border-radius: 11px !important;
     font-weight: 600 !important;
     padding: 0.6rem 1.4rem !important;
+    box-shadow: 0 3px 10px rgba(196, 138, 42, 0.2) !important;
 }
 .stButton > button:hover {
-    background-color: #B45309 !important;
-    color: white !important;
+    background-color: #A87320 !important;
+    color: #FFFFFF !important;
 }
 .stButton > button * {
-    color: white !important;
+    color: #FFFFFF !important;
 }
 
-/* Metrics */
+/* ===== INPUTS (Clean + Dark Text) ===== */
+.stTextInput input,
+.stNumberInput input,
+.stSelectbox div[data-baseweb="select"] > div {
+    background-color: #FFFFFF !important;
+    color: #1F1F1F !important;
+    border: 1.5px solid #D6D0C4 !important;
+    border-radius: 9px !important;
+}
+.stTextInput input::placeholder {
+    color: #8A8A8A !important;
+}
+.stSelectbox [data-baseweb="select"] span {
+    color: #1F1F1F !important;
+}
+
+/* ===== METRICS ===== */
 [data-testid="stMetricValue"] {
-    color: #134E3A !important;
+    color: #2F5D50 !important;
     font-weight: 700 !important;
 }
 [data-testid="stMetricLabel"] {
-    color: #57534E !important;
+    color: #5C5C5C !important;
+}
+
+/* ===== EXPANDER ===== */
+.streamlit-expanderHeader {
+    background-color: #E8F0EB !important;
+    color: #1F1F1F !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    border: 1px solid #D1E0D7 !important;
 }
 </style>
 """, unsafe_allow_html=True)
-
-# ===================== DATA =====================
-@st.cache_data
-def load_recipes():
-    for path in ["data/recipes.csv", "./data/recipes.csv", "recipes.csv"]:
-        if os.path.exists(path):
-            try:
-                df = pd.read_csv(path)
-                if len(df) > 0:
-                    df.columns = [str(c).lower().strip().replace(" ", "_") for c in df.columns]
-                    return df
-            except:
-                pass
-    # fallback
-    return pd.DataFrame([
-        {"recipe_name": "Chicken Karahi", "meal_type": "lunch", "cuisine": "Pakistani", "calories": 320, "protein_g": 30, "ingredients": "Chicken, Tomato, Onion, Spices"},
-        {"recipe_name": "Chicken Biryani", "meal_type": "lunch", "cuisine": "Pakistani", "calories": 480, "protein_g": 27, "ingredients": "Chicken, Rice, Yogurt, Spices"},
-        {"recipe_name": "Daal Chawal", "meal_type": "dinner", "cuisine": "Pakistani", "calories": 420, "protein_g": 16, "ingredients": "Lentils, Rice, Onion, Spices"},
-        {"recipe_name": "Vegetable Omelette", "meal_type": "breakfast", "cuisine": "Pakistani", "calories": 220, "protein_g": 14, "ingredients": "Eggs, Onion, Tomato"},
-        {"recipe_name": "Chana Chaat", "meal_type": "snack", "cuisine": "Pakistani", "calories": 260, "protein_g": 11, "ingredients": "Chickpeas, Onion, Tomato, Lemon"},
-        {"recipe_name": "Chicken Tikka", "meal_type": "dinner", "cuisine": "Pakistani", "calories": 290, "protein_g": 36, "ingredients": "Chicken, Yogurt, Spices"},
-        {"recipe_name": "Palak Paneer", "meal_type": "lunch", "cuisine": "Pakistani", "calories": 350, "protein_g": 18, "ingredients": "Spinach, Paneer, Spices"},
-        {"recipe_name": "Aloo Keema", "meal_type": "dinner", "cuisine": "Pakistani", "calories": 350, "protein_g": 25, "ingredients": "Minced Meat, Potato, Spices"},
-    ])
-
-recipes_df = load_recipes()
-
-def calculate_nutrition(age, sex, height_cm, weight_kg, activity, goal):
-    if sex.lower() == "male":
-        bmr = 10*weight_kg + 6.25*height_cm - 5*age + 5
-    else:
-        bmr = 10*weight_kg + 6.25*height_cm - 5*age - 161
-    mult = {"sedentary":1.2,"light":1.375,"moderate":1.55,"active":1.725,"very_active":1.9}
-    tdee = bmr * mult.get(activity, 1.55)
-    target = tdee - 400 if goal=="weight_loss" else (tdee + 300 if goal=="weight_gain" else tdee)
-    return {
-        "BMI": round(weight_kg/((height_cm/100)**2),1),
-        "Target": round(target),
-        "Protein": round(target*0.25/4),
-        "Carbs": round(target*0.50/4),
-        "Fat": round(target*0.25/9),
-        "Fiber": 30
-    }
-
-# Session
-for key in ["family", "logs", "meal_plan", "workouts", "pantry"]:
-    if key not in st.session_state:
-        st.session_state[key] = [] if key != "meal_plan" else None
-if "budget" not in st.session_state:
-    st.session_state.budget = {"daily": 900}
 
 # ===================== SIDEBAR =====================
 with st.sidebar:
