@@ -46,8 +46,8 @@ div[data-baseweb="select"] > div { border-radius:12px!important; }
 .quote { font-size:1.18rem; font-weight:850; color:#3d5948!important; }
 .quote-category { margin-top:.35rem; color:#78847d!important; font-size:.8rem; }
 .slideshow { position:relative; height:205px; overflow:hidden; border-radius:26px; margin:1rem 0 1.3rem; }
-.slide { position:absolute; inset:0; padding:2rem; display:flex; flex-direction:column; justify-content:center; opacity:0; animation:slideFade 25s infinite; }
-.slide:nth-child(1){background:linear-gradient(120deg,#e6f0e6,#f5f9f4);}
+.slide { position:absolute; inset:0; padding:2rem; display:flex; flex-direction:column; justify-content:center; opacity:0; animation:slideFade 25s infinite both; }
+.slide:nth-child(1){background:linear-gradient(120deg,#e6f0e6,#f5f9f4);animation-delay:0s;}
 .slide:nth-child(2){background:linear-gradient(120deg,#fbe8dc,#fff5ed);animation-delay:5s;}
 .slide:nth-child(3){background:linear-gradient(120deg,#eeeaf7,#f8f6fc);animation-delay:10s;}
 .slide:nth-child(4){background:linear-gradient(120deg,#fff1c9,#fff9e8);animation-delay:15s;}
@@ -134,7 +134,7 @@ recipes_df, recipe_source = load_recipes()
 # ============================================================
 def init_state():
     defaults = {
-        "page":"Dashboard", "family":[], "pantry":[], "favorites":[], "shopping_list":[],
+        "page":"Dashboard", "nav_history":[], "family":[], "pantry":[], "favorites":[], "shopping_list":[],
         "meal_plan":None, "workouts":{}, "logs":[],
         "budget_period":"Monthly", "budget_amount":30000,
         "budget_spent":0.0, "allocations":{}, "budget_entry_mode":"Household Total",
@@ -147,8 +147,34 @@ def init_state():
 init_state()
 
 
-def go(page):
+def go(page, remember=True):
+    current = st.session_state.get("page", "Dashboard")
+    if page == current:
+        return
+    if remember and current != "Dashboard":
+        history = st.session_state.setdefault("nav_history", [])
+        if not history or history[-1] != current:
+            history.append(current)
+        # Keep the in-app history compact and predictable.
+        st.session_state.nav_history = history[-12:]
     st.session_state.page = page
+    st.rerun()
+
+
+def go_back():
+    history = st.session_state.get("nav_history", [])
+    if history:
+        previous = history.pop()
+        st.session_state.nav_history = history
+        st.session_state.page = previous
+    else:
+        st.session_state.page = "Dashboard"
+    st.rerun()
+
+
+def go_dashboard():
+    st.session_state.nav_history = []
+    st.session_state.page = "Dashboard"
     st.rerun()
 
 
@@ -465,9 +491,32 @@ def dashboard():
                 st.info("Meal distribution will appear after logging meals.")
 
 # ============================================================
+# IN-APP PAGE NAVIGATION
+# ============================================================
+def page_nav():
+    page = st.session_state.get("page", "Dashboard")
+    if page == "Dashboard":
+        return
+    st.markdown('<div class="section-title">Navigation</div>', unsafe_allow_html=True)
+    left, middle, right = st.columns([1, 1.2, 4.8])
+    with left:
+        if st.button("← Back", key=f"back_{page}", use_container_width=True):
+            go_back()
+    with middle:
+        if st.button("⌂ Dashboard", key=f"home_{page}", use_container_width=True):
+            go_dashboard()
+    with right:
+        trail = ["Dashboard"] + st.session_state.get("nav_history", []) + [page]
+        # Show only the last few labels so the navigation never becomes crowded.
+        trail = trail[-4:]
+        st.caption("  ›  ".join(trail))
+
+
+# ============================================================
 # FAMILY
 # ============================================================
 def family_page():
+    page_nav()
     st.markdown('<div class="page-header"><h1>👨‍👩‍👧‍👦 Family Profiles</h1><p>Personalize nutrition, allergies, goals, portions and workouts for each member.</p></div>',unsafe_allow_html=True)
     with st.form("family_form",clear_on_submit=True):
         a,b=st.columns(2)
@@ -507,6 +556,7 @@ def family_page():
 # PANTRY
 # ============================================================
 def pantry_page():
+    page_nav()
     st.markdown('<div class="page-header"><h1>🧺 Smart Pantry</h1><p>Select what you already have. NutriNest will prioritize recipes with the highest pantry match.</p></div>',unsafe_allow_html=True)
     selected=[]
     for category,items in PANTRY_CATEGORIES.items():
@@ -541,6 +591,7 @@ def pantry_page():
 # RECIPES
 # ============================================================
 def recipes_page():
+    page_nav()
     st.markdown('<div class="page-header"><h1>🍛 Recipe Explorer</h1><p>Search by recipe, meal type, cuisine, nutrition and pantry availability.</p></div>',unsafe_allow_html=True)
     if recipes_df.empty:
         st.error("Recipe dataset not found. Put it at data/nutrinest_recipes_clean.csv or data/recipes.csv.")
@@ -592,6 +643,7 @@ def recipes_page():
 # BUDGET
 # ============================================================
 def budget_page():
+    page_nav()
     st.markdown('<div class="page-header"><h1>💰 Budget & Shopping</h1><p>Manage daily, weekly or monthly household spending, optional member allocations and your shopping list.</p></div>',unsafe_allow_html=True)
 
     period=st.selectbox(
@@ -737,6 +789,7 @@ Return ONLY JSON: {{"days":[{{"day":1,"meals":[{{"meal":"Breakfast","main":"Reci
 
 
 def meal_page():
+    page_nav()
     st.markdown('<div class="page-header"><h1>🍽️ Smart Family Meal Planner</h1><p>Plan shared meals around goals, allergies, pantry ingredients, cuisine, preferences and budget.</p></div>',unsafe_allow_html=True)
     if not st.session_state.family:
         st.warning("Add at least one family member first."); return
@@ -817,6 +870,7 @@ def generate_ai_workout(member):
 
 
 def workout_page():
+    page_nav()
     st.markdown('<div class="page-header"><h1>💪 Workout Planner</h1><p>Personalized 7-day routines based on goals, activity, location and equipment.</p></div>',unsafe_allow_html=True)
     if not st.session_state.family: st.warning("Add a family member first."); return
     selected=st.selectbox("Select Member",[m["name"] for m in st.session_state.family])
@@ -846,6 +900,7 @@ def workout_page():
 # PROGRESS
 # ============================================================
 def progress_page():
+    page_nav()
     st.markdown('<div class="page-header"><h1>📊 Progress Tracker</h1><p>Track weight, BMI, calories, protein, meals and workout completion.</p></div>',unsafe_allow_html=True)
     if not st.session_state.family: st.warning("Add a family member first."); return
     selected=st.selectbox("Select Member",[m["name"] for m in st.session_state.family])
@@ -917,6 +972,7 @@ def progress_page():
 # FAVORITES
 # ============================================================
 def favorites_page():
+    page_nav()
     st.markdown('<div class="page-header"><h1>❤️ Favorites</h1><p>Your saved recipes in one place.</p></div>',unsafe_allow_html=True)
     if not st.session_state.favorites: st.info("No favorites yet. Save recipes from Recipe Explorer."); return
     if recipes_df.empty:return
@@ -932,31 +988,54 @@ def favorites_page():
 # ============================================================
 # ROUTER + NAVIGATION
 # ============================================================
-# Sidebar is deliberately NOT used as primary feature navigation.
-# The dashboard cards are the primary navigation requested by the user.
+page = st.session_state.get("page", "Dashboard")
+
 with st.sidebar:
     st.markdown("## 🥗 NutriNest")
     st.caption("Family Nutrition & Wellness")
     st.divider()
-    st.caption("Dashboard cards are the main navigation.")
-    if st.button("🏠 Dashboard",use_container_width=True): go("Dashboard")
-    st.divider()
-    st.caption("System")
-    st.write("AI: " + ("Connected" if client else "Fallback mode"))
-    st.write("Recipes: " + ("Connected" if not recipes_df.empty else "Not found"))
-    st.caption("Use Streamlit Secrets for GROQ_API_KEY. Never upload secrets.toml to GitHub.")
 
-page=st.session_state.page
-if page=="Dashboard": dashboard()
-elif page=="Family Profiles": family_page()
-elif page=="Smart Pantry": pantry_page()
-elif page=="Recipe Explorer": recipes_page()
-elif page=="Budget & Shopping": budget_page()
-elif page=="Meal Planner": meal_page()
-elif page=="Workout Planner": workout_page()
-elif page=="Progress": progress_page()
-elif page=="Favorites": favorites_page()
-else: st.session_state.page="Dashboard"; st.rerun()
+    if page == "Dashboard":
+        st.success("🏠 Dashboard active")
+    else:
+        if st.button("🏠 Dashboard", key="sidebar_dashboard", use_container_width=True):
+            go_dashboard()
+        if st.button("← Back to previous page", key="sidebar_back", use_container_width=True):
+            go_back()
+
+    st.divider()
+    st.caption(f"Current page: {page}")
+    st.caption("Use the cards on Dashboard and the Back / Dashboard buttons inside each module.")
+
+    st.markdown("### System status")
+    st.write("AI: " + ("🟢 Connected" if client else "🟡 Fallback mode"))
+    st.write("Recipes: " + ("🟢 Loaded" if not recipes_df.empty else "🔴 Not found"))
+    st.write(f"Family: {len(st.session_state.family)} member(s)")
+    st.write(f"Pantry: {len(st.session_state.pantry)} item(s)")
+    st.caption("Groq uses Streamlit Secrets. Keep secrets.toml out of GitHub.")
+
+if page == "Dashboard":
+    dashboard()
+elif page == "Family Profiles":
+    family_page()
+elif page == "Smart Pantry":
+    pantry_page()
+elif page == "Recipe Explorer":
+    recipes_page()
+elif page == "Budget & Shopping":
+    budget_page()
+elif page == "Meal Planner":
+    meal_page()
+elif page == "Workout Planner":
+    workout_page()
+elif page == "Progress":
+    progress_page()
+elif page == "Favorites":
+    favorites_page()
+else:
+    st.session_state.page = "Dashboard"
+    st.session_state.nav_history = []
+    st.rerun()
 
 st.markdown("""
 <div class="footer-note">🥗 <b>NutriNest</b> · Smart Family Nutrition & Wellness<br>Eat well · Move well · Live well 💚<br><br>NutriNest provides general wellness planning and is not a substitute for medical diagnosis or clinical treatment.</div>
