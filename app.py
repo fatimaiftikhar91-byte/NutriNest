@@ -5,7 +5,7 @@ import os
 from datetime import date
 import plotly.express as px
 
-# ---------------- PAGE CONFIG ----------------
+# Page config
 st.set_page_config(
     page_title="NutriNest",
     page_icon="🥗",
@@ -13,106 +13,153 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ---------------- PROFESSIONAL UI ----------------
+# ===================== CLEAN PROFESSIONAL UI =====================
 st.markdown("""
 <style>
-    /* ===== FORCE RESET ===== */
-    .stApp {
-        background-color: #F5F0E8 !important;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-    /* ===== FORCE DARK TEXT EVERYWHERE ===== */
-    .stApp, .stApp * {
-        color: #1A1A1A !important;
-    }
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
 
-    /* Sidebar exception - white text */
-    [data-testid="stSidebar"], 
-    [data-testid="stSidebar"] * {
-        color: #FFFFFF !important;
-        background-color: #1B4332 !important;
-    }
+/* Main background - soft warm */
+.stApp {
+    background-color: #F8F6F1;
+    color: #1C1917;
+}
 
-    /* ===== CARDS ===== */
-    div[class*="member-card"], 
-    div[class*="plate-card"],
-    .member-card, .plate-card {
-        background-color: #FFFFFF !important;
-        color: #1A1A1A !important;
-        border-radius: 16px !important;
-        padding: 1.5rem !important;
-        border: 1px solid #E5E0D8 !important;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important;
-        margin-bottom: 1.2rem !important;
-    }
+/* Force readable dark text */
+.stApp p, .stApp span, .stApp label, .stApp div,
+.stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6 {
+    color: #1C1917 !important;
+}
 
-    .member-card h3, .plate-card h3,
-    div[class*="member-card"] h3, 
-    div[class*="plate-card"] h3 {
-        color: #1B4332 !important;
-        font-weight: 700 !important;
-    }
+/* ========== SIDEBAR ========== */
+[data-testid="stSidebar"] {
+    background-color: #134E3A !important;
+    border-right: none;
+}
+[data-testid="stSidebar"] * {
+    color: #F0FDF4 !important;
+}
+[data-testid="stSidebar"] .stRadio label {
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    padding: 6px 0 !important;
+}
+[data-testid="stSidebar"] .stRadio label:hover {
+    color: #BBF7D0 !important;
+}
 
-    /* ===== MACRO BOX ===== */
-    .macro-box {
-        background-color: #E8F5E9 !important;
-        color: #1B4332 !important;
-        border-radius: 8px !important;
-        padding: 0.35rem 0.8rem !important;
-        font-size: 0.85rem !important;
-        font-weight: 600 !important;
-        display: inline-block !important;
-        margin: 4px 5px 0 0 !important;
-    }
+/* ========== HEADER ========== */
+.main-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #134E3A !important;
+    letter-spacing: -0.8px;
+    margin-bottom: 0.15rem;
+}
+.sub-title {
+    color: #57534E !important;
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
+}
 
-    /* ===== BUTTONS ===== */
-    .stButton > button {
-        background-color: #D97706 !important;
-        color: #FFFFFF !important;
-        border-radius: 10px !important;
-        font-weight: 600 !important;
-        border: none !important;
-    }
-    .stButton > button:hover {
-        background-color: #B45309 !important;
-        color: #FFFFFF !important;
-    }
-    .stButton > button * {
-        color: #FFFFFF !important;
-    }
+/* ========== CARDS ========== */
+.member-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #E7E5E4;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    margin-bottom: 1.2rem;
+}
+.member-card h3 {
+    color: #134E3A !important;
+    font-weight: 700;
+    margin: 0 0 0.3rem 0;
+    font-size: 1.25rem;
+}
+.member-card p {
+    color: #57534E !important;
+    margin: 0;
+}
 
-    /* ===== METRICS ===== */
-    [data-testid="stMetricValue"] {
-        color: #1B4332 !important;
-        font-weight: 700 !important;
-    }
-    [data-testid="stMetricLabel"] {
-        color: #4A5568 !important;
-    }
+.plate-card {
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 1.4rem 1.6rem;
+    border-left: 5px solid #D97706;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    margin-bottom: 1.3rem;
+}
+.plate-card h3 {
+    color: #134E3A !important;
+    font-weight: 700;
+    margin-top: 0;
+    font-size: 1.15rem;
+}
 
-    /* ===== INPUTS ===== */
-    .stTextInput input, 
-    .stNumberInput input,
-    .stSelectbox div[data-baseweb="select"] {
-        background-color: #FFFFFF !important;
-        color: #1A1A1A !important;
-        border-radius: 8px !important;
-    }
+/* Macro pills */
+.macro-box {
+    background: #ECFDF5;
+    color: #065F46 !important;
+    border-radius: 20px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+    margin: 4px 4px 0 0;
+    border: 1px solid #A7F3D0;
+}
 
-    /* ===== TITLES ===== */
-    .main-title {
-        color: #1B4332 !important;
-        font-size: 2.6rem !important;
-        font-weight: 800 !important;
-    }
-    .sub-title {
-        color: #4A5568 !important;
-        font-size: 1.05rem !important;
-    }
+/* ========== BUTTONS ========== */
+.stButton > button {
+    background-color: #D97706 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    padding: 0.55rem 1.3rem !important;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2);
+}
+.stButton > button:hover {
+    background-color: #B45309 !important;
+    color: white !important;
+}
+.stButton > button * {
+    color: white !important;
+}
+
+/* ========== METRICS ========== */
+[data-testid="stMetricValue"] {
+    color: #134E3A !important;
+    font-weight: 700 !important;
+}
+[data-testid="stMetricLabel"] {
+    color: #57534E !important;
+}
+
+/* Inputs */
+.stTextInput input, .stNumberInput input {
+    border-radius: 8px !important;
+    border: 1.5px solid #D6D3D1 !important;
+    background: white !important;
+    color: #1C1917 !important;
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+    background-color: #FFFFFF !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    color: #1C1917 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- LOAD RECIPES ----------------
+# ===================== LOAD RECIPES =====================
 @st.cache_data
 def load_recipes():
     possible_paths = ["data/recipes.csv", "./data/recipes.csv", "recipes.csv"]
@@ -123,8 +170,6 @@ def load_recipes():
                 df = pd.read_csv(path)
                 if len(df) > 0:
                     df.columns = [str(c).lower().strip().replace(" ", "_") for c in df.columns]
-                    
-                    # Standardize column names
                     rename_map = {
                         "name": "recipe_name",
                         "recipe": "recipe_name",
@@ -135,15 +180,13 @@ def load_recipes():
                         "fat": "fat_g"
                     }
                     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
-                    
                     if "recipe_name" not in df.columns and len(df.columns) > 0:
                         df = df.rename(columns={df.columns[0]: "recipe_name"})
-                    
                     return df
-            except Exception as e:
-                st.warning(f"Could not load {path}: {e}")
+            except:
+                pass
     
-    # Fallback built-in recipes
+    # Fallback
     data = [
         {"recipe_name": "Chicken Karahi", "meal_type": "lunch", "cuisine": "Pakistani", "calories": 320, "protein_g": 30, "carbs_g": 10, "fat_g": 18, "ingredients": "Chicken, Tomato, Onion, Ginger, Garlic, Spices, Oil"},
         {"recipe_name": "Chicken Biryani", "meal_type": "lunch", "cuisine": "Pakistani", "calories": 480, "protein_g": 27, "carbs_g": 58, "fat_g": 15, "ingredients": "Chicken, Rice, Yogurt, Onion, Spices, Oil"},
@@ -160,7 +203,7 @@ def load_recipes():
 
 recipes_df = load_recipes()
 
-# ---------------- GROQ CLIENT ----------------
+# ===================== GROQ =====================
 def get_client():
     key = os.environ.get("GROQ_API_KEY")
     if key:
@@ -173,17 +216,14 @@ def get_client():
 
 client = get_client()
 
-# ---------------- NUTRITION CALCULATOR ----------------
+# ===================== NUTRITION =====================
 def calculate_nutrition(age, sex, height_cm, weight_kg, activity, goal):
     if sex.lower() == "male":
         bmr = 10 * weight_kg + 6.25 * height_cm - 5 * age + 5
     else:
         bmr = 10 * weight_kg + 6.25 * height_cm - 5 * age - 161
 
-    mult = {
-        "sedentary": 1.2, "light": 1.375, "moderate": 1.55,
-        "active": 1.725, "very_active": 1.9
-    }
+    mult = {"sedentary": 1.2, "light": 1.375, "moderate": 1.55, "active": 1.725, "very_active": 1.9}
     tdee = bmr * mult.get(activity, 1.55)
 
     if goal == "weight_loss":
@@ -204,7 +244,7 @@ def calculate_nutrition(age, sex, height_cm, weight_kg, activity, goal):
         "Fiber": 30
     }
 
-# ---------------- SESSION STATE ----------------
+# ===================== SESSION STATE =====================
 if "family" not in st.session_state:
     st.session_state.family = []
 if "logs" not in st.session_state:
@@ -218,7 +258,7 @@ if "pantry" not in st.session_state:
 if "budget" not in st.session_state:
     st.session_state.budget = {"daily": 900}
 
-# ---------------- SIDEBAR ----------------
+# ===================== SIDEBAR =====================
 with st.sidebar:
     st.markdown("### 🥗 NutriNest")
     st.caption("Family Nutrition & Fitness")
@@ -263,7 +303,7 @@ with st.sidebar:
                 }
                 st.session_state.family = [m for m in st.session_state.family if m["name"] != name]
                 st.session_state.family.append(member)
-                st.success(f"{name} saved successfully!")
+                st.success(f"{name} saved!")
 
     if st.session_state.family:
         for m in st.session_state.family:
@@ -272,13 +312,11 @@ with st.sidebar:
     st.markdown("---")
     st.session_state.budget["daily"] = st.number_input("Daily Budget (PKR)", 300, 5000, st.session_state.budget["daily"], 50)
 
-# ---------------- HEADER ----------------
+# ===================== HEADER =====================
 st.markdown('<p class="main-title">🥗 NutriNest</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Smart Family Nutrition • Shared Meals • Personalized Portions</p>', unsafe_allow_html=True)
 
-# ======================================================
-# DASHBOARD
-# ======================================================
+# ===================== DASHBOARD =====================
 if page == "Dashboard":
     if not st.session_state.family:
         st.info("Please add family members from the sidebar first.")
@@ -291,8 +329,8 @@ if page == "Dashboard":
                 st.markdown(f"""
                 <div class="member-card">
                     <h3>{m['name']}</h3>
-                    <p style="margin:0.3rem 0; color:#57534E;">{m['goal'].replace('_',' ').title()} • BMI {n['BMI']}</p>
-                    <h2 style="margin:0.6rem 0; color:#D97706;">{n['Target']} kcal</h2>
+                    <p>{m['goal'].replace('_',' ').title()} • BMI {n['BMI']}</p>
+                    <h2 style="margin:0.7rem 0; color:#D97706; font-size:1.8rem;">{n['Target']} kcal</h2>
                     <div>
                         <span class="macro-box">Protein {n['Protein']}g</span>
                         <span class="macro-box">Carbs {n['Carbs']}g</span>
@@ -303,42 +341,12 @@ if page == "Dashboard":
                 """, unsafe_allow_html=True)
 
         st.markdown("---")
-        st.subheader("Today's Snapshot")
-
-        if st.session_state.logs:
-            df_logs = pd.DataFrame(st.session_state.logs)
-            meal_logs = df_logs[df_logs["type"] == "meal"]
-            workout_logs = df_logs[df_logs["type"] == "workout"]
-
-            c1, c2 = st.columns(2)
-            with c1:
-                if len(meal_logs) > 0:
-                    fig = px.bar(
-                        meal_logs.groupby("member").size().reset_index(name="count"),
-                        x="member", y="count", title="Meals Logged",
-                        color_discrete_sequence=["#D97706"]
-                    )
-                    st.plotly_chart(fig, use_container_width=True)
-            with c2:
-                if len(workout_logs) > 0:
-                    fig2 = px.bar(
-                        workout_logs.groupby("member")["minutes"].sum().reset_index(),
-                        x="member", y="minutes", title="Workout Minutes",
-                        color_discrete_sequence=["#166534"]
-                    )
-                    st.plotly_chart(fig2, use_container_width=True)
-        else:
-            st.info("No progress logged yet. Go to the Progress page to start tracking.")
-
-        st.markdown("---")
         c1, c2, c3 = st.columns(3)
         c1.metric("Recipes in Database", len(recipes_df))
         c2.metric("Pantry Items", len(st.session_state.pantry))
         c3.metric("Daily Budget", f"Rs {st.session_state.budget['daily']}")
 
-# ======================================================
-# MEAL PLAN
-# ======================================================
+# ===================== MEAL PLAN =====================
 elif page == "Meal Plan":
     st.subheader("Shared Family Meal Plan")
 
@@ -348,66 +356,21 @@ elif page == "Meal Plan":
         with st.expander("Plan Preferences", expanded=True):
             col1, col2 = st.columns(2)
             with col1:
-                cuisines = st.multiselect(
-                    "Preferred Cuisines",
-                    ["Desi / Pakistani", "Chinese", "Italian", "Continental", "Mixed"],
-                    default=["Desi / Pakistani"]
-                )
+                cuisines = st.multiselect("Preferred Cuisines", ["Desi / Pakistani", "Chinese", "Italian", "Continental", "Mixed"], default=["Desi / Pakistani"])
             with col2:
-                prefs = st.multiselect(
-                    "Meal Preferences",
-                    ["Less oil", "High protein", "More fiber", "Vegetarian options", "Quick to cook", "Budget friendly"],
-                    default=["Less oil", "High protein"]
-                )
+                prefs = st.multiselect("Meal Preferences", ["Less oil", "High protein", "More fiber", "Vegetarian options", "Quick to cook", "Budget friendly"], default=["Less oil", "High protein"])
 
         if st.button("Generate Detailed Meal Plan", type="primary", use_container_width=True):
             with st.spinner("Creating plan..."):
-                # Simple but good fallback plan
                 plan = {
                     "day": "Day 1",
                     "meals": [
-                        {
-                            "meal": "Breakfast",
-                            "main": "Vegetable Omelette + Whole Wheat Roti",
-                            "sides": ["Cucumber", "Green tea"],
-                            "calories": 380, "protein": 22, "carbs": 28, "fat": 18,
-                            "fiber_tip": "Add extra salad or flax seeds",
-                            "protein_tip": "Eggs already provide good protein",
-                            "portions": {m["name"]: "1 plate" for m in st.session_state.family},
-                            "description": "Fluffy vegetable omelette with soft whole wheat roti."
-                        },
-                        {
-                            "meal": "Lunch",
-                            "main": "Lean Chicken Karahi + Brown Rice",
-                            "sides": ["Mixed salad", "Raita"],
-                            "calories": 520, "protein": 38, "carbs": 45, "fat": 18,
-                            "fiber_tip": "Brown rice + salad give good fiber",
-                            "protein_tip": "Chicken is excellent lean protein",
-                            "portions": {m["name"]: "1 serving" for m in st.session_state.family},
-                            "description": "Home-style chicken karahi with less oil and fiber-rich brown rice."
-                        },
-                        {
-                            "meal": "Evening Snack",
-                            "main": "Chana Chaat",
-                            "sides": ["Lemon", "Coriander"],
-                            "calories": 240, "protein": 11, "carbs": 38, "fat": 5,
-                            "fiber_tip": "Chickpeas are high in fiber",
-                            "protein_tip": "Add boiled egg for more protein",
-                            "portions": {m["name"]: "1 bowl" for m in st.session_state.family},
-                            "description": "Protein and fiber rich chickpea chaat."
-                        },
-                        {
-                            "meal": "Dinner",
-                            "main": "Dal Tadka + 2 Rotis",
-                            "sides": ["Cucumber raita"],
-                            "calories": 480, "protein": 22, "carbs": 62, "fat": 14,
-                            "fiber_tip": "Dal is excellent for fiber",
-                            "protein_tip": "Add kebab or chicken tikka for more protein",
-                            "portions": {m["name"]: "1 serving" for m in st.session_state.family},
-                            "description": "Comforting dal with soft rotis and light raita."
-                        }
+                        {"meal": "Breakfast", "main": "Vegetable Omelette + Whole Wheat Roti", "sides": ["Cucumber", "Green tea"], "calories": 380, "protein": 22, "carbs": 28, "fat": 18, "fiber_tip": "Add extra salad or flax seeds", "protein_tip": "Eggs provide high quality protein", "portions": {m["name"]: "1 plate" for m in st.session_state.family}, "description": "Fluffy vegetable omelette with soft whole wheat roti."},
+                        {"meal": "Lunch", "main": "Lean Chicken Karahi + Brown Rice", "sides": ["Mixed salad", "Raita"], "calories": 520, "protein": 38, "carbs": 45, "fat": 18, "fiber_tip": "Brown rice + salad give good fiber", "protein_tip": "Chicken is excellent lean protein", "portions": {m["name"]: "1 serving" for m in st.session_state.family}, "description": "Home-style chicken karahi with less oil and fiber-rich brown rice."},
+                        {"meal": "Evening Snack", "main": "Chana Chaat", "sides": ["Lemon", "Coriander"], "calories": 240, "protein": 11, "carbs": 38, "fat": 5, "fiber_tip": "Chickpeas are high in fiber", "protein_tip": "Add boiled egg for more protein", "portions": {m["name"]: "1 bowl" for m in st.session_state.family}, "description": "Protein and fiber rich chickpea chaat."},
+                        {"meal": "Dinner", "main": "Dal Tadka + 2 Rotis", "sides": ["Cucumber raita"], "calories": 480, "protein": 22, "carbs": 62, "fat": 14, "fiber_tip": "Dal is excellent for fiber", "protein_tip": "Add kebab for extra protein", "portions": {m["name"]: "1 serving" for m in st.session_state.family}, "description": "Comforting dal with soft rotis and light raita."}
                     ],
-                    "notes": f"Plan based on {', '.join(cuisines)}. Budget target ≈ Rs {st.session_state.budget['daily']}."
+                    "notes": f"Plan based on {', '.join(cuisines)}. Budget ≈ Rs {st.session_state.budget['daily']}."
                 }
                 st.session_state.meal_plan = plan
 
@@ -434,18 +397,15 @@ elif page == "Meal Plan":
                 for person, portion in meal.get("portions", {}).items():
                     st.write(f"• **{person}**: {portion}")
 
-                st.info(f"🌿 **Fiber tip:** {meal.get('fiber_tip', 'Add salad or whole grains')}")
-                st.success(f"💪 **Protein tip:** {meal.get('protein_tip', 'Good protein source')}")
+                st.info(f"🌿 Fiber tip: {meal.get('fiber_tip', '')}")
+                st.success(f"💪 Protein tip: {meal.get('protein_tip', '')}")
                 st.markdown("---")
 
             st.caption(plan.get("notes", ""))
 
-# ======================================================
-# RECIPES
-# ======================================================
+# ===================== RECIPES =====================
 elif page == "Recipes":
     st.subheader("Recipe Browser")
-
     if len(recipes_df) == 0:
         st.warning("No recipes found.")
     else:
@@ -464,15 +424,12 @@ elif page == "Recipes":
         if "calories" in filtered.columns:
             filtered = filtered[filtered["calories"].notna()]
             filtered = filtered[filtered["calories"] <= max_cal]
-
         if cuisine != "All" and "cuisine" in filtered.columns:
             filtered = filtered[filtered["cuisine"].astype(str).str.lower().str.contains(cuisine.lower(), na=False)]
-
         if search:
             filtered = filtered[filtered["recipe_name"].astype(str).str.lower().str.contains(search.lower(), na=False)]
 
         st.write(f"**{len(filtered)} recipes found**")
-
         for _, row in filtered.head(20).iterrows():
             name = row.get("recipe_name", "Unknown")
             cal = row.get("calories", "—")
@@ -484,14 +441,11 @@ elif page == "Recipes":
                 if "cuisine" in row:
                     st.caption(f"Cuisine: {row['cuisine']}")
 
-# ======================================================
-# PANTRY
-# ======================================================
+# ===================== PANTRY =====================
 elif page == "Pantry":
     st.subheader("My Pantry")
     st.caption("Add ingredients you already have at home.")
-
-    new_item = st.text_input("Add item (e.g. chicken, daal, rice, yogurt)")
+    new_item = st.text_input("Add item (chicken, daal, rice, yogurt...)")
     if st.button("Add to Pantry") and new_item.strip():
         item = new_item.strip().lower()
         if item not in st.session_state.pantry:
@@ -501,7 +455,6 @@ elif page == "Pantry":
             st.info("Already in pantry")
 
     if st.session_state.pantry:
-        st.write("**Current pantry items:**")
         for i, item in enumerate(st.session_state.pantry):
             col1, col2 = st.columns([6, 1])
             col1.write(f"• {item.title()}")
@@ -511,22 +464,18 @@ elif page == "Pantry":
     else:
         st.info("Pantry is empty.")
 
-# ======================================================
-# WORKOUT
-# ======================================================
+# ===================== WORKOUT =====================
 elif page == "Workout":
     st.subheader("Equipment-Based Workout")
-
     if not st.session_state.family:
         st.warning("Please add family members first.")
     else:
         selected = st.selectbox("Select Member", [m["name"] for m in st.session_state.family])
         member = next(m for m in st.session_state.family if m["name"] == selected)
-
-        st.write(f"**Location:** {member['workout_location'].title()}  |  **Equipment:** {', '.join(member['equipment'])}  |  **Goal:** {member['goal'].replace('_', ' ').title()}")
+        st.write(f"**Location:** {member['workout_location'].title()} | **Equipment:** {', '.join(member['equipment'])} | **Goal:** {member['goal'].replace('_',' ').title()}")
 
         if st.button("Generate 7-Day Workout", type="primary"):
-            with st.spinner("Creating personalized plan..."):
+            with st.spinner("Creating plan..."):
                 plan = {
                     "member": member["name"],
                     "week": [
@@ -551,14 +500,11 @@ elif page == "Workout":
                             if "duration" in ex:
                                 st.write(f"• {ex['name']} — {ex['duration']}")
                             else:
-                                st.write(f"• {ex['name']} — {ex.get('sets', '')} × {ex.get('reps', '')}")
+                                st.write(f"• {ex['name']} — {ex.get('sets','')} × {ex.get('reps','')}")
 
-# ======================================================
-# PROGRESS
-# ======================================================
+# ===================== PROGRESS =====================
 elif page == "Progress":
     st.subheader("Progress Tracking")
-
     if not st.session_state.family:
         st.warning("Please add family members first.")
     else:
@@ -569,10 +515,7 @@ elif page == "Progress":
             meal_name = st.text_input("Meal name", "Breakfast")
             status = st.selectbox("Status", ["followed", "different", "skipped"])
             if st.button("Log Meal", use_container_width=True):
-                st.session_state.logs.append({
-                    "date": str(date.today()), "member": m_name,
-                    "type": "meal", "item": meal_name, "status": status
-                })
+                st.session_state.logs.append({"date": str(date.today()), "member": m_name, "type": "meal", "item": meal_name, "status": status})
                 st.success("Meal logged")
 
         with c2:
@@ -581,20 +524,15 @@ elif page == "Progress":
             w_status = st.selectbox("Status ", ["completed", "skipped", "rest"])
             minutes = st.number_input("Minutes", 0, 180, 30)
             if st.button("Log Workout", use_container_width=True):
-                st.session_state.logs.append({
-                    "date": str(date.today()), "member": w_name,
-                    "type": "workout", "status": w_status,
-                    "minutes": minutes if w_status == "completed" else 0
-                })
+                st.session_state.logs.append({"date": str(date.today()), "member": w_name, "type": "workout", "status": w_status, "minutes": minutes if w_status=="completed" else 0})
                 st.success("Workout logged")
 
         st.markdown("---")
         if st.session_state.logs:
             for m in st.session_state.family:
                 logs = [l for l in st.session_state.logs if l["member"] == m["name"]]
-                meals = [l for l in logs if l["type"] == "meal"]
-                workouts = [l for l in logs if l["type"] == "workout"]
-                st.write(f"**{m['name']}**")
-                st.write(f"Meals: {len(meals)} | Followed: {sum(1 for x in meals if x['status']=='followed')} | Workouts: {sum(1 for x in workouts if x['status']=='completed')} | Minutes: {sum(x.get('minutes',0) for x in workouts)}")
+                meals = [l for l in logs if l["type"]=="meal"]
+                workouts = [l for l in logs if l["type"]=="workout"]
+                st.write(f"**{m['name']}** — Meals: {len(meals)} | Followed: {sum(1 for x in meals if x['status']=='followed')} | Workouts: {sum(1 for x in workouts if x['status']=='completed')} | Minutes: {sum(x.get('minutes',0) for x in workouts)}")
         else:
             st.info("No logs yet.")
