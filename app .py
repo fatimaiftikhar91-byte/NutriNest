@@ -17,236 +17,249 @@ except Exception:
 # =========================================================
 # PAGE
 # =========================================================
+
 st.set_page_config(
-    page_title="NutriNest",
+    page_title="NutriNest | Family Wellness",
     page_icon="🥗",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# =========================================================
-# DESIGN SYSTEM — soft pastel, dark readable text
-# =========================================================
-st.markdown(
-    """
-    <style>
-    :root {
-        --ink: #25302B;
-        --muted: #66736D;
-        --cream: #FBF8F3;
-        --sage: #E7F0E7;
-        --mint: #EEF7F1;
-        --peach: #FBE9DD;
-        --lavender: #EEEAF7;
-        --butter: #FFF3CF;
-        --accent: #587864;
-        --accent-dark: #395847;
-        --gold: #C98D3D;
-        --line: #DEDCD5;
-        --white: #FFFFFF;
-    }
-
-    .stApp {
-        background:
-          radial-gradient(circle at 8% 0%, rgba(231,240,231,.70), transparent 26rem),
-          radial-gradient(circle at 95% 8%, rgba(251,233,221,.65), transparent 25rem),
-          var(--cream);
-        color: var(--ink);
-    }
-
-    .block-container {
-        max-width: 1250px;
-        padding-top: 2rem;
-        padding-bottom: 4rem;
-    }
-
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #E9F1E8 0%, #F5F1E8 100%);
-        border-right: 1px solid #DDE4DC;
-    }
-
-    [data-testid="stSidebar"] * {
-        color: var(--ink);
-    }
-
-    [data-testid="stSidebar"] .stRadio label {
-        padding: .42rem .4rem;
-        border-radius: 10px;
-    }
-
-    h1, h2, h3, h4, h5, h6, p, label, span, div {
-        color: var(--ink);
-    }
-
-    .hero {
-        background: linear-gradient(120deg, #E7F0E7 0%, #F9EBDD 50%, #EEEAF7 100%);
-        border: 1px solid rgba(88,120,100,.15);
-        border-radius: 26px;
-        padding: 2rem 2.2rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 16px 40px rgba(45,62,52,.07);
-    }
-
-    .hero-kicker {
-        display: inline-block;
-        background: rgba(255,255,255,.72);
-        border: 1px solid rgba(88,120,100,.18);
-        border-radius: 999px;
-        padding: .35rem .75rem;
-        font-weight: 700;
-        color: var(--accent-dark);
-        margin-bottom: .65rem;
-        font-size: .83rem;
-    }
-
-    .hero-title {
-        font-size: clamp(2.0rem, 4vw, 3.25rem);
-        line-height: 1.05;
-        font-weight: 850;
-        letter-spacing: -.03em;
-        margin: 0 0 .55rem 0;
-        color: #26332D;
-    }
-
-    .hero-sub {
-        color: #56645E;
-        font-size: 1.05rem;
-        max-width: 760px;
-        margin: 0;
-    }
-
-    .section-title {
-        font-size: 1.2rem;
-        font-weight: 800;
-        color: var(--ink);
-        margin: .25rem 0 1rem 0;
-    }
-
-    .member-card, .soft-card, .plate-card {
-        background: rgba(255,255,255,.90);
-        border: 1px solid #E3E0D8;
-        border-radius: 18px;
-        padding: 1.15rem 1.2rem;
-        box-shadow: 0 8px 24px rgba(43,55,48,.055);
-        margin-bottom: .85rem;
-    }
-
-    .member-card {
-        min-height: 190px;
-        background: linear-gradient(155deg, #FFFFFF 0%, #F2F8F3 100%);
-    }
-
-    .plate-card {
-        border-left: 5px solid #C98D3D;
-        background: linear-gradient(140deg, #FFFFFF 0%, #FFF9ED 100%);
-    }
-
-    .macro-chip {
-        display: inline-block;
-        background: #EFF5EF;
-        border: 1px solid #DCE9DE;
-        border-radius: 999px;
-        padding: .30rem .62rem;
-        margin: .18rem .18rem .1rem 0;
-        font-size: .82rem;
-        font-weight: 700;
-        color: #40544A;
-    }
-
-    .subtle {
-        color: var(--muted);
-    }
-
-    .pill {
-        display:inline-block;
-        padding:.28rem .62rem;
-        border-radius:999px;
-        background:#F4EEE5;
-        color:#695B48;
-        font-size:.78rem;
-        font-weight:700;
-        margin-right:.3rem;
-    }
-
-    div[data-testid="stMetric"] {
-        background: rgba(255,255,255,.86);
-        border: 1px solid #E2E0D8;
-        border-radius: 16px;
-        padding: .8rem 1rem;
-        box-shadow: 0 6px 18px rgba(43,55,48,.04);
-    }
-
-    [data-testid="stMetricValue"] {
-        color: #33483D;
-        font-weight: 800;
-    }
-
-    div[data-testid="stExpander"] {
-        background: rgba(255,255,255,.72);
-        border: 1px solid #E2E0D8;
-        border-radius: 14px;
-        overflow: hidden;
-    }
-
-    .stButton > button,
-    .stDownloadButton > button {
-        border-radius: 12px;
-        min-height: 2.7rem;
-        font-weight: 750;
-        border: 1px solid #587864;
-        background: #587864;
-        color: white !important;
-        box-shadow: 0 5px 14px rgba(57,88,71,.14);
-        transition: all .15s ease;
-    }
-
-    .stButton > button:hover,
-    .stDownloadButton > button:hover {
-        background: #395847;
-        border-color: #395847;
-        transform: translateY(-1px);
-    }
-
-    div[data-baseweb="select"] > div,
-    .stTextInput input,
-    .stNumberInput input,
-    .stTextArea textarea {
-        border-radius: 12px !important;
-        background: #FFFFFF !important;
-        border-color: #D8DDD8 !important;
-        color: #25302B !important;
-    }
-
-    [data-testid="stDataFrame"] {
-        border: 1px solid #E2E0D8;
-        border-radius: 14px;
-        overflow: hidden;
-    }
-
-    .footer-note {
-        margin-top: 2rem;
-        padding: .8rem 1rem;
-        border-radius: 14px;
-        background: #F4F0E8;
-        color: #6E665A;
-        font-size: .82rem;
-        text-align: center;
-    }
-
-    @media (max-width: 800px) {
-        .block-container {padding-top: 1rem;}
-        .hero {padding: 1.4rem;}
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 
 # =========================================================
-# DATA HELPERS
+# PREMIUM UI
 # =========================================================
-DATA_CANDIDATES = [
+
+st.markdown("""
+<style>
+
+:root {
+    --cream: #FBF8F3;
+    --white: #FFFFFF;
+    --sage: #E7F0E7;
+    --mint: #EEF7F1;
+    --peach: #FBE9DD;
+    --lavender: #EEEAF7;
+    --yellow: #FFF3CF;
+    --ink: #25302B;
+    --muted: #69756F;
+    --green: #587864;
+    --green-dark: #395847;
+    --border: #E0DED7;
+}
+
+.stApp {
+    background:
+        radial-gradient(circle at 0% 0%, #E8F2E8 0, transparent 25rem),
+        radial-gradient(circle at 100% 0%, #FBE9DD 0, transparent 25rem),
+        var(--cream);
+    color: var(--ink);
+}
+
+.block-container {
+    max-width: 1280px;
+    padding-top: 1.5rem;
+    padding-bottom: 4rem;
+}
+
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #E9F1E8, #F8F3EA);
+    border-right: 1px solid #DDE5DB;
+}
+
+[data-testid="stSidebar"] * {
+    color: var(--ink);
+}
+
+h1, h2, h3, h4, h5, h6,
+p, label, span {
+    color: var(--ink);
+}
+
+.hero {
+    background: linear-gradient(
+        120deg,
+        #E5F0E5,
+        #FBE9DD 55%,
+        #EEEAF7
+    );
+    border: 1px solid rgba(88,120,100,.15);
+    border-radius: 30px;
+    padding: 2.2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 18px 50px rgba(40,60,48,.07);
+}
+
+.hero-kicker {
+    display: inline-block;
+    background: rgba(255,255,255,.75);
+    border: 1px solid #D8E4DA;
+    border-radius: 999px;
+    padding: .35rem .75rem;
+    font-size: .75rem;
+    font-weight: 800;
+    color: var(--green-dark);
+}
+
+.hero h1 {
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1;
+    letter-spacing: -.045em;
+    margin: .7rem 0 .6rem;
+    font-weight: 900;
+}
+
+.hero p {
+    color: #56645E;
+    max-width: 800px;
+    font-size: 1.05rem;
+}
+
+.section-title {
+    font-size: 1.45rem;
+    font-weight: 900;
+    margin-top: 1.4rem;
+    margin-bottom: .25rem;
+}
+
+.section-subtitle {
+    color: var(--muted);
+    margin-bottom: 1rem;
+}
+
+.card {
+    background: rgba(255,255,255,.92);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.1rem;
+    box-shadow: 0 8px 25px rgba(40,50,45,.045);
+    margin-bottom: .8rem;
+}
+
+.card-sage {
+    background: linear-gradient(145deg,#FFFFFF,#F0F8F1);
+}
+
+.card-peach {
+    background: linear-gradient(145deg,#FFFFFF,#FFF5EF);
+}
+
+.card-lavender {
+    background: linear-gradient(145deg,#FFFFFF,#F7F4FC);
+}
+
+.card-yellow {
+    background: linear-gradient(145deg,#FFFFFF,#FFFBF0);
+}
+
+.recipe-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.05rem;
+    margin: .5rem 0;
+    box-shadow: 0 7px 22px rgba(40,50,45,.045);
+}
+
+.badge {
+    display: inline-block;
+    padding: .3rem .65rem;
+    border-radius: 999px;
+    background: #EFF5EF;
+    color: var(--green-dark);
+    font-size: .75rem;
+    font-weight: 800;
+    margin-right: .25rem;
+}
+
+.macro {
+    display: inline-block;
+    padding: .25rem .55rem;
+    border-radius: 999px;
+    background: #F0F5F1;
+    border: 1px solid #DCE6DE;
+    font-size: .75rem;
+    font-weight: 750;
+    margin: .12rem;
+}
+
+.info-box {
+    background: #EFF7F0;
+    border: 1px solid #D9E6DA;
+    border-radius: 17px;
+    padding: 1rem;
+}
+
+.warning-box {
+    background: #FFF8E5;
+    border: 1px solid #E9DDBD;
+    border-radius: 17px;
+    padding: 1rem;
+}
+
+.pantry-item {
+    background: white;
+    border: 1px solid #E1DED7;
+    border-radius: 13px;
+    padding: .6rem .75rem;
+    margin: .25rem 0;
+}
+
+.stButton > button,
+.stDownloadButton > button {
+    border-radius: 12px;
+    min-height: 2.65rem;
+    font-weight: 800;
+    background: var(--green);
+    border: 1px solid var(--green);
+    color: white !important;
+}
+
+.stButton > button:hover {
+    background: var(--green-dark);
+    border-color: var(--green-dark);
+}
+
+div[data-baseweb="select"] > div,
+.stTextInput input,
+.stNumberInput input,
+.stTextArea textarea {
+    border-radius: 12px !important;
+    background: white !important;
+    border-color: #D8DDD8 !important;
+}
+
+div[data-testid="stMetric"] {
+    background: rgba(255,255,255,.9);
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    padding: .8rem 1rem;
+}
+
+[data-testid="stMetricValue"] {
+    color: #33483D;
+    font-weight: 850;
+}
+
+.footer {
+    margin-top: 2rem;
+    padding: .8rem;
+    text-align: center;
+    border-radius: 14px;
+    background: #F2EEE6;
+    color: #756E63;
+    font-size: .78rem;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+
+# =========================================================
+# DATASET
+# =========================================================
+
+DATA_FILES = [
     "data/nutrinest_recipes_clean.csv",
     "data/recipes.csv",
     "data/nutrinest_recipes.csv",
@@ -255,1045 +268,2310 @@ DATA_CANDIDATES = [
 ]
 
 
-def _first_existing_path():
-    for candidate in DATA_CANDIDATES:
-        if os.path.exists(candidate):
-            return candidate
+def find_dataset():
+    for path in DATA_FILES:
+        if os.path.exists(path):
+            return path
     return None
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data
 def load_recipes():
-    path = _first_existing_path()
+
+    path = find_dataset()
+
     if not path:
         return pd.DataFrame(), None
 
     df = pd.read_csv(path)
-    df.columns = [str(c).strip().lower() for c in df.columns]
 
-    # Accept the column names used across the tested notebook versions.
+    df.columns = [
+        str(c).strip().lower()
+        for c in df.columns
+    ]
+
     rename_map = {
+        "name": "recipe_name",
         "recipe name": "recipe_name",
         "dish name": "recipe_name",
-        "name": "recipe_name",
+
         "calories_per_serving": "calories",
-        "reported_calories": "calories",
+        "calories per serving": "calories",
+
         "protein(g)": "protein_g",
-        "protein_g_per_serving": "protein_g",
+        "protein": "protein_g",
+
         "carbs(g)": "carbs_g",
-        "carbohydrates (g)": "carbs_g",
-        "carbs_g_per_serving": "carbs_g",
+        "carbohydrates": "carbs_g",
+
         "fat(g)": "fat_g",
-        "fats (g)": "fat_g",
-        "fat_g_per_serving": "fat_g",
+        "fat": "fat_g",
+
         "meal type": "meal_type",
-        "cuisine_type": "cuisine",
         "cuisine type": "cuisine",
     }
-    df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
 
-    for col in ["calories", "protein_g", "carbs_g", "fat_g"]:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+    df.rename(
+        columns={
+            k: v
+            for k, v in rename_map.items()
+            if k in df.columns
+        },
+        inplace=True
+    )
 
-    if "recipe_name" not in df.columns:
-        df["recipe_name"] = "Unnamed recipe"
-    if "cuisine" not in df.columns:
-        df["cuisine"] = "Unspecified"
-    if "meal_type" not in df.columns:
-        df["meal_type"] = "main"
-    if "ingredients" not in df.columns:
-        df["ingredients"] = ""
-    if "steps" not in df.columns:
-        df["steps"] = ""
+    required = {
+        "recipe_name": "Unnamed Recipe",
+        "cuisine": "Mixed",
+        "meal_type": "Meal",
+        "ingredients": "",
+        "steps": "",
+    }
+
+    for col, default in required.items():
+        if col not in df.columns:
+            df[col] = default
+
+    for col in [
+        "calories",
+        "protein_g",
+        "carbs_g",
+        "fat_g"
+    ]:
+        if col not in df.columns:
+            df[col] = pd.NA
+
+        df[col] = pd.to_numeric(
+            df[col],
+            errors="coerce"
+        )
 
     return df, path
 
 
-recipes_df, recipe_source = load_recipes()
+recipes, dataset_path = load_recipes()
 
 
 # =========================================================
-# AI CLIENT
+# NUTRITION ENGINE
 # =========================================================
-def get_secret(name):
-    try:
-        if name in st.secrets:
-            return st.secrets[name]
-    except Exception:
-        pass
-    return os.environ.get(name)
+
+ACTIVITY = {
+    "Sedentary": 1.20,
+    "Lightly active": 1.375,
+    "Moderately active": 1.55,
+    "Very active": 1.725,
+    "Extra active": 1.90,
+}
 
 
-@st.cache_resource(show_spinner=False)
-def get_client():
-    key = get_secret("GROQ_API_KEY")
-    if key and Groq is not None:
-        try:
-            return Groq(api_key=key)
-        except Exception:
-            return None
-    return None
+GOALS = {
+    "Lose weight": "weight_loss",
+    "Maintain weight": "maintenance",
+    "Gain weight": "weight_gain",
+}
 
 
-client = get_client()
+def calculate_nutrition(
+    age,
+    gender,
+    height,
+    weight,
+    activity,
+    goal
+):
 
-
-# =========================================================
-# CORE NUTRITION
-# =========================================================
-def calculate_nutrition(age, sex, height_cm, weight_kg, activity, goal):
-    # Same Mifflin-St Jeor logic as the tested notebook.
-    if sex.lower() == "male":
-        bmr = 10 * weight_kg + 6.25 * height_cm - 5 * age + 5
+    if gender == "Male":
+        bmr = (
+            10 * weight
+            + 6.25 * height
+            - 5 * age
+            + 5
+        )
     else:
-        bmr = 10 * weight_kg + 6.25 * height_cm - 5 * age - 161
+        bmr = (
+            10 * weight
+            + 6.25 * height
+            - 5 * age
+            - 161
+        )
 
-    multipliers = {
-        "sedentary": 1.20,
-        "light": 1.375,
-        "moderate": 1.55,
-        "active": 1.725,
-        "very_active": 1.90,
-    }
-    tdee = bmr * multipliers.get(activity, 1.55)
+    tdee = bmr * ACTIVITY[activity]
 
     if goal == "weight_loss":
-        target = tdee - 400
-    elif goal == "weight_gain":
-        target = tdee + 300
-    else:
-        target = tdee
+        calories = tdee - 400
 
-    target = max(target, 1200)
+    elif goal == "weight_gain":
+        calories = tdee + 300
+
+    else:
+        calories = tdee
+
+    calories = max(calories, 1200)
+
+    bmi = weight / ((height / 100) ** 2)
 
     return {
-        "BMI": round(weight_kg / ((height_cm / 100) ** 2), 1),
-        "BMR": round(bmr),
-        "TDEE": round(tdee),
-        "Target": round(target),
-        "Protein": round(target * 0.25 / 4),
-        "Carbs": round(target * 0.50 / 4),
-        "Fat": round(target * 0.25 / 9),
-        "Fiber": 30,
+        "bmi": round(bmi, 1),
+        "bmr": round(bmr),
+        "tdee": round(tdee),
+        "calories": round(calories),
+        "protein": round(calories * .25 / 4),
+        "carbs": round(calories * .50 / 4),
+        "fat": round(calories * .25 / 9),
+        "fiber": 30,
     }
 
 
-ALLERGY_KEYWORDS = {
-    "nuts": ["nut", "almond", "peanut", "cashew", "walnut", "pistachio"],
-    "dairy": ["milk", "cheese", "yogurt", "cream", "butter", "paneer"],
-    "gluten": ["wheat", "flour", "bread", "roti", "chapati", "pasta", "barley"],
-    "egg": ["egg", "eggs"],
-    "seafood": ["fish", "prawn", "shrimp", "seafood", "tuna", "salmon"],
-}
+# =========================================================
+# HELPERS
+# =========================================================
 
+def parse_items(value):
 
-def safe_for_family(df, family):
-    if df.empty or not family:
-        return df.copy()
-
-    blocked = []
-    for member in family:
-        for allergy in member.get("allergies", []):
-            if allergy != "none":
-                blocked.extend(ALLERGY_KEYWORDS.get(allergy, [allergy]))
-
-    if not blocked:
-        return df.copy()
-
-    text = (
-        df.get("ingredients", pd.Series("", index=df.index)).fillna("").astype(str)
-        + " "
-        + df.get("recipe_name", pd.Series("", index=df.index)).fillna("").astype(str)
-    ).str.lower()
-
-    mask = ~text.apply(lambda x: any(word in x for word in blocked))
-    return df[mask].copy()
-
-
-CUISINE_MAP = {
-    "Desi / Pakistani": ["pakistani", "desi", "indian", "south asian", "home-style"],
-    "Chinese": ["chinese", "asian"],
-    "Italian": ["italian"],
-    "Continental": ["continental", "european", "american", "western", "international"],
-}
-
-
-def get_cuisine_recipes(df, selected_cuisines, family=None):
-    if df is None or df.empty:
-        return pd.DataFrame()
-
-    data = df.copy()
-    data = safe_for_family(data, family or [])
-
-    if "calories" in data.columns:
-        data = data[data["calories"].isna() | data["calories"].between(80, 1000)]
-
-    if not selected_cuisines or "Mixed" in selected_cuisines:
-        return data.reset_index(drop=True)
-
-    keywords = []
-    for cuisine in selected_cuisines:
-        keywords.extend(CUISINE_MAP.get(cuisine, [cuisine.lower()]))
-
-    mask = data["cuisine"].fillna("").astype(str).str.lower().apply(
-        lambda value: any(keyword in value for keyword in keywords)
-    )
-    filtered = data[mask]
-    return (filtered if not filtered.empty else data).reset_index(drop=True)
-
-
-def parse_listish(value):
-    if pd.isna(value):
+    if value is None:
         return []
+
     if isinstance(value, list):
-        return value
+        return [
+            str(x).strip()
+            for x in value
+            if str(x).strip()
+        ]
+
     text = str(value).strip()
+
     if not text:
         return []
+
     try:
         parsed = ast.literal_eval(text)
+
         if isinstance(parsed, list):
-            return [str(x) for x in parsed]
+            return [
+                str(x).strip()
+                for x in parsed
+                if str(x).strip()
+            ]
+
     except Exception:
         pass
-    return [x.strip() for x in re.split(r",|;", text) if x.strip()]
+
+    return [
+        x.strip()
+        for x in re.split(
+            r",|;|\||\n",
+            text
+        )
+        if x.strip()
+    ]
 
 
-def recipe_pool(df, max_cal=700, meal_hint=None, n=12):
-    if df.empty:
-        return []
-    temp = df.copy()
+ALLERGY_WORDS = {
 
-    if "calories" in temp.columns:
-        temp = temp[temp["calories"].isna() | (temp["calories"] <= max_cal)]
+    "Nuts": [
+        "nut",
+        "almond",
+        "peanut",
+        "cashew",
+        "walnut",
+        "pistachio",
+    ],
 
-    if meal_hint and "meal_type" in temp.columns:
-        hinted = temp[
-            temp["meal_type"].fillna("").astype(str).str.lower().str.contains(meal_hint, na=False)
-        ]
-        if len(hinted) >= 2:
-            temp = hinted
+    "Dairy": [
+        "milk",
+        "cheese",
+        "yogurt",
+        "cream",
+        "butter",
+        "paneer",
+    ],
 
-    keep = [c for c in ["recipe_name", "cuisine", "calories", "protein_g", "carbs_g", "fat_g"] if c in temp.columns]
-    return temp[keep].head(n).fillna("").to_dict("records")
+    "Gluten": [
+        "wheat",
+        "flour",
+        "bread",
+        "roti",
+        "chapati",
+        "pasta",
+        "barley",
+    ],
 
+    "Egg": [
+        "egg",
+        "eggs",
+    ],
 
-def extract_json(text):
-    if not text:
-        return None
-    cleaned = text.strip()
-    if "```" in cleaned:
-        chunks = cleaned.split("```")
-        cleaned = max(chunks, key=len).replace("json", "", 1).strip()
-    start = cleaned.find("{")
-    end = cleaned.rfind("}") + 1
-    if start < 0 or end <= start:
-        return None
-    try:
-        return json.loads(cleaned[start:end])
-    except Exception:
-        return None
-
-
-# =========================================================
-# SESSION
-# =========================================================
-defaults = {
-    "family": [],
-    "logs": [],
-    "meal_plan": None,
-    "workouts": {},
-    "pantry": [],
-    "budget": {"daily": 900},
+    "Seafood": [
+        "fish",
+        "prawn",
+        "shrimp",
+        "seafood",
+        "tuna",
+        "salmon",
+    ],
 }
+
+
+def recipe_text(row):
+
+    return (
+        str(row.get("recipe_name", ""))
+        + " "
+        + str(row.get("ingredients", ""))
+        + " "
+        + str(row.get("tags", ""))
+    ).lower()
+
+
+def recipe_is_safe(row, family):
+
+    text = recipe_text(row)
+
+    for person in family:
+
+        for allergy in person.get(
+            "allergies",
+            []
+        ):
+
+            if allergy == "None":
+                continue
+
+            for word in ALLERGY_WORDS.get(
+                allergy,
+                [allergy.lower()]
+            ):
+
+                if word.lower() in text:
+                    return False
+
+    return True
+
+
+# =========================================================
+# PANTRY MATCHING
+# =========================================================
+
+def pantry_match(row, pantry):
+
+    ingredients = parse_items(
+        row.get("ingredients", "")
+    )
+
+    if not ingredients:
+        return 0, [], []
+
+    pantry_lower = [
+        x.lower()
+        for x in pantry
+    ]
+
+    have = []
+    missing = []
+
+    for ingredient in ingredients:
+
+        ingredient_text = ingredient.lower()
+
+        found = any(
+            item in ingredient_text
+            or ingredient_text in item
+            for item in pantry_lower
+        )
+
+        if found:
+            have.append(ingredient)
+        else:
+            missing.append(ingredient)
+
+    percentage = round(
+        len(have) / len(ingredients) * 100
+    )
+
+    return percentage, have, missing
+
+
+# =========================================================
+# RECIPE SCORING
+# =========================================================
+
+def score_recipe(
+    row,
+    family,
+    pantry,
+    preferences
+):
+
+    if not recipe_is_safe(
+        row,
+        family
+    ):
+        return -1000
+
+    score = 0
+
+    # Pantry = highest priority
+    pantry_score, _, _ = pantry_match(
+        row,
+        pantry
+    )
+
+    score += pantry_score * 0.40
+
+    # Nutrition
+    calories = row.get("calories")
+
+    if pd.notna(calories) and family:
+
+        targets = [
+            p["nutrition"]["calories"]
+            for p in family
+        ]
+
+        target = sum(targets) / len(targets)
+
+        ideal_meal = target / 4
+
+        difference = abs(
+            float(calories)
+            - ideal_meal
+        )
+
+        score += max(
+            0,
+            20 - difference / 40
+        )
+
+    # Protein
+    if (
+        "High protein" in preferences
+        and pd.notna(row.get("protein_g"))
+    ):
+        score += min(
+            15,
+            float(row["protein_g"]) / 3
+        )
+
+    # Fiber
+    if "More fiber" in preferences:
+
+        text = recipe_text(row)
+
+        fiber_foods = [
+            "lentil",
+            "daal",
+            "chickpea",
+            "bean",
+            "vegetable",
+            "oat",
+        ]
+
+        if any(
+            x in text
+            for x in fiber_foods
+        ):
+            score += 8
+
+    # Quick
+    if "Quick to cook" in preferences:
+
+        text = recipe_text(row)
+
+        if any(
+            x in text
+            for x in [
+                "quick",
+                "easy",
+                "15 min",
+                "20 min",
+            ]
+        ):
+            score += 7
+
+    # Budget
+    if "Budget friendly" in preferences:
+        score += 5
+
+    return score
+
+
+def ranked_recipes(
+    family,
+    pantry,
+    preferences,
+    limit=12
+):
+
+    if recipes.empty:
+        return pd.DataFrame()
+
+    df = recipes.copy()
+
+    df["_score"] = df.apply(
+        lambda row: score_recipe(
+            row,
+            family,
+            pantry,
+            preferences
+        ),
+        axis=1
+    )
+
+    df = df[
+        df["_score"] > -1000
+    ]
+
+    return (
+        df.sort_values(
+            "_score",
+            ascending=False
+        )
+        .head(limit)
+    )
+
+
+# =========================================================
+# PANTRY CATEGORIES
+# =========================================================
+
+PANTRY_CATEGORIES = {
+
+    "🥩 Proteins": [
+        "Chicken",
+        "Beef",
+        "Fish",
+        "Eggs",
+        "Daal",
+        "Chickpeas",
+        "Beans",
+    ],
+
+    "🌾 Grains & Staples": [
+        "Rice",
+        "Atta",
+        "Pasta",
+        "Oats",
+        "Bread",
+        "Flour",
+    ],
+
+    "🥬 Vegetables": [
+        "Potato",
+        "Onion",
+        "Tomato",
+        "Spinach",
+        "Carrot",
+        "Capsicum",
+        "Cucumber",
+    ],
+
+    "🥛 Dairy": [
+        "Milk",
+        "Yogurt",
+        "Cheese",
+        "Butter",
+        "Paneer",
+    ],
+
+    "🌿 Herbs & Spices": [
+        "Ginger",
+        "Garlic",
+        "Green Chilli",
+        "Coriander",
+        "Cumin",
+        "Turmeric",
+    ],
+
+    "🍎 Fruits": [
+        "Apple",
+        "Banana",
+        "Orange",
+        "Mango",
+        "Lemon",
+    ],
+}
+
+
+# =========================================================
+# SESSION STATE
+# =========================================================
+
+defaults = {
+
+    "family": [],
+
+    "pantry": [],
+
+    "budget": {
+        "amount": 30000,
+        "period": "Monthly",
+        "scope": "Household",
+    },
+
+    "preferences": [
+        "Budget friendly",
+        "High protein",
+    ],
+
+    "meal_plan": None,
+
+    "shopping": [],
+
+    "logs": [],
+
+    "workouts": {},
+
+}
+
+
 for key, value in defaults.items():
+
     if key not in st.session_state:
         st.session_state[key] = value
 
 
 # =========================================================
+# BUDGET ENGINE
+# =========================================================
+
+def monthly_budget(amount, period):
+
+    if period == "Daily":
+        return amount * 30
+
+    if period == "Weekly":
+        return amount * 4.33
+
+    return amount
+
+
+def daily_budget():
+
+    b = st.session_state.budget
+
+    return monthly_budget(
+        float(b["amount"]),
+        b["period"]
+    ) / 30
+
+
+# =========================================================
 # SIDEBAR
 # =========================================================
+
 with st.sidebar:
-    st.markdown("## 🥗 NutriNest")
-    st.caption("Family Nutrition & Fitness")
-    st.markdown("---")
+
+    st.markdown(
+        "## 🥗 NutriNest"
+    )
+
+    st.caption(
+        "Your family's smarter wellness companion"
+    )
+
+    st.divider()
 
     page = st.radio(
         "Navigation",
-        ["Dashboard", "Meal Plan", "Recipes", "Pantry", "Workout", "Progress"],
-        label_visibility="collapsed",
+        [
+            "🏠 Home",
+            "👨‍👩‍👧 Family",
+            "🍽️ Meal Planner",
+            "🧺 Pantry",
+            "📖 Recipes",
+            "🏃 Fitness",
+            "📊 Progress",
+        ],
+        label_visibility="collapsed"
     )
 
-    st.markdown("---")
-    st.markdown("### Family Members")
+    st.divider()
 
-    with st.expander("➕ Add / update member"):
-        with st.form("member_form"):
-            name = st.text_input("Name", "Father")
-            c1, c2 = st.columns(2)
-            with c1:
-                age = st.number_input("Age", 10, 90, 40)
-                sex = st.selectbox("Sex", ["male", "female"])
-            with c2:
-                height = st.number_input("Height (cm)", 120, 220, 170)
-                weight = st.number_input("Weight (kg)", 30, 180, 70)
-
-            goal = st.selectbox("Goal", ["weight_loss", "maintenance", "weight_gain"])
-            activity = st.selectbox(
-                "Activity level",
-                ["sedentary", "light", "moderate", "active", "very_active"],
-                index=2,
-            )
-            allergies = st.multiselect(
-                "Allergies",
-                ["none", "nuts", "dairy", "gluten", "egg", "seafood"],
-                default=["none"],
-            )
-            medical = st.multiselect(
-                "Medical conditions",
-                ["none", "diabetes", "hypertension", "thyroid", "pcos"],
-                default=["none"],
-            )
-            location = st.radio("Workout location", ["home", "gym"], horizontal=True)
-            equipment = st.multiselect(
-                "Available equipment",
-                ["none", "yoga_mat", "dumbbells", "resistance_bands", "bench", "full_gym"],
-                default=["yoga_mat"],
-            )
-
-            save = st.form_submit_button("Save member", use_container_width=True)
-            if save:
-                cleaned_name = name.strip() or "Member"
-                member = {
-                    "name": cleaned_name,
-                    "age": int(age),
-                    "sex": sex,
-                    "height_cm": float(height),
-                    "weight_kg": float(weight),
-                    "goal": goal,
-                    "activity_level": activity,
-                    "allergies": allergies,
-                    "medical": medical,
-                    "workout_location": location,
-                    "equipment": equipment,
-                    "nutrition": calculate_nutrition(age, sex, height, weight, activity, goal),
-                }
-                st.session_state.family = [
-                    m for m in st.session_state.family
-                    if m["name"].casefold() != cleaned_name.casefold()
-                ]
-                st.session_state.family.append(member)
-                st.success(f"{cleaned_name} saved.")
+    st.markdown("### 👨‍👩‍👧 Household")
 
     if st.session_state.family:
-        for member in st.session_state.family:
-            c1, c2 = st.columns([5, 1])
-            c1.markdown(
-                f"**{member['name']}**  \n"
-                f"<span style='font-size:.78rem;color:#6a756f'>{member['nutrition']['Target']} kcal/day</span>",
-                unsafe_allow_html=True,
-            )
-            if c2.button("×", key=f"remove_{member['name']}", help="Remove member"):
-                st.session_state.family = [
-                    m for m in st.session_state.family if m["name"] != member["name"]
-                ]
-                st.rerun()
 
-    st.markdown("---")
-    st.session_state.budget["daily"] = st.number_input(
-        "Daily food budget (PKR)",
-        min_value=300,
-        max_value=5000,
-        value=int(st.session_state.budget["daily"]),
-        step=50,
+        for person in st.session_state.family:
+
+            st.markdown(
+                f"**{person['name']}**"
+            )
+
+            st.caption(
+                f"{person['nutrition']['calories']:,} kcal/day"
+            )
+
+    else:
+
+        st.caption(
+            "Add your family members to begin."
+        )
+
+    st.divider()
+
+    st.markdown("### 💰 Food budget")
+
+    st.metric(
+        "Daily equivalent",
+        f"Rs {daily_budget():,.0f}"
     )
 
-    st.markdown("---")
-    if recipe_source:
-        st.success(f"Dataset connected\n\n`{recipe_source}`")
-    else:
-        st.warning("Recipe CSV not found in `data/`.")
-
-    st.caption("AI: " + ("Connected" if client else "Fallback mode"))
+    st.caption(
+        f"{st.session_state.budget['period']} · "
+        f"{st.session_state.budget['scope']}"
+    )
 
 
 # =========================================================
 # HERO
 # =========================================================
-st.markdown(
-    """
-    <div class="hero">
-      <div class="hero-kicker">SMART FAMILY WELLNESS</div>
-      <div class="hero-title">Nutrition that fits the whole family.</div>
-      <p class="hero-sub">
-        Shared meals, individual calorie targets, pantry-aware planning,
-        recipe discovery, equipment-based workouts and simple progress tracking.
-      </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+
+st.markdown("""
+<div class="hero">
+
+<span class="hero-kicker">
+SMART FAMILY WELLNESS
+</span>
+
+<h1>
+Healthy planning,<br>
+made for real life.
+</h1>
+
+<p>
+Plan family meals, personalize portions, use what is already
+in your kitchen, stay within budget and build healthier routines
+without making everyday planning complicated.
+</p>
+
+</div>
+""", unsafe_allow_html=True)
 
 
 # =========================================================
-# DASHBOARD
+# HOME
 # =========================================================
-if page == "Dashboard":
-    st.markdown('<div class="section-title">Family overview</div>', unsafe_allow_html=True)
+
+if page == "🏠 Home":
 
     if not st.session_state.family:
-        st.info("Add your first family member from the sidebar to start.")
+
+        st.markdown(
+            '<div class="section-title">'
+            '🌱 Welcome to NutriNest'
+            '</div>',
+            unsafe_allow_html=True
+        )
+
+        st.markdown("""
+        <div class="card card-sage">
+
+        <h3>Let's build your personalized plan.</h3>
+
+        <p>
+        Start by adding your family members, setting your food
+        budget and selecting what is already available in your
+        kitchen. NutriNest will use these details to create
+        smarter suggestions.
+        </p>
+
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.info(
+            "Start with 👨‍👩‍👧 Family from the navigation menu."
+        )
+
     else:
-        columns = st.columns(min(3, len(st.session_state.family)))
-        for i, member in enumerate(st.session_state.family):
-            n = member["nutrition"]
-            with columns[i % len(columns)]:
-                st.markdown(
-                    f"""
-                    <div class="member-card">
-                        <span class="pill">{member['goal'].replace('_', ' ').title()}</span>
-                        <h3 style="margin:.6rem 0 .15rem">{member['name']}</h3>
-                        <p class="subtle" style="margin:.1rem 0">BMI {n['BMI']} · {member['activity_level'].replace('_',' ').title()}</p>
-                        <h2 style="margin:.55rem 0;color:#587864">{n['Target']} <span style="font-size:.85rem">kcal/day</span></h2>
-                        <span class="macro-chip">Protein {n['Protein']}g</span>
-                        <span class="macro-chip">Carbs {n['Carbs']}g</span>
-                        <span class="macro-chip">Fat {n['Fat']}g</span>
-                        <span class="macro-chip">Fiber ~{n['Fiber']}g</span>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
 
-        st.markdown("### Today's snapshot")
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Recipes in database", len(recipes_df))
-        c2.metric("Pantry items", len(st.session_state.pantry))
-        c3.metric("Daily family budget", f"Rs {st.session_state.budget['daily']:,}")
+        total_calories = sum(
+            p["nutrition"]["calories"]
+            for p in st.session_state.family
+        )
 
-        if st.session_state.logs:
-            logs_df = pd.DataFrame(st.session_state.logs)
-            a, b = st.columns(2)
+        st.markdown(
+            '<div class="section-title">'
+            'Today at a glance'
+            '</div>',
+            unsafe_allow_html=True
+        )
 
-            with a:
-                meals = logs_df[logs_df["type"] == "meal"]
-                if not meals.empty:
-                    counts = meals.groupby("member").size().reset_index(name="Meals")
-                    fig = px.bar(counts, x="member", y="Meals", title="Meals logged")
-                    fig.update_layout(
-                        paper_bgcolor="rgba(0,0,0,0)",
-                        plot_bgcolor="rgba(0,0,0,0)",
-                        showlegend=False,
-                        margin=dict(l=10, r=10, t=45, b=10),
-                    )
-                    st.plotly_chart(fig, use_container_width=True)
+        c1, c2, c3, c4 = st.columns(4)
 
-            with b:
-                workouts = logs_df[logs_df["type"] == "workout"]
-                if not workouts.empty:
-                    mins = workouts.groupby("member")["minutes"].sum().reset_index()
-                    fig = px.bar(mins, x="member", y="minutes", title="Workout minutes")
-                    fig.update_layout(
-                        paper_bgcolor="rgba(0,0,0,0)",
-                        plot_bgcolor="rgba(0,0,0,0)",
-                        showlegend=False,
-                        margin=dict(l=10, r=10, t=45, b=10),
-                    )
-                    st.plotly_chart(fig, use_container_width=True)
+        c1.metric(
+            "👨‍👩‍👧 Members",
+            len(st.session_state.family)
+        )
+
+        c2.metric(
+            "🔥 Family calories",
+            f"{total_calories:,}"
+        )
+
+        c3.metric(
+            "🧺 Pantry items",
+            len(st.session_state.pantry)
+        )
+
+        c4.metric(
+            "💰 Daily budget",
+            f"Rs {daily_budget():,.0f}"
+        )
+
+        st.markdown(
+            '<div class="section-title">'
+            'Quick actions'
+            '</div>',
+            unsafe_allow_html=True
+        )
+
+        a, b, c = st.columns(3)
+
+        with a:
+
+            st.markdown("""
+            <div class="card card-sage">
+
+            <h3>🍳 What can I cook now?</h3>
+
+            <p>
+            Find meals that make the best use of ingredients
+            you already have.
+            </p>
+
+            </div>
+            """, unsafe_allow_html=True)
+
+        with b:
+
+            st.markdown("""
+            <div class="card card-peach">
+
+            <h3>✨ Build my meal plan</h3>
+
+            <p>
+            Create a personalized plan around your family's
+            goals, preferences and budget.
+            </p>
+
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c:
+
+            st.markdown("""
+            <div class="card card-lavender">
+
+            <h3>🛒 Smart shopping</h3>
+
+            <p>
+            See exactly what your selected meals still need.
+            </p>
+
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown(
+            '<div class="section-title">'
+            '🧺 Best matches from your pantry'
+            '</div>',
+            unsafe_allow_html=True
+        )
+
+        matches = ranked_recipes(
+            st.session_state.family,
+            st.session_state.pantry,
+            st.session_state.preferences,
+            6
+        )
+
+        if matches.empty:
+
+            st.info(
+                "Add a few pantry ingredients to discover meals you can make now."
+            )
+
         else:
-            st.caption("Progress charts will appear after you log meals or workouts.")
 
+            for _, row in matches.iterrows():
 
-# =========================================================
-# MEAL PLAN
-# =========================================================
-elif page == "Meal Plan":
-    st.markdown('<div class="section-title">Shared family meal plan</div>', unsafe_allow_html=True)
-
-    if not st.session_state.family:
-        st.warning("Please add at least one family member first.")
-    else:
-        with st.expander("Plan preferences", expanded=True):
-            c1, c2 = st.columns(2)
-            with c1:
-                cuisines = st.multiselect(
-                    "Preferred cuisines",
-                    ["Desi / Pakistani", "Chinese", "Italian", "Continental", "Mixed"],
-                    default=["Desi / Pakistani"],
-                )
-            with c2:
-                preferences = st.multiselect(
-                    "Meal preferences",
-                    [
-                        "Less oil",
-                        "High protein",
-                        "More fiber",
-                        "Vegetarian options",
-                        "Quick to cook",
-                        "Budget friendly",
-                    ],
-                    default=["Less oil", "High protein"],
+                match, have, missing = pantry_match(
+                    row,
+                    st.session_state.pantry
                 )
 
-        if st.button("✨ Generate detailed meal plan", type="primary", use_container_width=True):
-            with st.spinner("Building your family plan..."):
-                safe_recipes = get_cuisine_recipes(
-                    recipes_df, cuisines, family=st.session_state.family
-                )
-
-                family_info = [
-                    {
-                        "name": m["name"],
-                        "goal": m["goal"],
-                        "target_calories": m["nutrition"]["Target"],
-                        "protein_g": m["nutrition"]["Protein"],
-                        "allergies": m["allergies"],
-                        "medical_conditions": m["medical"],
-                    }
-                    for m in st.session_state.family
-                ]
-
-                breakfast_pool = recipe_pool(safe_recipes, 450, "breakfast")
-                lunch_pool = recipe_pool(safe_recipes, 700, "lunch")
-                snack_pool = recipe_pool(safe_recipes, 350, "snack")
-                dinner_pool = recipe_pool(safe_recipes, 650, "dinner")
-
-                # Tested-app fallback, improved only for presentation/portion sanity.
-                fallback = {
-                    "day": "Day 1",
-                    "meals": [
-                        {
-                            "meal": "Breakfast",
-                            "main": "Vegetable Omelette + Whole Wheat Roti",
-                            "sides": ["Cucumber", "Green tea"],
-                            "calories": 380,
-                            "protein": 22,
-                            "carbs": 28,
-                            "fat": 18,
-                            "fiber_tip": "Add extra salad, fruit or seeds for more fiber.",
-                            "protein_tip": "Eggs already provide a strong protein base.",
-                            "description": "A balanced, familiar breakfast with vegetables and whole grains.",
-                        },
-                        {
-                            "meal": "Lunch",
-                            "main": "Lean Chicken Karahi + Brown Rice",
-                            "sides": ["Mixed salad", "Raita"],
-                            "calories": 520,
-                            "protein": 38,
-                            "carbs": 45,
-                            "fat": 18,
-                            "fiber_tip": "Brown rice and salad improve the fiber content.",
-                            "protein_tip": "Chicken provides lean protein.",
-                            "description": "Home-style chicken karahi prepared with less oil.",
-                        },
-                        {
-                            "meal": "Evening Snack",
-                            "main": "Chana Chaat",
-                            "sides": ["Lemon", "Coriander"],
-                            "calories": 240,
-                            "protein": 11,
-                            "carbs": 38,
-                            "fat": 5,
-                            "fiber_tip": "Chickpeas are naturally rich in fiber.",
-                            "protein_tip": "Add a boiled egg only if it fits the family's allergy needs.",
-                            "description": "A light, filling chickpea snack.",
-                        },
-                        {
-                            "meal": "Dinner",
-                            "main": "Dal + Whole Wheat Roti",
-                            "sides": ["Cucumber salad"],
-                            "calories": 470,
-                            "protein": 22,
-                            "carbs": 62,
-                            "fat": 13,
-                            "fiber_tip": "Lentils and whole grains support fiber intake.",
-                            "protein_tip": "Lentils provide plant protein.",
-                            "description": "A simple, comforting family dinner.",
-                        },
-                    ],
-                    "notes": f"Fallback plan · daily food budget target ≈ Rs {st.session_state.budget['daily']}.",
-                }
-
-                for meal in fallback["meals"]:
-                    meal["portions"] = {}
-                    for member in st.session_state.family:
-                        goal = member["goal"]
-                        if goal == "weight_loss":
-                            portion = "0.85 serving"
-                        elif goal == "weight_gain":
-                            portion = "1.15 servings"
-                        else:
-                            portion = "1 serving"
-                        meal["portions"][member["name"]] = portion
-
-                plan = fallback
-
-                if client:
-                    prompt = f"""
-You are helping a family plan everyday meals.
-
-Create ONE shared Day 1 meal plan with exactly four meals:
-Breakfast, Lunch, Evening Snack, Dinner.
-
-Selected cuisines: {json.dumps(cuisines)}
-Preferences: {json.dumps(preferences)}
-Family: {json.dumps(family_info)}
-Pantry: {json.dumps(st.session_state.pantry)}
-Daily food budget: PKR {st.session_state.budget['daily']}
-
-Use recipe names from these dataset pools whenever suitable:
-Breakfast: {json.dumps(breakfast_pool[:8])}
-Lunch: {json.dumps(lunch_pool[:8])}
-Snack: {json.dumps(snack_pool[:8])}
-Dinner: {json.dumps(dinner_pool[:8])}
-
-Rules:
-- Respect selected cuisines.
-- Respect listed allergies. Never recommend a known allergen.
-- Keep one shared dish per meal; customize PORTION SIZE per member.
-- Do not claim medical treatment or disease reversal.
-- Keep suggestions practical for home cooking and the stated budget.
-- If nutrition numbers are unknown in the dataset, estimate modestly and do not imply they are lab-verified.
-
-Return ONLY valid JSON:
-{{
-  "day": "Day 1",
-  "meals": [
-    {{
-      "meal": "Breakfast",
-      "main": "dish name",
-      "sides": ["side 1"],
-      "calories": 380,
-      "protein": 22,
-      "carbs": 30,
-      "fat": 15,
-      "fiber_tip": "short tip",
-      "protein_tip": "short tip",
-      "portions": {{"Person name": "1 serving"}},
-      "description": "short description"
-    }}
-  ],
-  "notes": "short plan note"
-}}
-"""
-                    try:
-                        response = client.chat.completions.create(
-                            model="openai/gpt-oss-120b",
-                            messages=[
-                                {
-                                    "role": "system",
-                                    "content": "Return valid JSON only. Follow allergy constraints carefully.",
-                                },
-                                {"role": "user", "content": prompt},
-                            ],
-                            temperature=0.25,
-                            max_tokens=2200,
-                        )
-                        ai_plan = extract_json(response.choices[0].message.content)
-                        if (
-                            isinstance(ai_plan, dict)
-                            and isinstance(ai_plan.get("meals"), list)
-                            and len(ai_plan["meals"]) >= 4
-                        ):
-                            plan = ai_plan
-                    except Exception as exc:
-                        st.warning(f"AI was unavailable, so the built-in fallback plan is shown. ({exc})")
-
-                st.session_state.meal_plan = plan
-
-        plan = st.session_state.meal_plan
-        if plan:
-            st.success(f"{plan.get('day', 'Day 1')} plan is ready.")
-            for meal in plan.get("meals", []):
                 st.markdown(
                     f"""
-                    <div class="plate-card">
-                        <span class="pill">{meal.get('meal', 'Meal')}</span>
-                        <h3 style="margin:.55rem 0 .3rem">{meal.get('main', 'Meal')}</h3>
-                        <p class="subtle" style="margin:0">{meal.get('description', '')}</p>
+                    <div class="recipe-card">
+
+                    <span class="badge">
+                    🟢 {match}% pantry match
+                    </span>
+
+                    <h3>
+                    {row["recipe_name"]}
+                    </h3>
+
+                    <p>
+                    {row.get("cuisine","Mixed")}
+                    ·
+                    {row.get("meal_type","Meal")}
+                    </p>
+
+                    <p>
+                    <b>You have:</b>
+                    {", ".join(have[:7]) or "Nothing yet"}
+                    </p>
+
+                    <p>
+                    <b>Still needed:</b>
+                    {", ".join(missing[:5]) or "Nothing major"}
+                    </p>
+
                     </div>
                     """,
-                    unsafe_allow_html=True,
+                    unsafe_allow_html=True
                 )
 
-                c1, c2, c3, c4 = st.columns(4)
-                c1.metric("Calories", f"{meal.get('calories', '—')} kcal")
-                c2.metric("Protein", f"{meal.get('protein', '—')} g")
-                c3.metric("Carbs", f"{meal.get('carbs', '—')} g")
-                c4.metric("Fat", f"{meal.get('fat', '—')} g")
-
-                sides = meal.get("sides", [])
-                if sides:
-                    st.markdown("**Sides:** " + ", ".join(map(str, sides)))
-
-                portions = meal.get("portions", {})
-                if portions:
-                    cols = st.columns(min(4, len(portions)))
-                    for i, (person, portion) in enumerate(portions.items()):
-                        cols[i % len(cols)].info(f"**{person}**\n\n{portion}")
-
-                a, b = st.columns(2)
-                a.info("🌿 " + str(meal.get("fiber_tip", "Add vegetables or whole grains where suitable.")))
-                b.success("💪 " + str(meal.get("protein_tip", "Include an appropriate protein source.")))
-
-            st.caption(plan.get("notes", ""))
-
 
 # =========================================================
-# RECIPES
+# FAMILY
 # =========================================================
-elif page == "Recipes":
-    st.markdown('<div class="section-title">Recipe browser</div>', unsafe_allow_html=True)
 
-    if recipes_df.empty:
-        st.warning(
-            "No recipe CSV was found. Put your recipe file inside the GitHub `data/` folder "
-            "and name it `nutrinest_recipes_clean.csv` or `recipes.csv`."
+elif page == "👨‍👩‍👧 Family":
+
+    st.markdown(
+        '<div class="section-title">'
+        '👨‍👩‍👧 Build your family profile'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        '<p class="section-subtitle">'
+        'These details help NutriNest personalize calories, portions and meal suggestions.'
+        '</p>',
+        unsafe_allow_html=True
+    )
+
+    with st.form("family_form"):
+
+        left, right = st.columns(2)
+
+        with left:
+
+            name = st.text_input(
+                "👤 Name",
+                placeholder="e.g. Mother"
+            )
+
+            age = st.number_input(
+                "🎂 Age",
+                10,
+                100,
+                30
+            )
+
+            gender = st.selectbox(
+                "⚧ Gender",
+                ["Female", "Male"]
+            )
+
+            height = st.number_input(
+                "📏 Height (cm)",
+                120,
+                220,
+                165
+            )
+
+            weight = st.number_input(
+                "⚖️ Weight (kg)",
+                30,
+                200,
+                65
+            )
+
+        with right:
+
+            goal_label = st.selectbox(
+                "🎯 Main goal",
+                list(GOALS.keys())
+            )
+
+            activity = st.selectbox(
+                "🏃 Activity level",
+                list(ACTIVITY.keys()),
+                index=2
+            )
+
+            allergies = st.multiselect(
+                "⚠️ Food allergies",
+                [
+                    "None",
+                    "Nuts",
+                    "Dairy",
+                    "Gluten",
+                    "Egg",
+                    "Seafood",
+                ],
+                default=["None"]
+            )
+
+            workout_location = st.selectbox(
+                "🏠 Workout setting",
+                ["Home", "Gym"]
+            )
+
+            equipment = st.multiselect(
+                "🏋️ Available equipment",
+                [
+                    "None",
+                    "Yoga mat",
+                    "Dumbbells",
+                    "Resistance bands",
+                    "Bench",
+                    "Full gym",
+                ],
+                default=["Yoga mat"]
+            )
+
+        save = st.form_submit_button(
+            "✨ Create / update profile",
+            type="primary",
+            use_container_width=True
         )
-    else:
-        c1, c2, c3 = st.columns([1.5, 1, 1])
+
+    if save:
+
+        name = name.strip() or "Family Member"
+
+        nutrition = calculate_nutrition(
+            age,
+            gender,
+            height,
+            weight,
+            activity,
+            GOALS[goal_label]
+        )
+
+        profile = {
+
+            "name": name,
+            "age": age,
+            "gender": gender,
+            "height": height,
+            "weight": weight,
+            "goal": GOALS[goal_label],
+            "goal_label": goal_label,
+            "activity": activity,
+            "allergies": allergies,
+            "workout_location": workout_location,
+            "equipment": equipment,
+            "nutrition": nutrition,
+
+        }
+
+        st.session_state.family = [
+            p
+            for p in st.session_state.family
+            if p["name"].lower() != name.lower()
+        ]
+
+        st.session_state.family.append(profile)
+
+        st.success(
+            f"{name}'s profile has been saved."
+        )
+
+    if st.session_state.family:
+
+        st.markdown(
+            '<div class="section-title">'
+            'Your household'
+            '</div>',
+            unsafe_allow_html=True
+        )
+
+        cols = st.columns(
+            min(3, len(st.session_state.family))
+        )
+
+        for i, person in enumerate(
+            st.session_state.family
+        ):
+
+            n = person["nutrition"]
+
+            with cols[i % len(cols)]:
+
+                st.markdown(
+                    f"""
+                    <div class="card card-sage">
+
+                    <span class="badge">
+                    🎯 {person["goal_label"]}
+                    </span>
+
+                    <h3>
+                    👤 {person["name"]}
+                    </h3>
+
+                    <p>
+                    BMI {n["bmi"]}
+                    ·
+                    {person["activity"]}
+                    </p>
+
+                    <h2>
+                    {n["calories"]:,}
+                    <small> kcal/day</small>
+                    </h2>
+
+                    <span class="macro">
+                    💪 {n["protein"]}g protein
+                    </span>
+
+                    <span class="macro">
+                    🌾 {n["carbs"]}g carbs
+                    </span>
+
+                    <span class="macro">
+                    🥑 {n["fat"]}g fat
+                    </span>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                if st.button(
+                    "Remove",
+                    key=f"remove_{person['name']}"
+                ):
+
+                    st.session_state.family = [
+                        p
+                        for p in st.session_state.family
+                        if p["name"] != person["name"]
+                    ]
+
+                    st.rerun()
+
+
+    # -----------------------------------------------------
+    # BUDGET
+    # -----------------------------------------------------
+
+    st.markdown(
+        '<div class="section-title">'
+        '💰 Set your food budget'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    with st.form("budget_form"):
+
+        c1, c2, c3 = st.columns(3)
+
         with c1:
-            search = st.text_input("Search recipes", placeholder="e.g. chicken, pasta, chana")
-        with c2:
-            cuisines_available = ["All"] + sorted(
-                recipes_df["cuisine"].dropna().astype(str).str.strip().replace("", "Unspecified").unique().tolist()
-            )[:60]
-            cuisine = st.selectbox("Cuisine", cuisines_available)
-        with c3:
-            if "calories" in recipes_df.columns and recipes_df["calories"].notna().any():
-                max_cal = st.slider("Max calories", 100, 1000, 650, step=25)
-            else:
-                max_cal = 1000
 
-        family_safe_only = st.toggle(
-            "Hide recipes that may contain a selected family allergen",
-            value=True,
+            period = st.selectbox(
+                "Budget period",
+                [
+                    "Monthly",
+                    "Weekly",
+                    "Daily"
+                ]
+            )
+
+        with c2:
+
+            amount = st.number_input(
+                "Budget (PKR)",
+                300,
+                1000000,
+                int(
+                    st.session_state.budget[
+                        "amount"
+                    ]
+                ),
+                step=500
+            )
+
+        with c3:
+
+            scope = st.selectbox(
+                "Budget applies to",
+                [
+                    "Household",
+                    "Individual"
+                ]
+            )
+
+        save_budget = st.form_submit_button(
+            "Save budget",
+            use_container_width=True
         )
 
-        filtered = recipes_df.copy()
-        if family_safe_only:
-            filtered = safe_for_family(filtered, st.session_state.family)
+    if save_budget:
 
-        if "calories" in filtered.columns:
-            filtered = filtered[filtered["calories"].isna() | (filtered["calories"] <= max_cal)]
+        st.session_state.budget = {
+            "amount": amount,
+            "period": period,
+            "scope": scope,
+        }
 
-        if cuisine != "All":
-            filtered = filtered[
-                filtered["cuisine"].fillna("").astype(str).str.casefold() == cuisine.casefold()
-            ]
+        st.success(
+            f"Your {period.lower()} budget is Rs {amount:,.0f}."
+        )
 
-        if search.strip():
-            needle = search.strip().casefold()
-            haystack = (
-                filtered["recipe_name"].fillna("").astype(str)
-                + " "
-                + filtered["ingredients"].fillna("").astype(str)
-            ).str.casefold()
-            filtered = filtered[haystack.str.contains(re.escape(needle), na=False)]
-
-        st.caption(f"{len(filtered)} recipes found")
-
-        for idx, row in filtered.head(40).iterrows():
-            name = row.get("recipe_name", "Unknown recipe")
-            cal = row.get("calories", None)
-            protein = row.get("protein_g", None)
-            cuisine_name = row.get("cuisine", "Unspecified")
-
-            label_parts = [str(name)]
-            if pd.notna(cal):
-                label_parts.append(f"{round(float(cal))} kcal")
-            if pd.notna(protein):
-                label_parts.append(f"{float(protein):g}g protein")
-
-            with st.expander("  •  ".join(label_parts)):
-                st.markdown(f"**Cuisine:** {cuisine_name}")
-                if pd.notna(row.get("meal_type", None)):
-                    st.markdown(f"**Meal type:** {row.get('meal_type')}")
-
-                ingredients = row.get("ingredients", "")
-                if pd.notna(ingredients) and str(ingredients).strip():
-                    st.markdown("**Ingredients**")
-                    parsed = parse_listish(ingredients)
-                    if parsed:
-                        st.write(" · ".join(parsed[:30]))
-                    else:
-                        st.write(str(ingredients))
-
-                steps = row.get("steps", "")
-                if pd.notna(steps) and str(steps).strip():
-                    st.markdown("**Method**")
-                    st.write(str(steps))
-
-                metrics = st.columns(4)
-                metrics[0].metric("Calories", "—" if pd.isna(cal) else f"{float(cal):.0f}")
-                metrics[1].metric("Protein", "—" if pd.isna(protein) else f"{float(protein):g}g")
-                carb = row.get("carbs_g", None)
-                fat = row.get("fat_g", None)
-                metrics[2].metric("Carbs", "—" if pd.isna(carb) else f"{float(carb):g}g")
-                metrics[3].metric("Fat", "—" if pd.isna(fat) else f"{float(fat):g}g")
+        st.info(
+            f"That's approximately Rs {daily_budget():,.0f} per day."
+        )
 
 
 # =========================================================
 # PANTRY
 # =========================================================
-elif page == "Pantry":
-    st.markdown('<div class="section-title">My pantry</div>', unsafe_allow_html=True)
-    st.caption("Add ingredients you already have. They are sent to the meal planner as preferred ingredients.")
 
-    with st.form("pantry_form", clear_on_submit=True):
-        c1, c2 = st.columns([5, 1])
-        with c1:
-            new_item = st.text_input("Ingredient", placeholder="e.g. chicken, daal, rice, yogurt")
-        with c2:
-            st.write("")
-            st.write("")
-            add = st.form_submit_button("Add", use_container_width=True)
+elif page == "🧺 Pantry":
 
-    if add and new_item.strip():
-        item = new_item.strip().lower()
-        if item not in st.session_state.pantry:
-            st.session_state.pantry.append(item)
-            st.success(f"Added {item.title()}.")
-        else:
-            st.info("That ingredient is already in your pantry.")
+    st.markdown(
+        '<div class="section-title">'
+        '🧺 What is already in your kitchen?'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        '<p class="section-subtitle">'
+        'Tick what you already have. NutriNest will prioritize recipes that use these ingredients.'
+        '</p>',
+        unsafe_allow_html=True
+    )
+
+    pantry = set(
+        x.lower()
+        for x in st.session_state.pantry
+    )
+
+    for category, items in PANTRY_CATEGORIES.items():
+
+        st.markdown(
+            f"### {category}"
+        )
+
+        cols = st.columns(4)
+
+        for i, item in enumerate(items):
+
+            key = (
+                "pantry_"
+                + category
+                + "_"
+                + item
+            )
+
+            checked = cols[i % 4].checkbox(
+                item,
+                value=item.lower() in pantry,
+                key=key
+            )
+
+            if checked:
+                pantry.add(item.lower())
+            else:
+                pantry.discard(item.lower())
+
+    st.markdown("### ➕ Something else?")
+
+    custom = st.text_input(
+        "Add another ingredient",
+        placeholder="e.g. mince, frozen peas, vermicelli"
+    )
+
+    if st.button("Add ingredient"):
+
+        if custom.strip():
+
+            pantry.add(
+                custom.strip().lower()
+            )
+
+    st.session_state.pantry = sorted(
+        pantry
+    )
+
+    st.markdown(
+        '<div class="section-title">'
+        'Your pantry'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
     if st.session_state.pantry:
-        st.markdown("### Available ingredients")
-        for i, item in enumerate(st.session_state.pantry):
-            c1, c2 = st.columns([8, 1])
-            c1.markdown(f"<div class='soft-card'>🌿 <b>{item.title()}</b></div>", unsafe_allow_html=True)
-            if c2.button("Remove", key=f"pantry_remove_{i}"):
-                st.session_state.pantry.pop(i)
-                st.rerun()
+
+        cols = st.columns(4)
+
+        for i, item in enumerate(
+            st.session_state.pantry
+        ):
+
+            cols[i % 4].markdown(
+                f"""
+                <div class="pantry-item">
+                ✓ {item.title()}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
         if st.button("Clear pantry"):
+
             st.session_state.pantry = []
+
             st.rerun()
+
     else:
-        st.info("Your pantry is empty.")
+
+        st.info(
+            "Your pantry is empty. Select some ingredients above."
+        )
 
 
 # =========================================================
-# WORKOUT
+# MEAL PLANNER
 # =========================================================
-elif page == "Workout":
-    st.markdown('<div class="section-title">Equipment-based workout</div>', unsafe_allow_html=True)
+
+elif page == "🍽️ Meal Planner":
+
+    st.markdown(
+        '<div class="section-title">'
+        '🍽️ Build your family meal plan'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        '<p class="section-subtitle">'
+        'NutriNest combines nutrition goals, allergies, pantry availability and preferences before recommending meals.'
+        '</p>',
+        unsafe_allow_html=True
+    )
 
     if not st.session_state.family:
-        st.warning("Please add a family member first.")
+
+        st.warning(
+            "Please create at least one family profile first."
+        )
+
+    elif recipes.empty:
+
+        st.error(
+            "Recipe dataset not found. Put your CSV inside the data folder."
+        )
+
     else:
-        selected = st.selectbox("Select member", [m["name"] for m in st.session_state.family])
-        member = next(m for m in st.session_state.family if m["name"] == selected)
+
+        with st.form("meal_plan_form"):
+
+            c1, c2 = st.columns(2)
+
+            with c1:
+
+                selected_people = st.multiselect(
+                    "👨‍👩‍👧 Who are we planning for?",
+                    [
+                        p["name"]
+                        for p in st.session_state.family
+                    ],
+                    default=[
+                        p["name"]
+                        for p in st.session_state.family
+                    ]
+                )
+
+                days = st.selectbox(
+                    "📅 Plan length",
+                    [1, 3, 7],
+                    index=2,
+                    format_func=lambda x:
+                        f"{x} day"
+                        if x == 1
+                        else f"{x} days"
+                )
+
+                cuisines = st.multiselect(
+                    "🍜 Food style",
+                    [
+                        "Desi / Pakistani",
+                        "Chinese",
+                        "Italian",
+                        "Continental",
+                        "Mixed",
+                    ],
+                    default=["Desi / Pakistani"]
+                )
+
+            with c2:
+
+                preferences = st.multiselect(
+                    "✨ What matters most?",
+                    [
+                        "Budget friendly",
+                        "High protein",
+                        "More fiber",
+                        "Quick to cook",
+                        "Less oil",
+                    ],
+                    default=st.session_state.preferences
+                )
+
+                prioritize_pantry = st.toggle(
+                    "🧺 Prioritize pantry ingredients",
+                    value=True
+                )
+
+            build = st.form_submit_button(
+                "✨ Build my plan",
+                type="primary",
+                use_container_width=True
+            )
+
+        if build:
+
+            family = [
+                p
+                for p in st.session_state.family
+                if p["name"] in selected_people
+            ]
+
+            if not family:
+                family = st.session_state.family
+
+            ranked = ranked_recipes(
+                family,
+                st.session_state.pantry,
+                preferences,
+                80
+            )
+
+            if ranked.empty:
+
+                st.error(
+                    "No suitable recipes were found. Try broadening your preferences."
+                )
+
+            else:
+
+                meal_plan = []
+
+                used = set()
+
+                meal_types = [
+                    ("Breakfast", "breakfast"),
+                    ("Lunch", "lunch"),
+                    ("Dinner", "dinner"),
+                ]
+
+                for day_number in range(
+                    1,
+                    days + 1
+                ):
+
+                    for label, hint in meal_types:
+
+                        pool = ranked[
+                            ~ranked.index.isin(used)
+                        ]
+
+                        if pool.empty:
+                            pool = ranked
+
+                        if prioritize_pantry:
+
+                            pool = pool.copy()
+
+                            pool["_pantry"] = pool.apply(
+                                lambda r:
+                                pantry_match(
+                                    r,
+                                    st.session_state.pantry
+                                )[0],
+                                axis=1
+                            )
+
+                            pool = pool.sort_values(
+                                [
+                                    "_pantry",
+                                    "_score"
+                                ],
+                                ascending=False
+                            )
+
+                        matching_type = pool[
+                            pool["meal_type"]
+                            .astype(str)
+                            .str.lower()
+                            .str.contains(
+                                hint,
+                                na=False
+                            )
+                        ]
+
+                        if not matching_type.empty:
+                            pool = matching_type
+
+                        recipe = pool.iloc[0]
+
+                        used.add(recipe.name)
+
+                        match, have, missing = pantry_match(
+                            recipe,
+                            st.session_state.pantry
+                        )
+
+                        meal_plan.append({
+
+                            "day": day_number,
+                            "meal": label,
+                            "recipe": recipe.to_dict(),
+                            "pantry": match,
+                            "have": have,
+                            "missing": missing,
+
+                        })
+
+                st.session_state.meal_plan = meal_plan
+
+                missing_all = []
+
+                for meal in meal_plan:
+
+                    missing_all.extend(
+                        meal["missing"]
+                    )
+
+                unique_missing = []
+
+                for ingredient in missing_all:
+
+                    if not ingredient:
+                        continue
+
+                    if not any(
+                        ingredient.lower()
+                        == x.lower()
+                        for x in unique_missing
+                    ):
+                        unique_missing.append(
+                            ingredient
+                        )
+
+                st.session_state.shopping = (
+                    unique_missing
+                )
+
+                st.session_state.preferences = (
+                    preferences
+                )
+
+                st.success(
+                    "Your personalized meal plan is ready."
+                )
+
+        # -------------------------------------------------
+        # DISPLAY PLAN
+        # -------------------------------------------------
+
+        if st.session_state.meal_plan:
+
+            st.markdown(
+                '<div class="section-title">'
+                '✨ Your personalized plan'
+                '</div>',
+                unsafe_allow_html=True
+            )
+
+            max_day = max(
+                x["day"]
+                for x in st.session_state.meal_plan
+            )
+
+            for day_number in range(
+                1,
+                max_day + 1
+            ):
+
+                st.markdown(
+                    f"### 📅 Day {day_number}"
+                )
+
+                day_meals = [
+                    x
+                    for x in st.session_state.meal_plan
+                    if x["day"] == day_number
+                ]
+
+                for meal in day_meals:
+
+                    recipe = meal["recipe"]
+
+                    calories = recipe.get(
+                        "calories"
+                    )
+
+                    protein = recipe.get(
+                        "protein_g"
+                    )
+
+                    calories_text = (
+                        "—"
+                        if pd.isna(calories)
+                        else f"{float(calories):.0f} kcal"
+                    )
+
+                    protein_text = (
+                        "—"
+                        if pd.isna(protein)
+                        else f"{float(protein):.0f}g protein"
+                    )
+
+                    st.markdown(
+                        f"""
+                        <div class="recipe-card">
+
+                        <span class="badge">
+                        🍽️ {meal["meal"]}
+                        </span>
+
+                        <span class="badge">
+                        🧺 {meal["pantry"]}% pantry match
+                        </span>
+
+                        <h3>
+                        {recipe["recipe_name"]}
+                        </h3>
+
+                        <p>
+                        {recipe.get("cuisine","Mixed")}
+                        ·
+                        {calories_text}
+                        ·
+                        {protein_text}
+                        </p>
+
+                        <p>
+                        <b>Already have:</b>
+                        {", ".join(meal["have"][:7]) or "—"}
+                        </p>
+
+                        <p>
+                        <b>Shopping:</b>
+                        {", ".join(meal["missing"][:6]) or "Nothing major"}
+                        </p>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+            # -------------------------------------------------
+            # SHOPPING
+            # -------------------------------------------------
+
+            if st.session_state.shopping:
+
+                st.markdown(
+                    '<div class="section-title">'
+                    '🛒 Smart shopping list'
+                    '</div>',
+                    unsafe_allow_html=True
+                )
+
+                st.markdown(
+                    '<p class="section-subtitle">'
+                    'Only the ingredients missing from your pantry are listed here.'
+                    '</p>',
+                    unsafe_allow_html=True
+                )
+
+                shopping_text = []
+
+                for i, item in enumerate(
+                    st.session_state.shopping
+                ):
+
+                    checked = st.checkbox(
+                        item,
+                        key=f"shopping_{i}"
+                    )
+
+                    shopping_text.append(
+                        f"[{'x' if checked else ' '}] {item}"
+                    )
+
+                st.download_button(
+                    "⬇️ Download shopping list",
+                    "\n".join(shopping_text),
+                    "NutriNest_Shopping_List.txt"
+                )
+
+
+# =========================================================
+# RECIPES
+# =========================================================
+
+elif page == "📖 Recipes":
+
+    st.markdown(
+        '<div class="section-title">'
+        '📖 Explore recipes'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    if recipes.empty:
+
+        st.error(
+            "Recipe dataset not found."
+        )
+
+    else:
+
+        c1, c2, c3 = st.columns(
+            [1.5, 1, 1]
+        )
+
+        with c1:
+
+            search = st.text_input(
+                "🔎 Search recipes",
+                placeholder="chicken, rice, daal..."
+            )
+
+        with c2:
+
+            cuisine = st.selectbox(
+                "🍜 Cuisine",
+                [
+                    "All"
+                ]
+                + sorted(
+                    recipes["cuisine"]
+                    .astype(str)
+                    .unique()
+                    .tolist()
+                )
+            )
+
+        with c3:
+
+            max_calories = st.slider(
+                "🔥 Maximum calories",
+                100,
+                1500,
+                800,
+                25
+            )
+
+        safe_only = st.toggle(
+            "🛡️ Show family-safe recipes",
+            value=True
+        )
+
+        df = recipes.copy()
+
+        if safe_only:
+
+            df = df[
+                df.apply(
+                    lambda row:
+                    recipe_is_safe(
+                        row,
+                        st.session_state.family
+                    ),
+                    axis=1
+                )
+            ]
+
+        df = df[
+            df["calories"].isna()
+            |
+            df["calories"].le(
+                max_calories
+            )
+        ]
+
+        if cuisine != "All":
+
+            df = df[
+                df["cuisine"]
+                .astype(str)
+                .str.casefold()
+                ==
+                cuisine.casefold()
+            ]
+
+        if search.strip():
+
+            query = search.lower()
+
+            df = df[
+                (
+                    df["recipe_name"]
+                    .astype(str)
+                    .str.lower()
+                    .str.contains(
+                        query,
+                        na=False
+                    )
+                )
+                |
+                (
+                    df["ingredients"]
+                    .astype(str)
+                    .str.lower()
+                    .str.contains(
+                        query,
+                        na=False
+                    )
+                )
+            ]
+
+        st.caption(
+            f"{len(df)} recipes found"
+        )
+
+        for _, row in df.head(60).iterrows():
+
+            match, have, missing = pantry_match(
+                row,
+                st.session_state.pantry
+            )
+
+            with st.expander(
+                f"🍽️ {row['recipe_name']} · {match}% pantry match"
+            ):
+
+                st.markdown(
+                    f"""
+                    <span class="badge">
+                    {row.get("cuisine","Mixed")}
+                    </span>
+
+                    <span class="badge">
+                    {row.get("meal_type","Meal")}
+                    </span>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                c1, c2, c3, c4 = st.columns(4)
+
+                c1.metric(
+                    "🔥 Calories",
+                    "—"
+                    if pd.isna(row["calories"])
+                    else f"{float(row['calories']):.0f}"
+                )
+
+                c2.metric(
+                    "💪 Protein",
+                    "—"
+                    if pd.isna(row["protein_g"])
+                    else f"{float(row['protein_g']):.0f}g"
+                )
+
+                c3.metric(
+                    "🌾 Carbs",
+                    "—"
+                    if pd.isna(row["carbs_g"])
+                    else f"{float(row['carbs_g']):.0f}g"
+                )
+
+                c4.metric(
+                    "🥑 Fat",
+                    "—"
+                    if pd.isna(row["fat_g"])
+                    else f"{float(row['fat_g']):.0f}g"
+                )
+
+                st.markdown("### 🧺 Pantry")
+
+                st.write(
+                    "Already available: "
+                    + (
+                        ", ".join(have)
+                        if have
+                        else "None"
+                    )
+                )
+
+                st.write(
+                    "Still needed: "
+                    + (
+                        ", ".join(missing)
+                        if missing
+                        else "Nothing major"
+                    )
+                )
+
+                ingredients = parse_items(
+                    row.get(
+                        "ingredients",
+                        ""
+                    )
+                )
+
+                if ingredients:
+
+                    st.markdown(
+                        "### 🥕 Ingredients"
+                    )
+
+                    st.write(
+                        " · ".join(
+                            ingredients
+                        )
+                    )
+
+                if str(
+                    row.get("steps","")
+                ).strip():
+
+                    st.markdown(
+                        "### 👩‍🍳 Method"
+                    )
+
+                    st.write(
+                        str(
+                            row["steps"]
+                        )
+                    )
+
+
+# =========================================================
+# FITNESS
+# =========================================================
+
+elif page == "🏃 Fitness":
+
+    st.markdown(
+        '<div class="section-title">'
+        '🏃 Weekly movement plan'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    if not st.session_state.family:
+
+        st.warning(
+            "Create a family profile first."
+        )
+
+    else:
+
+        names = [
+            p["name"]
+            for p in st.session_state.family
+        ]
+
+        selected = st.selectbox(
+            "👤 Choose a family member",
+            names
+        )
+
+        person = next(
+            p
+            for p in st.session_state.family
+            if p["name"] == selected
+        )
 
         st.markdown(
             f"""
-            <div class="soft-card">
-                <span class="pill">{member['workout_location'].title()}</span>
-                <span class="pill">{member['goal'].replace('_',' ').title()}</span>
-                <h3 style="margin:.65rem 0 .2rem">{member['name']}</h3>
-                <p class="subtle" style="margin:0">
-                    Equipment: {', '.join(member['equipment']).replace('_',' ')}
-                </p>
+            <div class="card card-lavender">
+
+            <span class="badge">
+            🎯 {person["goal_label"]}
+            </span>
+
+            <span class="badge">
+            🏠 {person["workout_location"]}
+            </span>
+
+            <h3>
+            {person["name"]}
+            </h3>
+
+            <p>
+            Equipment:
+            {", ".join(person["equipment"])}
+            </p>
+
             </div>
             """,
-            unsafe_allow_html=True,
+            unsafe_allow_html=True
         )
 
-        if st.button("🏃 Generate 7-day workout", type="primary", use_container_width=True):
-            with st.spinner("Creating workout plan..."):
-                plan = {
-                    "member": member["name"],
-                    "week": [
-                        {"day": 1, "focus": "Full Body", "exercises": [
-                            {"name": "Bodyweight Squats", "sets": "3", "reps": "12"},
-                            {"name": "Push-ups", "sets": "3", "reps": "10"},
-                            {"name": "Walking", "duration": "20 min"},
-                        ]},
-                        {"day": 2, "focus": "Rest", "exercises": []},
-                        {"day": 3, "focus": "Lower Body", "exercises": [
-                            {"name": "Lunges", "sets": "3", "reps": "10 each"},
-                            {"name": "Glute Bridges", "sets": "3", "reps": "15"},
-                        ]},
-                        {"day": 4, "focus": "Rest", "exercises": []},
-                        {"day": 5, "focus": "Upper Body + Core", "exercises": [
-                            {"name": "Wall / Incline Push-ups", "sets": "3", "reps": "12"},
-                            {"name": "Plank", "duration": "30 sec"},
-                        ]},
-                        {"day": 6, "focus": "Cardio", "exercises": [
-                            {"name": "Brisk Walk", "duration": "30 min"}
-                        ]},
-                        {"day": 7, "focus": "Recovery", "exercises": [
-                            {"name": "Gentle Stretching", "duration": "15 min"}
-                        ]},
-                    ],
-                }
+        if st.button(
+            "🏃 Build my 7-day routine",
+            type="primary",
+            use_container_width=True
+        ):
 
-                if client:
-                    prompt = f"""
-Create a practical 7-day workout plan.
-Person: {member['name']}
-Goal: {member['goal']}
-Location: {member['workout_location']}
-Equipment: {member['equipment']}
-Activity level: {member['activity_level']}
+            workout = {
 
-Return ONLY JSON in this shape:
-{{
-  "member":"name",
-  "week":[
-    {{
-      "day":1,
-      "focus":"Full Body",
-      "exercises":[
-        {{"name":"Exercise","sets":"3","reps":"10"}},
-        {{"name":"Walk","duration":"20 min"}}
-      ]
-    }}
-  ]
-}}
-Keep it general, beginner-friendly, and do not present it as medical treatment.
-"""
-                    try:
-                        response = client.chat.completions.create(
-                            model="openai/gpt-oss-120b",
-                            messages=[
-                                {"role": "system", "content": "Return valid JSON only."},
-                                {"role": "user", "content": prompt},
-                            ],
-                            temperature=0.3,
-                            max_tokens=1900,
+                "member": selected,
+
+                "week": [
+
+                    {
+                        "day": 1,
+                        "focus": "Full Body",
+                        "exercises": [
+                            "Bodyweight Squats — 3 × 12",
+                            "Incline Push-ups — 3 × 10",
+                            "Brisk Walk — 20 min",
+                        ],
+                    },
+
+                    {
+                        "day": 2,
+                        "focus": "Recovery",
+                        "exercises": [
+                            "Gentle stretching — 15 min"
+                        ],
+                    },
+
+                    {
+                        "day": 3,
+                        "focus": "Lower Body",
+                        "exercises": [
+                            "Lunges — 3 × 10 each",
+                            "Glute Bridges — 3 × 15",
+                        ],
+                    },
+
+                    {
+                        "day": 4,
+                        "focus": "Rest",
+                        "exercises": [],
+                    },
+
+                    {
+                        "day": 5,
+                        "focus": "Upper Body + Core",
+                        "exercises": [
+                            "Wall Push-ups — 3 × 12",
+                            "Plank — 3 × 30 sec",
+                        ],
+                    },
+
+                    {
+                        "day": 6,
+                        "focus": "Cardio",
+                        "exercises": [
+                            "Brisk Walk — 30 min"
+                        ],
+                    },
+
+                    {
+                        "day": 7,
+                        "focus": "Recovery",
+                        "exercises": [
+                            "Gentle stretching — 15 min"
+                        ],
+                    },
+
+                ]
+            }
+
+            st.session_state.workouts[
+                selected
+            ] = workout
+
+        workout = st.session_state.workouts.get(
+            selected
+        )
+
+        if workout:
+
+            for day in workout["week"]:
+
+                with st.expander(
+                    f"Day {day['day']} · {day['focus']}"
+                ):
+
+                    if not day["exercises"]:
+
+                        st.info(
+                            "🌙 Rest and recovery day."
                         )
-                        ai_plan = extract_json(response.choices[0].message.content)
-                        if isinstance(ai_plan, dict) and ai_plan.get("week"):
-                            plan = ai_plan
-                    except Exception:
-                        pass
 
-                st.session_state.workouts[member["name"]] = plan
+                    else:
 
-        current = st.session_state.workouts.get(selected)
-        if current:
-            for day_item in current.get("week", []):
-                day_num = day_item.get("day", "?")
-                focus = day_item.get("focus", "Workout")
-                with st.expander(f"Day {day_num} · {focus}", expanded=(day_num == 1)):
-                    exercises = day_item.get("exercises", [])
-                    if not exercises:
-                        st.write("Recovery / rest day 🌙")
-                    for ex in exercises:
-                        if ex.get("duration"):
-                            st.write(f"• **{ex.get('name','Exercise')}** — {ex['duration']}")
-                        else:
-                            st.write(
-                                f"• **{ex.get('name','Exercise')}** — "
-                                f"{ex.get('sets','')} × {ex.get('reps','')}"
+                        for exercise in day[
+                            "exercises"
+                        ]:
+
+                            st.markdown(
+                                f"**{exercise}**"
                             )
 
 
 # =========================================================
 # PROGRESS
 # =========================================================
-elif page == "Progress":
-    st.markdown('<div class="section-title">Progress tracking</div>', unsafe_allow_html=True)
+
+elif page == "📊 Progress":
+
+    st.markdown(
+        '<div class="section-title">'
+        '📊 Track your progress'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
     if not st.session_state.family:
-        st.warning("Please add a family member first.")
+
+        st.warning(
+            "Create a family profile first."
+        )
+
     else:
-        a, b = st.columns(2)
 
-        with a:
-            st.markdown("### 🍽 Log meal")
-            with st.form("meal_log_form"):
-                member_name = st.selectbox(
-                    "Member",
-                    [m["name"] for m in st.session_state.family],
-                    key="meal_member",
-                )
-                meal_name = st.text_input("Meal", "Breakfast")
-                meal_status = st.selectbox("Status", ["followed", "different", "skipped"])
-                if st.form_submit_button("Log meal", use_container_width=True):
-                    st.session_state.logs.append(
-                        {
-                            "date": str(date.today()),
-                            "member": member_name,
-                            "type": "meal",
-                            "item": meal_name,
-                            "status": meal_status,
-                            "minutes": 0,
-                        }
-                    )
-                    st.success("Meal logged.")
+        names = [
+            p["name"]
+            for p in st.session_state.family
+        ]
 
-        with b:
-            st.markdown("### 🏃 Log workout")
-            with st.form("workout_log_form"):
-                workout_member = st.selectbox(
-                    "Member",
-                    [m["name"] for m in st.session_state.family],
-                    key="workout_member",
-                )
-                workout_status = st.selectbox("Status", ["completed", "skipped", "rest"])
-                minutes = st.number_input("Minutes", 0, 180, 30)
-                if st.form_submit_button("Log workout", use_container_width=True):
-                    st.session_state.logs.append(
-                        {
-                            "date": str(date.today()),
-                            "member": workout_member,
-                            "type": "workout",
-                            "status": workout_status,
-                            "minutes": int(minutes) if workout_status == "completed" else 0,
-                        }
-                    )
-                    st.success("Workout logged.")
+        left, right = st.columns(2)
 
-        if st.session_state.logs:
-            st.markdown("### Summary")
-            summary_cols = st.columns(min(3, len(st.session_state.family)))
-            for i, member in enumerate(st.session_state.family):
-                logs = [x for x in st.session_state.logs if x["member"] == member["name"]]
-                meals = [x for x in logs if x["type"] == "meal"]
-                workouts = [x for x in logs if x["type"] == "workout"]
-                followed = sum(x.get("status") == "followed" for x in meals)
-                completed = sum(x.get("status") == "completed" for x in workouts)
-                total_minutes = sum(x.get("minutes", 0) for x in workouts)
+        with left:
 
-                with summary_cols[i % len(summary_cols)]:
-                    st.markdown(
-                        f"""
-                        <div class="member-card">
-                            <h3>{member['name']}</h3>
-                            <p>Meals followed: <b>{followed}</b> / {len(meals)}</p>
-                            <p>Workouts completed: <b>{completed}</b></p>
-                            <p>Workout minutes: <b>{total_minutes}</b></p>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
-
-            logs_df = pd.DataFrame(st.session_state.logs)
-            st.dataframe(logs_df, use_container_width=True, hide_index=True)
-
-            csv = logs_df.to_csv(index=False).encode("utf-8")
-            st.download_button(
-                "Download progress CSV",
-                data=csv,
-                file_name="nutrinest_progress.csv",
-                mime="text/csv",
+            st.markdown(
+                """
+                <div class="card card-sage">
+                <h3>🍽️ Log a meal</h3>
+                </div>
+                """,
+                unsafe_allow_html=True
             )
 
-            if st.button("Clear progress logs"):
-                st.session_state.logs = []
-                st.rerun()
-        else:
-            st.info("No progress entries yet.")
+            with st.form("meal_log"):
 
+                member = st.selectbox(
+                    "Family member",
+                    names
+                )
+
+                meal = st.text_input(
+                    "Meal",
+                    "Breakfast"
+                )
+
+                status = st.selectbox(
+                    "How did it go?",
+                    [
+                        "Followed plan",
+                        "Different meal",
+                        "Skipped",
+                    ]
+                )
+
+                save = st.form_submit_button(
+                    "Log meal",
+                    use_container_width=True
+                )
+
+            if save:
+
+                st.session_state.logs.append({
+
+                    "date": str(date.today()),
+                    "member": member,
+                    "type": "meal",
+                    "item": meal,
+                    "status": status,
+                    "minutes": 0,
+
+                })
+
+                st.success(
+                    "Meal logged."
+                )
+
+        with right:
+
+            st.markdown(
+                """
+                <div class="card card-lavender">
+                <h3>🏃 Log a workout</h3>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            with st.form("workout_log"):
+
+                member = st.selectbox(
+                    "Family member",
+                    names,
+                    key="workout_member"
+                )
+
+                status = st.selectbox(
+                    "Workout status",
+                    [
+                        "Completed",
+                        "Skipped",
+                        "Rest",
+                    ]
+                )
+
+                minutes = st.number_input(
+                    "Minutes",
+                    0,
+                    300,
+                    30
+                )
+
+                save = st.form_submit_button(
+                    "Log workout",
+                    use_container_width=True
+                )
+
+            if save:
+
+                st.session_state.logs.append({
+
+                    "date": str(date.today()),
+                    "member": member,
+                    "type": "workout",
+                    "item": "Workout",
+                    "status": status,
+                    "minutes":
+                        int(minutes)
+                        if status == "Completed"
+                        else 0,
+
+                })
+
+                st.success(
+                    "Workout logged."
+                )
+
+        if st.session_state.logs:
+
+            logs = pd.DataFrame(
+                st.session_state.logs
+            )
+
+            st.markdown(
+                '<div class="section-title">'
+                'Your progress overview'
+                '</div>',
+                unsafe_allow_html=True
+            )
+
+            c1, c2, c3 = st.columns(3)
+
+            c1.metric(
+                "📝 Entries",
+                len(logs)
+            )
+
+            c2.metric(
+                "🍽️ Meals logged",
+                int(
+                    (
+                        logs["type"]
+                        == "meal"
+                    ).sum()
+                )
+            )
+
+            c3.metric(
+                "🏃 Workout minutes",
+                int(
+                    logs["minutes"]
+                    .sum()
+                )
+            )
+
+            if "workout" in logs["type"].values:
+
+                workout_data = (
+                    logs[
+                        logs["type"]
+                        == "workout"
+                    ]
+                    .groupby("member")
+                    ["minutes"]
+                    .sum()
+                    .reset_index()
+                )
+
+                fig = px.bar(
+                    workout_data,
+                    x="member",
+                    y="minutes",
+                    title="Workout minutes"
+                )
+
+                fig.update_layout(
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)",
+                )
+
+                st.plotly_chart(
+                    fig,
+                    use_container_width=True
+                )
+
+            st.dataframe(
+                logs,
+                use_container_width=True,
+                hide_index=True
+            )
+
+            st.download_button(
+                "⬇️ Download progress CSV",
+                logs.to_csv(
+                    index=False
+                ).encode(),
+                "NutriNest_Progress.csv",
+                mime="text/csv"
+            )
+
+            if st.button(
+                "Clear progress history"
+            ):
+
+                st.session_state.logs = []
+
+                st.rerun()
+
+        else:
+
+            st.info(
+                "Your progress history will appear here as you log meals and workouts."
+            )
+
+
+# =========================================================
+# FOOTER
+# =========================================================
 
 st.markdown(
     """
-    <div class="footer-note">
-      NutriNest provides general wellness planning, not medical diagnosis or individualized clinical treatment.
+    <div class="footer">
+    🥗 NutriNest · Family nutrition and wellness planning
+    <br>
+    General wellness guidance only — not a substitute for professional medical advice.
     </div>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
