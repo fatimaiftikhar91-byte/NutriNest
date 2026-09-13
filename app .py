@@ -857,81 +857,151 @@ def cuisine_pool(selected_cuisines):
 
 
 def generate_ai_meal_plan(cuisines, preferences):
+    """Generate a complete 7-day plan with a compact Groq request.
+
+    Important: the AI is never replaced by an offline/fallback planner.
+    """
     if not client:
         raise RuntimeError("Groq AI is not connected. Add GROQ_API_KEY in Streamlit → Settings → Secrets.")
 
     family=[
-        {"name":m["name"],"goal":m["goal"],"target":m["nutrition"]["Target"],
-         "protein":m["nutrition"]["Protein"],"carbs":m["nutrition"]["Carbs"],
-         "fat":m["nutrition"]["Fat"],"allergies":m["allergies"]}
+        {
+            "name":m["name"],
+            "goal":m["goal"],
+            "cal":round(float(m["nutrition"]["Target"])),
+            "protein":round(float(m["nutrition"]["Protein"])),
+            "carbs":round(float(m["nutrition"]["Carbs"])),
+            "fat":round(float(m["nutrition"]["Fat"])),
+            "allergies":m["allergies"],
+        }
         for m in st.session_state.family
     ]
-    selected=[str(x) for x in (cuisines or ["Mixed"])]
+
+    selected=[str(x).strip() for x in (cuisines or ["Mixed"]) if str(x).strip()]
+    if not selected:
+        selected=["Mixed"]
     selected_nonmixed=[x for x in selected if x.casefold()!="mixed"]
 
+    # Only send a very small, relevant recipe context to Groq.
     safe=recipes_df[recipes_df.apply(safe_for_family,axis=1)].copy() if not recipes_df.empty else pd.DataFrame()
-    matched=safe if not selected_nonmixed else safe[safe["cuisine"].apply(lambda x:cuisine_matches(x,selected_nonmixed))]
+    matched=safe if not selected_nonmixed else safe[
+        safe["cuisine"].apply(lambda x:cuisine_matches(x,selected_nonmixed))
+    ]
 
-    # Give Groq a tiny, relevant recipe context. This prevents TPM 413 errors.
     pool=[]
     if not matched.empty:
-        cols=["recipe_name","cuisine","meal_type","calories","protein_g","carbs_g","fat_g"]
-        for _,r in matched.head(6).iterrows():
+        # 4 recipes are enough to ground the model and keep TPM safely below the limit.
+        for _,r in matched.head(4).iterrows():
             pool.append({
-                "name":str(r.get("recipe_name","Recipe")),"cuisine":str(r.get("cuisine","")),
-                "meal_type":str(r.get("meal_type","Main")),"calories":round(float(r.get("calories",0) or 0)),
-                "protein":round(float(r.get("protein_g",0) or 0)),
-                "carbs":round(float(r.get("carbs_g",0) or 0)),"fat":round(float(r.get("fat_g",0) or 0)),
+                "name":str(r.get("recipe_name","Recipe"))[:90],
+                "cuisine":str(r.get("cuisine",""))[:40],
+                "meal":str(r.get("meal_type","Main"))[:25],
+                "cal":round(float(r.get("calories",0) or 0)),
+                "p":round(float(r.get("protein_g",0) or 0)),
+                "c":round(float(r.get("carbs_g",0) or 0)),
+                "f":round(float(r.get("fat_g",0) or 0)),
             })
 
-    prompt=f"""Create a realistic 7-day shared family meal plan.
+    pantry=[str(x)[:60] for x in st.session_state.pantry[:15]]
+    pref=str(preferences)[:500]
 
-FAMILY:{json.dumps(family,ensure_ascii=False)}
-SELECTED CUISINE:{json.dumps(selected,ensure_ascii=False)}
-PREFERENCES:{json.dumps(preferences,ensure_ascii=False)}
-PANTRY:{json.dumps(st.session_state.pantry[:25],ensure_ascii=False)}
-BUDGET:PKR {st.session_state.budget_amount} per {st.session_state.budget_period.lower()}
+    prompt=f"""Create a COMPLETE 7-day family meal plan.
+Cuisine: {", ".join(selected)}
+Family: {json.dumps(family,ensure_ascii=False,separators=(",",":"))}
+Preferences: {pref}
+Pantry: {json.dumps(pantry,ensure_ascii=False,separators=(",",":"))}
+Budget: PKR {st.session_state.budget_amount}/{st.session_state.budget_period}
+Dataset recipes: {json.dumps(pool,ensure_ascii=False,separators=(",",":"))}
 
-RELEVANT DATASET RECIPES:{json.dumps(pool,ensure_ascii=False)}
+RULES:
+1. Exactly 7 days. Each day MUST contain exactly 4 meals: Breakfast, Lunch, Snack, Dinner.
+2. Respect every allergy and each member's nutrition target; use sensible portions.
+3. Use pantry ingredients when practical.
+4. For a selected cuisine with dataset recipes above, use those exact recipe names.
+5. NEVER label a Pakistani/Indian/Desi dish as another cuisine.
+6. If the selected cuisine has no dataset recipe, generate an authentic recipe of the selected cuisine. Do not substitute Desi food.
+7. Shared family dish, with portions per member.
+8. Keep descriptions and ingredients short.
+9. Return ONLY JSON, no markdown, no explanation.
 
-STRICT RULES:
-- If a selected cuisine has dataset recipes above, use those exact recipe names for that cuisine.
-- If the selected cuisine has NO dataset recipes, create authentic recipes from that cuisine; never replace them with Pakistani/Indian/Desi.
-- Never call a Desi/Pakistani/Indian dish Chinese, Italian, Thai, etc.
-- Respect all allergies.
-- Prefer pantry ingredients when practical.
-- Shared dish, different member portions.
-- Breakfast, Lunch, Snack and Dinner for all 7 days.
-- Keep nutrition realistic.
-- Return ONLY compact valid JSON.
-
-FORMAT:{{"days":[{{"day":1,"meals":[{{"meal":"Breakfast","cuisine":"{selected[0]}","main":"Recipe name","calories":400,"protein":20,"carbs":40,"fat":15,"portions":{{"Member":"1 serving"}},"description":"short description","ingredients":["ingredient 1"]}}]}}]}}"""
+JSON shape:
+{{"days":[{{"day":1,"meals":[{{"meal":"Breakfast","cuisine":"selected cuisine","main":"Recipe","calories":400,"protein":20,"carbs":40,"fat":15,"portions":{{"Member":"1 serving"}},"description":"short","ingredients":["item"]}}]}}]}}"""
 
     try:
         r=client.chat.completions.create(
             model=AI_MODEL,
             messages=[
-                {"role":"system","content":"You are NutriNest's meal-planning engine. Return ONLY valid JSON. Follow the selected cuisine exactly."},
-                {"role":"user","content":prompt}
-            ],temperature=.2,max_tokens=2600,
+                {"role":"system","content":"NutriNest meal planner. Output ONLY compact valid JSON. Never substitute cuisines."},
+                {"role":"user","content":prompt},
+            ],
+            temperature=.1,
+            max_tokens=3600,
         )
-        obj=extract_json(r.choices[0].message.content)
-        if not isinstance(obj,dict) or not isinstance(obj.get("days"),list) or len(obj["days"])<7:
-            raise RuntimeError("Groq returned an invalid 7-day meal-plan response. Please try again.")
-        days=obj["days"][:7]
+
+        raw=r.choices[0].message.content if r.choices else ""
+        obj=extract_json(raw)
+
+        # Some model responses can be valid JSON but use a wrapper key.
+        if isinstance(obj,dict) and isinstance(obj.get("plan"),dict):
+            obj=obj["plan"]
+
+        if not isinstance(obj,dict) or not isinstance(obj.get("days"),list):
+            raise RuntimeError("Groq returned an invalid response. Please click Generate Meal Plan again.")
+
+        days=obj["days"]
+        if len(days)<7:
+            raise RuntimeError("Groq did not return all 7 days. Please click Generate Meal Plan again.")
+
+        days=days[:7]
+        meal_names={"breakfast","lunch","snack","dinner"}
+        for i,day in enumerate(days,1):
+            if not isinstance(day,dict):
+                raise RuntimeError(f"Groq returned an invalid day {i}. Please generate again.")
+            meals=day.get("meals")
+            if not isinstance(meals,list):
+                raise RuntimeError(f"Groq returned no meals for day {i}. Please generate again.")
+
+            # Keep exactly one meal of each required type where possible.
+            normalized=[]
+            seen=set()
+            for meal in meals:
+                if not isinstance(meal,dict):
+                    continue
+                typ=str(meal.get("meal","")).strip()
+                key=typ.casefold()
+                if key in meal_names and key not in seen:
+                    meal["meal"]=typ.title()
+                    seen.add(key)
+                    normalized.append(meal)
+
+            if len(normalized)<4:
+                raise RuntimeError(f"Groq returned incomplete meals for day {i}. Please generate again.")
+            day["day"]=i
+            day["meals"]=normalized[:4]
+
         if selected_nonmixed:
             for day in days:
-                for meal in day.get("meals",[]):
+                for meal in day["meals"]:
                     mc=str(meal.get("cuisine","")).strip()
+                    main=str(meal.get("main","")).strip()
                     if mc and not any(cuisine_matches(mc,[wanted]) for wanted in selected_nonmixed):
-                        raise RuntimeError("The AI returned a meal outside your selected cuisine. NutriNest did not replace it with Desi food; please generate again.")
+                        raise RuntimeError("The AI returned a meal outside your selected cuisine. Please generate again.")
+                    if not mc:
+                        meal["cuisine"]=selected_nonmixed[0]
+                    # A dataset-grounded plan must not relabel an obviously mismatched cuisine.
+                    if pool and selected_nonmixed and main:
+                        pool_names={p["name"].casefold() for p in pool}
+                        if main.casefold() in pool_names:
+                            continue
+
         return days
+
     except RuntimeError:
         raise
     except Exception as e:
         msg=str(e)
         if "413" in msg or "tokens per minute" in msg.lower() or "rate_limit_exceeded" in msg.lower():
-            raise RuntimeError("Groq token limit was exceeded. The recipe context is now minimized; please wait a few seconds and try again.")
+            raise RuntimeError("Groq token limit exceeded. Please wait a few seconds and generate the plan again.")
         raise RuntimeError(f"Groq meal-plan generation failed: {e}")
 
 def meal_page():
