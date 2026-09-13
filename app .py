@@ -76,12 +76,16 @@ div[data-baseweb="select"] > div { border-radius:12px!important; }
 # ============================================================
 # DATA
 # ============================================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATHS = [
-    "data/nutrinest_recipes_clean.csv",
-    "data/recipes.csv",
-    "data/nutrinest_recipes.csv",
-    "nutrinest_recipes_clean.csv",
-    "recipes.csv",
+    os.path.join(BASE_DIR, "data", "nutrinest_recipes_clean.csv"),
+    os.path.join(BASE_DIR, "data", "nutrinest_recipes_clean.xlsx"),
+    os.path.join(BASE_DIR, "data", "nutrinest_recipes_clean.xls"),
+    os.path.join(BASE_DIR, "data", "recipes.csv"),
+    os.path.join(BASE_DIR, "data", "recipes.xlsx"),
+    os.path.join(BASE_DIR, "data", "recipes.xls"),
+    os.path.join(BASE_DIR, "nutrinest_recipes_clean.csv"),
+    os.path.join(BASE_DIR, "recipes.csv"),
 ]
 
 
@@ -99,7 +103,10 @@ def load_recipes():
     if not path:
         return pd.DataFrame(), None
     try:
-        df = pd.read_csv(path)
+        if path.lower().endswith(('.xlsx', '.xls')):
+            df = pd.read_excel(path)
+        else:
+            df = pd.read_csv(path)
     except Exception:
         return pd.DataFrame(), path
     df.columns = [str(c).strip().lower() for c in df.columns]
@@ -279,6 +286,7 @@ def get_client():
 
 
 client=get_client()
+AI_MODEL="openai/gpt-oss-120b"
 
 
 def extract_json(text):
@@ -743,27 +751,9 @@ def budget_page():
 # ============================================================
 # MEAL PLANNER
 # ============================================================
-def fallback_meal_plan():
-    base=[
-      ("Breakfast","Vegetable Omelette + Whole Wheat Roti",380,22,28,18,["Eggs","Onion","Tomato","Whole Wheat Flour"]),
-      ("Lunch","Chicken Rice Bowl",520,35,48,15,["Chicken","Rice","Onion","Tomato"]),
-      ("Snack","Chana Chaat",230,10,35,5,["Chickpeas","Tomato","Onion","Lemon"]),
-      ("Dinner","Daal + Roti + Salad",470,22,62,13,["Lentils","Whole Wheat Flour","Cucumber","Tomato"]),
-    ]
-    days=[]
-    for d in range(1,8):
-        meals=[]
-        for meal,name,cal,pro,carb,fat,ingredients in base:
-            portions={}
-            for m in st.session_state.family:
-                portions[m["name"]]="0.85 serving" if m["goal"]=="Weight Loss" else "1.15 servings" if m["goal"]=="Weight Gain" else "1 serving"
-            meals.append({"meal":meal,"main":name,"calories":cal,"protein":pro,"carbs":carb,"fat":fat,"portions":portions,"sides":[],"description":"A practical family-friendly meal.","ingredients":ingredients})
-        days.append({"day":d,"meals":meals})
-    return days
-
-
 def generate_ai_meal_plan(cuisines,preferences):
-    if not client: return None
+    if not client:
+        raise RuntimeError("Groq AI is not connected. Add GROQ_API_KEY in Streamlit → Settings → Secrets.")
     family=[{"name":m["name"],"goal":m["goal"],"target":m["nutrition"]["Target"],"protein":m["nutrition"]["Protein"],"allergies":m["allergies"]} for m in st.session_state.family]
     pool=[]
     if not recipes_df.empty:
@@ -781,11 +771,15 @@ Rules: respect allergies; prefer pantry ingredients; use one shared dish per mea
 Return ONLY JSON: {{"days":[{{"day":1,"meals":[{{"meal":"Breakfast","main":"Recipe","calories":400,"protein":20,"carbs":40,"fat":15,"portions":{{"Member":"1 serving"}},"description":"short","ingredients":["ingredient 1","ingredient 2"]}}]}}]}}
 """
     try:
-        r=client.chat.completions.create(model="openai/gpt-oss-120b",messages=[{"role":"system","content":"Return valid JSON only."},{"role":"user","content":prompt}],temperature=.25,max_tokens=6000)
+        r=client.chat.completions.create(model=AI_MODEL,messages=[{"role":"system","content":"Return valid JSON only."},{"role":"user","content":prompt}],temperature=.25,max_tokens=6000)
         obj=extract_json(r.choices[0].message.content)
-        if isinstance(obj,dict) and isinstance(obj.get("days"),list) and len(obj["days"])>=7: return obj["days"][:7]
-    except Exception: return None
-    return None
+        if isinstance(obj,dict) and isinstance(obj.get("days"),list) and len(obj["days"])>=7:
+            return obj["days"][:7]
+        raise RuntimeError("Groq returned an invalid meal-plan response. Please try again.")
+    except RuntimeError:
+        raise
+    except Exception as e:
+        raise RuntimeError(f"Groq meal-plan generation failed: {e}")
 
 
 def meal_page():
@@ -798,10 +792,13 @@ def meal_page():
     with b: preferences=st.multiselect("Preferences",["High Protein","High Fiber","Less Oil","Budget Friendly","Quick Meals","Vegetarian","Pantry First"],["High Protein","Less Oil"])
     if st.session_state.pantry: st.success(f"🧺 Pantry-aware planning: {len(st.session_state.pantry)} ingredients selected.")
     if st.button("✨ Generate 7-Day Family Meal Plan",type="primary",use_container_width=True):
-        with st.spinner("Creating your family plan..."):
-            plan=generate_ai_meal_plan(cuisines,preferences)
-            if plan is None: plan=fallback_meal_plan(); st.info("AI is unavailable, so NutriNest is using its built-in meal planning fallback.")
-            st.session_state.meal_plan=plan
+        with st.spinner("Creating your family plan with Groq AI..."):
+            try:
+                st.session_state.meal_plan=generate_ai_meal_plan(cuisines,preferences)
+                st.success("7-day AI meal plan generated 🎉")
+            except Exception as e:
+                st.session_state.meal_plan=[]
+                st.error(str(e))
     plan=st.session_state.meal_plan
     if not plan: return
     st.success("7-day meal plan ready 🎉")
@@ -844,29 +841,20 @@ def meal_page():
 # ============================================================
 # WORKOUT
 # ============================================================
-def fallback_workout(member):
-    home=member["workout_location"]=="Home"
-    push="Wall / Incline Push-ups" if home else "Push-ups"
-    return {"member":member["name"],"week":[
-      {"day":1,"focus":"Full Body","exercises":[{"name":"Bodyweight Squats","sets":"3","reps":"12"},{"name":push,"sets":"3","reps":"10"},{"name":"Brisk Walk","duration":"20 min"}]},
-      {"day":2,"focus":"Recovery","exercises":[{"name":"Gentle Stretching","duration":"15 min"}]},
-      {"day":3,"focus":"Lower Body","exercises":[{"name":"Lunges","sets":"3","reps":"10 each"},{"name":"Glute Bridges","sets":"3","reps":"15"}]},
-      {"day":4,"focus":"Rest","exercises":[]},
-      {"day":5,"focus":"Upper Body + Core","exercises":[{"name":push,"sets":"3","reps":"12"},{"name":"Plank","duration":"30 sec"}]},
-      {"day":6,"focus":"Cardio","exercises":[{"name":"Brisk Walk","duration":"30 min"}]},
-      {"day":7,"focus":"Recovery","exercises":[{"name":"Gentle Stretching","duration":"15 min"}]},
-    ]}
-
-
 def generate_ai_workout(member):
-    if not client:return None
+    if not client:
+        raise RuntimeError("Groq AI is not connected. Add GROQ_API_KEY in Streamlit → Settings → Secrets.")
     prompt=f"Create a safe general 7-day workout plan for {member['name']}. Goal={member['goal']}, activity={member['activity_level']}, location={member['workout_location']}, equipment={member['equipment']}. Include rest/recovery. Return ONLY JSON with member and week list, each day having day, focus and exercises with name plus sets/reps or duration. Do not give medical treatment advice."
     try:
-        r=client.chat.completions.create(model="openai/gpt-oss-120b",messages=[{"role":"system","content":"Return valid JSON only."},{"role":"user","content":prompt}],temperature=.3,max_tokens=3000)
+        r=client.chat.completions.create(model=AI_MODEL,messages=[{"role":"system","content":"Return valid JSON only."},{"role":"user","content":prompt}],temperature=.3,max_tokens=3000)
         obj=extract_json(r.choices[0].message.content)
-        if isinstance(obj,dict) and isinstance(obj.get("week"),list) and len(obj["week"])>=7:return obj
-    except Exception:return None
-    return None
+        if isinstance(obj,dict) and isinstance(obj.get("week"),list) and len(obj["week"])>=7:
+            return obj
+        raise RuntimeError("Groq returned an invalid workout response. Please try again.")
+    except RuntimeError:
+        raise
+    except Exception as e:
+        raise RuntimeError(f"Groq workout generation failed: {e}")
 
 
 def workout_page():
@@ -877,7 +865,13 @@ def workout_page():
     member=next(m for m in st.session_state.family if m["name"]==selected)
     st.markdown(f"<div class='soft-card'><span class='pill'>{member['goal']}</span><span class='pill'>{member['workout_location']}</span><p><b>Equipment:</b> {', '.join(member['equipment'])}</p></div>",unsafe_allow_html=True)
     if st.button("🏃 Generate 7-Day Workout",type="primary",use_container_width=True):
-        plan=generate_ai_workout(member) or fallback_workout(member); st.session_state.workouts[selected]=plan; st.success("Workout plan generated.")
+        with st.spinner("Creating your workout with Groq AI..."):
+            try:
+                st.session_state.workouts[selected]=generate_ai_workout(member)
+                st.success("7-day AI workout generated 🎉")
+            except Exception as e:
+                st.session_state.workouts.pop(selected,None)
+                st.error(str(e))
     plan=st.session_state.workouts.get(selected)
     if not plan:return
     completed=0
@@ -1008,8 +1002,8 @@ with st.sidebar:
     st.caption("Use the cards on Dashboard and the Back / Dashboard buttons inside each module.")
 
     st.markdown("### System status")
-    st.write("AI: " + ("🟢 Connected" if client else "🟡 Fallback mode"))
-    st.write("Recipes: " + ("🟢 Loaded" if not recipes_df.empty else "🔴 Not found"))
+    st.write("AI: " + ("🟢 Connected" if client else "🔴 Not connected"))
+    st.write("Recipes: " + (f"🟢 Loaded ({len(recipes_df):,})" if not recipes_df.empty else "🔴 Dataset missing"))
     st.write(f"Family: {len(st.session_state.family)} member(s)")
     st.write(f"Pantry: {len(st.session_state.pantry)} item(s)")
     st.caption("Groq uses Streamlit Secrets. Keep secrets.toml out of GitHub.")
