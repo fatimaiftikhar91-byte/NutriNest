@@ -77,62 +77,107 @@ div[data-baseweb="select"] > div { border-radius:12px!important; }
 # DATA
 # ============================================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# NutriNest accepts the cleaned database in the GitHub repo's data folder.
+# We also search nested folders and common filenames so a repo layout change
+# does not silently make Recipe Explorer empty.
+DATA_ROOT = os.path.join(BASE_DIR, "data")
 DATA_PATHS = [
-    os.path.join(BASE_DIR, "data", "nutrinest_recipes_clean.csv"),
-    os.path.join(BASE_DIR, "data", "nutrinest_recipes_clean.xlsx"),
-    os.path.join(BASE_DIR, "data", "nutrinest_recipes_clean.xls"),
-    os.path.join(BASE_DIR, "data", "recipes.csv"),
-    os.path.join(BASE_DIR, "data", "recipes.xlsx"),
-    os.path.join(BASE_DIR, "data", "recipes.xls"),
+    os.path.join(DATA_ROOT, "nutrinest_recipes_clean.csv"),
+    os.path.join(DATA_ROOT, "nutrinest_recipes_clean.xlsx"),
+    os.path.join(DATA_ROOT, "nutrinest_recipes_clean.xls"),
+    os.path.join(DATA_ROOT, "recipes.csv"),
+    os.path.join(DATA_ROOT, "recipes.xlsx"),
+    os.path.join(DATA_ROOT, "recipes.xls"),
     os.path.join(BASE_DIR, "nutrinest_recipes_clean.csv"),
     os.path.join(BASE_DIR, "recipes.csv"),
 ]
 
 
+def _is_recipe_table(df):
+    cols={str(c).strip().casefold() for c in df.columns}
+    name_ok=bool(cols & {"recipe_name","name","recipe name","dish name","recipe_name"})
+    return name_ok
+
+
 def find_dataset():
+    # 1) Exact expected paths first.
     for p in DATA_PATHS:
-        if os.path.exists(p):
+        if os.path.isfile(p):
             return p
+
+    # 2) Case-insensitive recursive search inside data/.
+    if os.path.isdir(DATA_ROOT):
+        preferred=[]
+        others=[]
+        for root, _, files in os.walk(DATA_ROOT):
+            for fname in files:
+                low=fname.casefold()
+                if low.endswith((".csv",".xlsx",".xls")):
+                    full=os.path.join(root,fname)
+                    if "nutrinest" in low or "recipe" in low:
+                        preferred.append(full)
+                    else:
+                        others.append(full)
+        # Prefer likely recipe databases, but validate the table before returning.
+        for candidate in preferred + others:
+            try:
+                if candidate.lower().endswith((".xlsx",".xls")):
+                    test=pd.read_excel(candidate,nrows=3)
+                else:
+                    test=pd.read_csv(candidate,nrows=3)
+                if _is_recipe_table(test):
+                    return candidate
+            except Exception:
+                continue
     return None
 
 
 @st.cache_data
-
 def load_recipes():
-    path = find_dataset()
+    path=find_dataset()
     if not path:
         return pd.DataFrame(), None
     try:
-        if path.lower().endswith(('.xlsx', '.xls')):
-            df = pd.read_excel(path)
+        if path.lower().endswith((".xlsx", ".xls")):
+            df=pd.read_excel(path)
         else:
-            df = pd.read_csv(path)
+            # utf-8-sig handles CSVs exported by Excel/Colab without changing the data.
+            df=pd.read_csv(path, encoding="utf-8-sig")
     except Exception:
         return pd.DataFrame(), path
-    df.columns = [str(c).strip().lower() for c in df.columns]
-    aliases = {
+
+    df.columns=[str(c).strip().lower() for c in df.columns]
+    aliases={
         "name":"recipe_name", "recipe name":"recipe_name", "dish name":"recipe_name",
-        "calories_per_serving":"calories", "calories per serving":"calories",
-        "protein":"protein_g", "protein(g)":"protein_g", "protein per serving":"protein_g",
+        "recipe":"recipe_name", "calories_per_serving":"calories", "calories per serving":"calories",
+        "calories (kcal)":"calories", "protein":"protein_g", "protein(g)":"protein_g",
+        "protein (g)":"protein_g", "protein per serving":"protein_g",
         "carbs":"carbs_g", "carbohydrates":"carbs_g", "carbs(g)":"carbs_g",
-        "fat":"fat_g", "fat(g)":"fat_g", "cuisine_type":"cuisine", "cuisine type":"cuisine",
-        "meal type":"meal_type",
+        "carbohydrates (g)":"carbs_g", "fat":"fat_g", "fat(g)":"fat_g", "fats(g)":"fat_g",
+        "fats (g)":"fat_g", "cuisine_type":"cuisine", "cuisine type":"cuisine",
+        "cuisine_type":"cuisine", "meal type":"meal_type", "mealtype":"meal_type",
+        "ingredients list":"ingredients",
     }
     for old,new in aliases.items():
         if old in df.columns and new not in df.columns:
-            df = df.rename(columns={old:new})
-    defaults = {
+            df=df.rename(columns={old:new})
+
+    defaults={
         "recipe_name":"Recipe", "meal_type":"Main", "cuisine":"Mixed", "ingredients":"",
         "steps":"", "allergens":"", "tags":"", "calories":0, "protein_g":0, "carbs_g":0,
         "fat_g":0, "fiber_g":0, "servings":1, "serving_size":"1 serving",
     }
     for c,d in defaults.items():
         if c not in df.columns:
-            df[c] = d
-    for c in ["calories","protein_g","carbs_g","fat_g","fiber_g","servings"]:
-        df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0)
-    return df, path
+            df[c]=d
 
+    for c in ["calories","protein_g","carbs_g","fat_g","fiber_g","servings"]:
+        df[c]=pd.to_numeric(df[c],errors="coerce").fillna(0)
+    df["recipe_name"]=df["recipe_name"].astype(str).str.strip()
+    df["cuisine"]=df["cuisine"].astype(str).str.strip()
+    df=df[df["recipe_name"].ne("") & df["recipe_name"].ne("Recipe")].copy()
+    return df.reset_index(drop=True),path
 
 recipes_df, recipe_source = load_recipes()
 
@@ -751,35 +796,64 @@ def budget_page():
 # ============================================================
 # MEAL PLANNER
 # ============================================================
+COMMON_CUISINES=[
+    "Pakistani","Indian","Chinese","Italian","Continental","Mediterranean",
+    "Mexican","Thai","Japanese","Korean","Middle Eastern","American","Mixed"
+]
+
+
 def available_cuisines():
-    """Return clean cuisine names available in the recipe dataset."""
-    if recipes_df.empty or "cuisine" not in recipes_df.columns:
-        return []
-    vals=[]
-    for value in recipes_df["cuisine"].dropna().astype(str):
-        value=value.strip()
-        if value and value.casefold() not in {"unknown", "nan", "mixed", "none"}:
-            vals.append(value)
+    """Dataset cuisines first, then common AI cuisines. No cuisine is forced to Desi."""
+    values=[]
+    if not recipes_df.empty and "cuisine" in recipes_df.columns:
+        for value in recipes_df["cuisine"].dropna().astype(str):
+            value=value.strip()
+            if value and value.casefold() not in {"unknown","nan","none"}:
+                values.append(value)
     seen=set(); out=[]
-    for value in sorted(vals, key=str.casefold):
+    # Keep familiar choices available even if the cleaned dataset does not contain them.
+    for value in values + COMMON_CUISINES:
         key=value.casefold()
         if key not in seen:
             seen.add(key); out.append(value)
+    # Mixed at the end makes the selector predictable.
+    out=[x for x in out if x.casefold()!="mixed"]+(["Mixed"] if any(x.casefold()=="mixed" for x in out) else [])
     return out
 
 
 def cuisine_matches(value, selected):
     v=str(value or "").strip().casefold()
-    wanted=[str(x).strip().casefold() for x in selected]
+    wanted=[str(x).strip().casefold() for x in selected if str(x).strip()]
     if not wanted or "mixed" in wanted:
         return True
+    aliases={
+        "pakistani":["pakistani","pakistan"],
+        "indian":["indian","india"],
+        "chinese":["chinese","china"],
+        "italian":["italian","italy"],
+        "continental":["continental","western","european","american"],
+        "mediterranean":["mediterranean","greek","turkish","levantine"],
+        "mexican":["mexican","mexico"],
+        "thai":["thai","thailand"],
+        "japanese":["japanese","japan"],
+        "korean":["korean","korea"],
+        "middle eastern":["middle eastern","middle-east","arabic","levantine","persian"],
+        "american":["american","usa","united states"],
+        "desi / pakistani":["pakistani","indian","desi","south asian"],
+    }
     for w in wanted:
-        if w == "desi / pakistani":
-            if any(x in v for x in ["pakistan", "indian", "desi", "south asian"]):
-                return True
-        elif w in v or v in w:
+        terms=aliases.get(w,[w])
+        if any(term in v for term in terms):
             return True
     return False
+
+
+def cuisine_pool(selected_cuisines):
+    if recipes_df.empty:
+        return recipes_df.copy()
+    if not selected_cuisines or any(str(x).casefold()=="mixed" for x in selected_cuisines):
+        return recipes_df.copy()
+    return recipes_df[recipes_df["cuisine"].apply(lambda x:cuisine_matches(x,selected_cuisines))].copy()
 
 
 def generate_ai_meal_plan(cuisines, preferences):
@@ -792,86 +866,73 @@ def generate_ai_meal_plan(cuisines, preferences):
          "fat":m["nutrition"]["Fat"],"allergies":m["allergies"]}
         for m in st.session_state.family
     ]
+    selected=[str(x) for x in (cuisines or ["Mixed"])]
+    selected_nonmixed=[x for x in selected if x.casefold()!="mixed"]
 
-    selected_cuisines=cuisines or ["Mixed"]
+    safe=recipes_df[recipes_df.apply(safe_for_family,axis=1)].copy() if not recipes_df.empty else pd.DataFrame()
+    matched=safe if not selected_nonmixed else safe[safe["cuisine"].apply(lambda x:cuisine_matches(x,selected_nonmixed))]
+
+    # Give Groq a tiny, relevant recipe context. This prevents TPM 413 errors.
     pool=[]
-    if not recipes_df.empty:
-        safe=recipes_df[recipes_df.apply(safe_for_family,axis=1)].copy()
-        if "cuisine" in safe.columns and selected_cuisines != ["Mixed"]:
-            safe=safe[safe["cuisine"].apply(lambda x: cuisine_matches(x, selected_cuisines))]
-        for _,r in safe.head(8).iterrows():
+    if not matched.empty:
+        cols=["recipe_name","cuisine","meal_type","calories","protein_g","carbs_g","fat_g"]
+        for _,r in matched.head(6).iterrows():
             pool.append({
-                "name":str(r.get("recipe_name","Recipe")),
-                "cuisine":str(r.get("cuisine","")),
-                "meal_type":str(r.get("meal_type","Main")),
-                "calories":round(float(r.get("calories",0) or 0)),
+                "name":str(r.get("recipe_name","Recipe")),"cuisine":str(r.get("cuisine","")),
+                "meal_type":str(r.get("meal_type","Main")),"calories":round(float(r.get("calories",0) or 0)),
                 "protein":round(float(r.get("protein_g",0) or 0)),
-                "ingredients":str(r.get("ingredients", ""))[:350],
+                "carbs":round(float(r.get("carbs_g",0) or 0)),"fat":round(float(r.get("fat_g",0) or 0)),
             })
 
     prompt=f"""Create a realistic 7-day shared family meal plan.
 
-FAMILY:
-{json.dumps(family, ensure_ascii=False)}
+FAMILY:{json.dumps(family,ensure_ascii=False)}
+SELECTED CUISINE:{json.dumps(selected,ensure_ascii=False)}
+PREFERENCES:{json.dumps(preferences,ensure_ascii=False)}
+PANTRY:{json.dumps(st.session_state.pantry[:25],ensure_ascii=False)}
+BUDGET:PKR {st.session_state.budget_amount} per {st.session_state.budget_period.lower()}
 
-SELECTED CUISINE(S):
-{json.dumps(selected_cuisines, ensure_ascii=False)}
+RELEVANT DATASET RECIPES:{json.dumps(pool,ensure_ascii=False)}
 
-PREFERENCES:
-{json.dumps(preferences, ensure_ascii=False)}
+STRICT RULES:
+- If a selected cuisine has dataset recipes above, use those exact recipe names for that cuisine.
+- If the selected cuisine has NO dataset recipes, create authentic recipes from that cuisine; never replace them with Pakistani/Indian/Desi.
+- Never call a Desi/Pakistani/Indian dish Chinese, Italian, Thai, etc.
+- Respect all allergies.
+- Prefer pantry ingredients when practical.
+- Shared dish, different member portions.
+- Breakfast, Lunch, Snack and Dinner for all 7 days.
+- Keep nutrition realistic.
+- Return ONLY compact valid JSON.
 
-PANTRY:
-{json.dumps(st.session_state.pantry, ensure_ascii=False)}
-
-BUDGET:
-PKR {st.session_state.budget_amount} per {st.session_state.budget_period.lower()}
-
-AVAILABLE RECIPE OPTIONS FROM DATASET:
-{json.dumps(pool, ensure_ascii=False)}
-
-RULES:
-1. Follow the selected cuisine strictly.
-2. Never substitute Pakistani, Indian or Desi food when another cuisine is selected.
-3. Respect every listed allergy.
-4. Prefer pantry ingredients when practical.
-5. Use one shared dish per meal with individual portions.
-6. Include Breakfast, Lunch, Snack and Dinner for all 7 days.
-7. Keep nutrition realistic for the family's calorie and protein targets.
-8. If the dataset options are empty for the selected cuisine, create genuinely authentic examples of the selected cuisine instead of using Desi recipes.
-9. Return ONLY valid JSON, no markdown.
-
-JSON FORMAT:
-{{"days":[{{"day":1,"meals":[{{"meal":"Breakfast","cuisine":"selected cuisine","main":"Recipe name","calories":400,"protein":20,"carbs":40,"fat":15,"portions":{{"Member":"1 serving"}},"description":"short description","ingredients":["ingredient 1","ingredient 2"]}}]}}]}}"""
+FORMAT:{{"days":[{{"day":1,"meals":[{{"meal":"Breakfast","cuisine":"{selected[0]}","main":"Recipe name","calories":400,"protein":20,"carbs":40,"fat":15,"portions":{{"Member":"1 serving"}},"description":"short description","ingredients":["ingredient 1"]}}]}}]}}"""
 
     try:
         r=client.chat.completions.create(
             model=AI_MODEL,
             messages=[
-                {"role":"system","content":"You are NutriNest's meal-planning engine. Return ONLY compact valid JSON. Obey the requested cuisine exactly."},
+                {"role":"system","content":"You are NutriNest's meal-planning engine. Return ONLY valid JSON. Follow the selected cuisine exactly."},
                 {"role":"user","content":prompt}
-            ],
-            temperature=.2,
-            max_tokens=3000,
+            ],temperature=.2,max_tokens=2600,
         )
         obj=extract_json(r.choices[0].message.content)
         if not isinstance(obj,dict) or not isinstance(obj.get("days"),list) or len(obj["days"])<7:
             raise RuntimeError("Groq returned an invalid 7-day meal-plan response. Please try again.")
         days=obj["days"][:7]
-        if selected_cuisines != ["Mixed"]:
+        if selected_nonmixed:
             for day in days:
                 for meal in day.get("meals",[]):
                     mc=str(meal.get("cuisine","")).strip()
-                    if mc and not cuisine_matches(mc, selected_cuisines):
-                        raise RuntimeError("Groq returned meals outside the selected cuisine. Please generate again; NutriNest will not silently replace your cuisine with Desi food.")
+                    if mc and not any(cuisine_matches(mc,[wanted]) for wanted in selected_nonmixed):
+                        raise RuntimeError("The AI returned a meal outside your selected cuisine. NutriNest did not replace it with Desi food; please generate again.")
         return days
     except RuntimeError:
         raise
     except Exception as e:
         msg=str(e)
-        if "413" in msg or "tokens per minute" in msg.lower() or "rate_limit_exceeded" in msg:
-            raise RuntimeError("Groq token limit was exceeded. NutriNest now sends a much smaller recipe context; wait a few seconds and generate again.")
+        if "413" in msg or "tokens per minute" in msg.lower() or "rate_limit_exceeded" in msg.lower():
+            raise RuntimeError("Groq token limit was exceeded. The recipe context is now minimized; please wait a few seconds and try again.")
         raise RuntimeError(f"Groq meal-plan generation failed: {e}")
-
 
 def meal_page():
     page_nav()
@@ -879,12 +940,9 @@ def meal_page():
     if not st.session_state.family:
         st.warning("Add at least one family member first."); return
     a,b=st.columns(2)
-    dataset_cuisines=available_cuisines()
-    cuisine_options=dataset_cuisines + ([] if any(x.casefold()=="mixed" for x in dataset_cuisines) else ["Mixed"])
-    if not cuisine_options:
-        cuisine_options=["Desi / Pakistani","Indian","Chinese","Italian","Continental","Mixed"]
-    default_cuisine=[cuisine_options[0]]
-    with a: cuisines=st.multiselect("Preferred cuisines",cuisine_options,default_cuisine,help="Cuisine choices are driven by your recipe dataset. AI is instructed not to replace a selected cuisine with Desi food.")
+    cuisine_options=available_cuisines()
+    default_cuisine=["Mixed"] if "Mixed" in cuisine_options else [cuisine_options[0]]
+    with a: cuisines=st.multiselect("Preferred cuisines",cuisine_options,default_cuisine,help="Dataset cuisines are available directly; other cuisines are generated by AI without substituting Desi food.")
     with b: preferences=st.multiselect("Preferences",["High Protein","High Fiber","Less Oil","Budget Friendly","Quick Meals","Vegetarian","Pantry First"],["High Protein","Less Oil"])
     if st.session_state.pantry: st.success(f"🧺 Pantry-aware planning: {len(st.session_state.pantry)} ingredients selected.")
     if st.button("✨ Generate 7-Day Family Meal Plan",type="primary",use_container_width=True):
