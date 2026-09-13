@@ -751,34 +751,125 @@ def budget_page():
 # ============================================================
 # MEAL PLANNER
 # ============================================================
-def generate_ai_meal_plan(cuisines,preferences):
+def available_cuisines():
+    """Return clean cuisine names available in the recipe dataset."""
+    if recipes_df.empty or "cuisine" not in recipes_df.columns:
+        return []
+    vals=[]
+    for value in recipes_df["cuisine"].dropna().astype(str):
+        value=value.strip()
+        if value and value.casefold() not in {"unknown", "nan", "mixed", "none"}:
+            vals.append(value)
+    seen=set(); out=[]
+    for value in sorted(vals, key=str.casefold):
+        key=value.casefold()
+        if key not in seen:
+            seen.add(key); out.append(value)
+    return out
+
+
+def cuisine_matches(value, selected):
+    v=str(value or "").strip().casefold()
+    wanted=[str(x).strip().casefold() for x in selected]
+    if not wanted or "mixed" in wanted:
+        return True
+    for w in wanted:
+        if w == "desi / pakistani":
+            if any(x in v for x in ["pakistan", "indian", "desi", "south asian"]):
+                return True
+        elif w in v or v in w:
+            return True
+    return False
+
+
+def generate_ai_meal_plan(cuisines, preferences):
     if not client:
         raise RuntimeError("Groq AI is not connected. Add GROQ_API_KEY in Streamlit → Settings → Secrets.")
-    family=[{"name":m["name"],"goal":m["goal"],"target":m["nutrition"]["Target"],"protein":m["nutrition"]["Protein"],"allergies":m["allergies"]} for m in st.session_state.family]
+
+    family=[
+        {"name":m["name"],"goal":m["goal"],"target":m["nutrition"]["Target"],
+         "protein":m["nutrition"]["Protein"],"carbs":m["nutrition"]["Carbs"],
+         "fat":m["nutrition"]["Fat"],"allergies":m["allergies"]}
+        for m in st.session_state.family
+    ]
+
+    selected_cuisines=cuisines or ["Mixed"]
     pool=[]
     if not recipes_df.empty:
-        safe=recipes_df[recipes_df.apply(safe_for_family,axis=1)]
-        for _,r in safe.head(60).iterrows(): pool.append({"name":r["recipe_name"],"meal_type":r["meal_type"],"calories":r["calories"],"protein":r["protein_g"],"ingredients":r["ingredients"]})
-    prompt=f"""
-Create a realistic 7-day shared family meal plan.
-Family: {json.dumps(family)}
-Cuisines: {json.dumps(cuisines)}
-Preferences: {json.dumps(preferences)}
-Pantry: {json.dumps(st.session_state.pantry)}
-Budget: PKR {st.session_state.budget_amount} per {st.session_state.budget_period.lower()}
-Recipes: {json.dumps(pool)}
-Rules: respect allergies; prefer pantry ingredients; use one shared dish per meal with individual portions; include Breakfast, Lunch, Snack and Dinner every day; do not provide medical treatment advice.
-Return ONLY JSON: {{"days":[{{"day":1,"meals":[{{"meal":"Breakfast","main":"Recipe","calories":400,"protein":20,"carbs":40,"fat":15,"portions":{{"Member":"1 serving"}},"description":"short","ingredients":["ingredient 1","ingredient 2"]}}]}}]}}
-"""
+        safe=recipes_df[recipes_df.apply(safe_for_family,axis=1)].copy()
+        if "cuisine" in safe.columns and selected_cuisines != ["Mixed"]:
+            safe=safe[safe["cuisine"].apply(lambda x: cuisine_matches(x, selected_cuisines))]
+        for _,r in safe.head(8).iterrows():
+            pool.append({
+                "name":str(r.get("recipe_name","Recipe")),
+                "cuisine":str(r.get("cuisine","")),
+                "meal_type":str(r.get("meal_type","Main")),
+                "calories":round(float(r.get("calories",0) or 0)),
+                "protein":round(float(r.get("protein_g",0) or 0)),
+                "ingredients":str(r.get("ingredients", ""))[:350],
+            })
+
+    prompt=f"""Create a realistic 7-day shared family meal plan.
+
+FAMILY:
+{json.dumps(family, ensure_ascii=False)}
+
+SELECTED CUISINE(S):
+{json.dumps(selected_cuisines, ensure_ascii=False)}
+
+PREFERENCES:
+{json.dumps(preferences, ensure_ascii=False)}
+
+PANTRY:
+{json.dumps(st.session_state.pantry, ensure_ascii=False)}
+
+BUDGET:
+PKR {st.session_state.budget_amount} per {st.session_state.budget_period.lower()}
+
+AVAILABLE RECIPE OPTIONS FROM DATASET:
+{json.dumps(pool, ensure_ascii=False)}
+
+RULES:
+1. Follow the selected cuisine strictly.
+2. Never substitute Pakistani, Indian or Desi food when another cuisine is selected.
+3. Respect every listed allergy.
+4. Prefer pantry ingredients when practical.
+5. Use one shared dish per meal with individual portions.
+6. Include Breakfast, Lunch, Snack and Dinner for all 7 days.
+7. Keep nutrition realistic for the family's calorie and protein targets.
+8. If the dataset options are empty for the selected cuisine, create genuinely authentic examples of the selected cuisine instead of using Desi recipes.
+9. Return ONLY valid JSON, no markdown.
+
+JSON FORMAT:
+{{"days":[{{"day":1,"meals":[{{"meal":"Breakfast","cuisine":"selected cuisine","main":"Recipe name","calories":400,"protein":20,"carbs":40,"fat":15,"portions":{{"Member":"1 serving"}},"description":"short description","ingredients":["ingredient 1","ingredient 2"]}}]}}]}}"""
+
     try:
-        r=client.chat.completions.create(model=AI_MODEL,messages=[{"role":"system","content":"Return valid JSON only."},{"role":"user","content":prompt}],temperature=.25,max_tokens=6000)
+        r=client.chat.completions.create(
+            model=AI_MODEL,
+            messages=[
+                {"role":"system","content":"You are NutriNest's meal-planning engine. Return ONLY compact valid JSON. Obey the requested cuisine exactly."},
+                {"role":"user","content":prompt}
+            ],
+            temperature=.2,
+            max_tokens=3000,
+        )
         obj=extract_json(r.choices[0].message.content)
-        if isinstance(obj,dict) and isinstance(obj.get("days"),list) and len(obj["days"])>=7:
-            return obj["days"][:7]
-        raise RuntimeError("Groq returned an invalid meal-plan response. Please try again.")
+        if not isinstance(obj,dict) or not isinstance(obj.get("days"),list) or len(obj["days"])<7:
+            raise RuntimeError("Groq returned an invalid 7-day meal-plan response. Please try again.")
+        days=obj["days"][:7]
+        if selected_cuisines != ["Mixed"]:
+            for day in days:
+                for meal in day.get("meals",[]):
+                    mc=str(meal.get("cuisine","")).strip()
+                    if mc and not cuisine_matches(mc, selected_cuisines):
+                        raise RuntimeError("Groq returned meals outside the selected cuisine. Please generate again; NutriNest will not silently replace your cuisine with Desi food.")
+        return days
     except RuntimeError:
         raise
     except Exception as e:
+        msg=str(e)
+        if "413" in msg or "tokens per minute" in msg.lower() or "rate_limit_exceeded" in msg:
+            raise RuntimeError("Groq token limit was exceeded. NutriNest now sends a much smaller recipe context; wait a few seconds and generate again.")
         raise RuntimeError(f"Groq meal-plan generation failed: {e}")
 
 
@@ -788,7 +879,12 @@ def meal_page():
     if not st.session_state.family:
         st.warning("Add at least one family member first."); return
     a,b=st.columns(2)
-    with a: cuisines=st.multiselect("Preferred cuisines",["Desi / Pakistani","Indian","Chinese","Italian","Continental","Mixed"],["Desi / Pakistani"])
+    dataset_cuisines=available_cuisines()
+    cuisine_options=dataset_cuisines + ([] if any(x.casefold()=="mixed" for x in dataset_cuisines) else ["Mixed"])
+    if not cuisine_options:
+        cuisine_options=["Desi / Pakistani","Indian","Chinese","Italian","Continental","Mixed"]
+    default_cuisine=[cuisine_options[0]]
+    with a: cuisines=st.multiselect("Preferred cuisines",cuisine_options,default_cuisine,help="Cuisine choices are driven by your recipe dataset. AI is instructed not to replace a selected cuisine with Desi food.")
     with b: preferences=st.multiselect("Preferences",["High Protein","High Fiber","Less Oil","Budget Friendly","Quick Meals","Vegetarian","Pantry First"],["High Protein","Less Oil"])
     if st.session_state.pantry: st.success(f"🧺 Pantry-aware planning: {len(st.session_state.pantry)} ingredients selected.")
     if st.button("✨ Generate 7-Day Family Meal Plan",type="primary",use_container_width=True):
