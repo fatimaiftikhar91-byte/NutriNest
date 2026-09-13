@@ -1,13 +1,12 @@
 import ast
 import json
 import os
-import re
 import random
-from datetime import date, datetime
+import re
+from datetime import date
 
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import streamlit as st
 
 try:
@@ -21,7 +20,7 @@ except Exception:
 # =========================================================
 
 st.set_page_config(
-    page_title="NutriNest | Family Wellness",
+    page_title="NutriNest",
     page_icon="🥗",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -29,354 +28,342 @@ st.set_page_config(
 
 
 # =========================================================
-# PREMIUM UI
+# CUSTOM CSS
 # =========================================================
 
 st.markdown(
     """
 <style>
 
-:root {
-    --ink: #25302B;
-    --muted: #68756E;
-    --cream: #FBF8F3;
-    --white: #FFFFFF;
-    --sage: #E7F0E7;
-    --mint: #EEF7F1;
-    --peach: #FBE9DD;
-    --lavender: #EEEAF7;
-    --butter: #FFF3CF;
-    --accent: #587864;
-    --accent-dark: #395847;
-    --gold: #C98D3D;
-    --line: #E2DED5;
-}
-
 .stApp {
     background:
-        radial-gradient(circle at 5% 0%, rgba(231,240,231,.85), transparent 25rem),
-        radial-gradient(circle at 95% 5%, rgba(251,233,221,.75), transparent 27rem),
-        linear-gradient(180deg, #FBF8F3 0%, #F8F7F2 100%);
-    color: var(--ink);
+        radial-gradient(
+            circle at 5% 0%,
+            rgba(225, 239, 226, 0.9),
+            transparent 28rem
+        ),
+        radial-gradient(
+            circle at 95% 0%,
+            rgba(250, 231, 218, 0.8),
+            transparent 30rem
+        ),
+        #FBF8F3;
+    color: #25302B;
 }
 
 .block-container {
     max-width: 1350px;
-    padding-top: 1.4rem;
+    padding-top: 1.5rem;
     padding-bottom: 4rem;
 }
 
-h1,h2,h3,h4,h5,h6,p,label,span {
-    color: var(--ink);
+h1, h2, h3, h4, h5, h6 {
+    color: #25302B !important;
 }
 
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg,#EAF2E9,#F7F1E8);
+p, label, span {
+    color: #35433C;
 }
 
 .hero {
-    border-radius: 30px;
     padding: 2.3rem;
-    margin-bottom: 1.4rem;
+    border-radius: 30px;
     background:
         linear-gradient(
             120deg,
-            rgba(231,240,231,.95),
-            rgba(251,233,221,.92),
-            rgba(238,234,247,.95)
+            #E7F0E7,
+            #FBE9DD,
+            #EEEAF7
         );
-    border: 1px solid rgba(88,120,100,.14);
-    box-shadow: 0 18px 50px rgba(50,65,55,.08);
+    border: 1px solid #DDE5DC;
+    box-shadow: 0 15px 40px rgba(45, 65, 53, 0.08);
+    margin-bottom: 1.3rem;
 }
 
-.hero-kicker {
-    display:inline-block;
-    padding:.4rem .8rem;
-    border-radius:999px;
-    background:rgba(255,255,255,.75);
-    font-size:.78rem;
-    font-weight:800;
-    letter-spacing:.08em;
-    color:#486454;
+.hero-badge {
+    display: inline-block;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.8);
+    color: #486454 !important;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
 }
 
 .hero-title {
-    font-size:clamp(2rem,4vw,3.4rem);
-    line-height:1.05;
-    font-weight:900;
-    letter-spacing:-.04em;
-    margin:.65rem 0;
+    font-size: 3.2rem;
+    font-weight: 900;
+    line-height: 1.05;
+    margin-top: 0.7rem;
+    letter-spacing: -0.04em;
 }
 
-.hero-sub {
-    max-width:800px;
-    color:#58665F;
-    font-size:1.05rem;
-    line-height:1.6;
+.hero-subtitle {
+    max-width: 850px;
+    color: #5F6D65 !important;
+    font-size: 1.05rem;
+    line-height: 1.65;
 }
 
 .quote-card {
-    border-radius:22px;
-    padding:1.4rem 1.6rem;
-    margin:1rem 0 1.5rem;
-    background:linear-gradient(135deg,#FFFDF8,#EEF7F1);
-    border:1px solid #E1E6DE;
-    box-shadow:0 10px 28px rgba(50,65,55,.06);
+    margin: 1rem 0 1.5rem;
+    padding: 1.35rem 1.6rem;
+    border-radius: 22px;
+    background: linear-gradient(
+        135deg,
+        #FFFDF7,
+        #EEF7F0
+    );
+    border: 1px solid #DFE6DE;
+    box-shadow: 0 8px 25px rgba(40, 60, 48, 0.06);
 }
 
-.quote-text {
-    font-size:1.25rem;
-    font-weight:800;
-    line-height:1.5;
-    color:#35493E;
+.quote {
+    font-size: 1.22rem;
+    font-weight: 800;
+    color: #385044 !important;
 }
 
-.quote-author {
-    color:#738078;
-    font-size:.86rem;
-    margin-top:.45rem;
-}
-
-.feature-card {
-    min-height:190px;
-    border-radius:23px;
-    padding:1.25rem;
-    border:1px solid #E2DED5;
-    background:rgba(255,255,255,.90);
-    box-shadow:0 9px 28px rgba(40,55,47,.055);
-    transition:.2s ease;
-    margin-bottom:1rem;
-}
-
-.feature-card:hover {
-    transform:translateY(-4px);
-    box-shadow:0 16px 36px rgba(40,55,47,.10);
-}
-
-.feature-icon {
-    font-size:2.15rem;
-}
-
-.feature-title {
-    font-size:1.1rem;
-    font-weight:850;
-    margin:.55rem 0 .25rem;
-}
-
-.feature-desc {
-    color:#69766F;
-    font-size:.88rem;
-    line-height:1.45;
-}
-
-.member-card,
-.soft-card,
-.recipe-card,
-.stat-card {
-    border-radius:20px;
-    padding:1.1rem 1.2rem;
-    background:rgba(255,255,255,.92);
-    border:1px solid #E2DED5;
-    box-shadow:0 8px 25px rgba(40,55,47,.055);
-    margin-bottom:.9rem;
-}
-
-.member-card {
-    background:linear-gradient(145deg,#FFFFFF,#F1F7F1);
-}
-
-.recipe-card {
-    background:linear-gradient(145deg,#FFFFFF,#FFF9EE);
-}
-
-.stat-card {
-    text-align:center;
-}
-
-.big-number {
-    font-size:1.9rem;
-    font-weight:900;
-    color:#486B56;
-}
-
-.small-label {
-    color:#748078;
-    font-size:.82rem;
-}
-
-.pill {
-    display:inline-block;
-    padding:.28rem .65rem;
-    border-radius:999px;
-    background:#F2EEE5;
-    color:#675B49;
-    font-size:.76rem;
-    font-weight:750;
-    margin:.15rem;
-}
-
-.macro-chip {
-    display:inline-block;
-    padding:.3rem .6rem;
-    border-radius:999px;
-    background:#EEF5EF;
-    border:1px solid #DCE8DD;
-    color:#456051;
-    font-size:.78rem;
-    font-weight:750;
-    margin:.16rem;
-}
-
-.progress-wrap {
-    background:#E9E6DE;
-    border-radius:999px;
-    height:10px;
-    overflow:hidden;
-    margin:.5rem 0;
-}
-
-.progress-fill {
-    background:linear-gradient(90deg,#587864,#8AA891);
-    height:100%;
-    border-radius:999px;
+.quote-category {
+    color: #748078 !important;
+    font-size: 0.83rem;
+    margin-top: 0.4rem;
 }
 
 .slideshow {
-    position:relative;
-    height:210px;
-    overflow:hidden;
-    border-radius:26px;
-    margin-bottom:1.5rem;
+    height: 205px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 26px;
+    margin-bottom: 1.5rem;
 }
 
 .slide {
-    position:absolute;
-    inset:0;
-    opacity:0;
-    padding:2rem;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    animation:slideFade 20s infinite;
+    position: absolute;
+    inset: 0;
+    padding: 2rem;
+    opacity: 0;
+    animation: fadeSlide 20s infinite;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .slide:nth-child(1) {
-    background:linear-gradient(120deg,#E7F0E7,#F4F8F2);
-    animation-delay:0s;
+    background: linear-gradient(120deg, #E6F0E7, #F4F8F3);
 }
 
 .slide:nth-child(2) {
-    background:linear-gradient(120deg,#FBE9DD,#FFF5ED);
-    animation-delay:5s;
+    background: linear-gradient(120deg, #FBE8DC, #FFF5ED);
+    animation-delay: 5s;
 }
 
 .slide:nth-child(3) {
-    background:linear-gradient(120deg,#EEEAF7,#F7F5FC);
-    animation-delay:10s;
+    background: linear-gradient(120deg, #EEEAF7, #F8F6FC);
+    animation-delay: 10s;
 }
 
 .slide:nth-child(4) {
-    background:linear-gradient(120deg,#FFF3CF,#FFF9E7);
-    animation-delay:15s;
+    background: linear-gradient(120deg, #FFF1C9, #FFF9E8);
+    animation-delay: 15s;
 }
 
 .slide h2 {
-    margin:0 0 .4rem;
-    font-size:1.75rem;
-    font-weight:900;
+    font-size: 1.8rem;
+    margin: 0 0 0.35rem;
+    font-weight: 900;
 }
 
 .slide p {
-    max-width:650px;
-    color:#657169;
+    max-width: 720px;
+    color: #65736B !important;
 }
 
-@keyframes slideFade {
-    0% {opacity:0;}
-    5% {opacity:1;}
-    23% {opacity:1;}
-    28% {opacity:0;}
-    100% {opacity:0;}
+@keyframes fadeSlide {
+    0% {
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    23% {
+        opacity: 1;
+    }
+    28% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
 }
 
-.section-heading {
-    font-size:1.45rem;
-    font-weight:900;
-    margin:1.4rem 0 .9rem;
+.section-title {
+    font-size: 1.45rem;
+    font-weight: 900;
+    margin: 1.5rem 0 0.9rem;
+}
+
+.feature-card {
+    min-height: 180px;
+    padding: 1.25rem;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid #E3DED5;
+    box-shadow: 0 8px 26px rgba(45,60,50,0.06);
+    margin-bottom: 0.8rem;
+}
+
+.feature-icon {
+    font-size: 2.2rem;
+}
+
+.feature-title {
+    font-size: 1.08rem;
+    font-weight: 900;
+    margin-top: 0.45rem;
+}
+
+.feature-description {
+    color: #6C7771 !important;
+    font-size: 0.86rem;
+    line-height: 1.45;
+    margin-top: 0.25rem;
 }
 
 .page-header {
-    padding:1.3rem 1.5rem;
-    border-radius:22px;
-    background:linear-gradient(120deg,#EAF2E9,#FFF9F2);
-    border:1px solid #E2DED5;
-    margin-bottom:1.3rem;
+    padding: 1.35rem 1.5rem;
+    border-radius: 22px;
+    background: linear-gradient(
+        120deg,
+        #EAF2E9,
+        #FFF9F2
+    );
+    border: 1px solid #E1DED6;
+    margin-bottom: 1.3rem;
 }
 
 .page-header h1 {
-    margin:0;
-    font-size:2rem;
-    font-weight:900;
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 900;
 }
 
 .page-header p {
-    margin:.35rem 0 0;
-    color:#69766F;
+    margin: 0.4rem 0 0;
+    color: #6C7771 !important;
 }
 
-.stButton > button {
-    border-radius:13px;
-    min-height:2.65rem;
-    font-weight:800;
-    border:1px solid #587864;
-    background:#587864;
-    color:white !important;
-    box-shadow:0 5px 14px rgba(57,88,71,.12);
+.soft-card {
+    padding: 1.15rem;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid #E3DED5;
+    box-shadow: 0 7px 22px rgba(45,60,50,0.05);
+    margin-bottom: 0.9rem;
 }
 
-.stButton > button:hover {
-    background:#395847;
-    border-color:#395847;
+.recipe-card {
+    padding: 1.15rem;
+    border-radius: 20px;
+    background: linear-gradient(
+        145deg,
+        #FFFFFF,
+        #FFF9EF
+    );
+    border: 1px solid #E5DED1;
+    margin-bottom: 0.8rem;
 }
 
-div[data-testid="stMetric"] {
-    border-radius:18px;
-    border:1px solid #E2DED5;
-    background:rgba(255,255,255,.88);
-    padding:.8rem 1rem;
+.pill {
+    display: inline-block;
+    padding: 0.28rem 0.65rem;
+    margin: 0.15rem;
+    border-radius: 999px;
+    background: #F1EEE6;
+    color: #655D4D !important;
+    font-size: 0.75rem;
+    font-weight: 750;
+}
+
+.macro {
+    display: inline-block;
+    padding: 0.3rem 0.65rem;
+    margin: 0.15rem;
+    border-radius: 999px;
+    background: #EDF5EF;
+    color: #476151 !important;
+    font-size: 0.76rem;
+    font-weight: 750;
+}
+
+.member-card {
+    padding: 1.2rem;
+    border-radius: 21px;
+    background: linear-gradient(
+        145deg,
+        #FFFFFF,
+        #F0F7F0
+    );
+    border: 1px solid #DDE7DD;
+    box-shadow: 0 8px 24px rgba(45,60,50,0.05);
+    margin-bottom: 1rem;
+}
+
+.big-number {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #466853 !important;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 18px;
+    background: #FFFFFF;
+    border: 1px solid #E1DED6;
+}
+
+[data-testid="stMetric"] {
+    border-radius: 18px;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid #E2DED5;
+    padding: 0.8rem;
 }
 
 [data-testid="stMetricValue"] {
-    color:#3D5D4A;
-    font-weight:900;
+    color: #41614D !important;
+    font-weight: 900;
 }
 
-div[data-baseweb="select"] > div,
+.stButton > button {
+    border-radius: 13px;
+    min-height: 2.6rem;
+    font-weight: 800;
+    background: #587864;
+    border: 1px solid #587864;
+    color: white !important;
+}
+
+.stButton > button:hover {
+    background: #395847;
+    border-color: #395847;
+}
+
 .stTextInput input,
 .stNumberInput input,
 .stTextArea textarea {
-    border-radius:12px !important;
-    background:white !important;
-    color:#25302B !important;
+    border-radius: 12px !important;
+    background: white !important;
+    color: #25302B !important;
 }
 
-div[data-testid="stExpander"] {
-    border-radius:16px;
-    border:1px solid #E2DED5;
-    background:rgba(255,255,255,.72);
-}
-
-[data-testid="stDataFrame"] {
-    border-radius:16px;
-    overflow:hidden;
-}
-
-.back-button {
-    margin-bottom:.5rem;
+div[data-baseweb="select"] > div {
+    border-radius: 12px !important;
 }
 
 hr {
-    border-color:#E4E0D7;
+    border-color: #E2DED5;
 }
 
 </style>
@@ -386,10 +373,10 @@ hr {
 
 
 # =========================================================
-# DATA
+# RECIPE DATASET
 # =========================================================
 
-DATA_CANDIDATES = [
+DATA_PATHS = [
     "data/nutrinest_recipes_clean.csv",
     "data/recipes.csv",
     "data/nutrinest_recipes.csv",
@@ -398,18 +385,19 @@ DATA_CANDIDATES = [
 ]
 
 
-def find_recipe_file():
-    for path in DATA_CANDIDATES:
+def find_dataset():
+    for path in DATA_PATHS:
         if os.path.exists(path):
             return path
     return None
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data
 def load_recipes():
-    path = find_recipe_file()
 
-    if not path:
+    path = find_dataset()
+
+    if path is None:
         return pd.DataFrame(), None
 
     try:
@@ -417,103 +405,146 @@ def load_recipes():
     except Exception:
         return pd.DataFrame(), path
 
-    df.columns = [str(c).strip().lower() for c in df.columns]
+    df.columns = [
+        str(column).strip().lower()
+        for column in df.columns
+    ]
 
-    rename_map = {
+    rename = {
+        "name": "recipe_name",
         "recipe name": "recipe_name",
         "dish name": "recipe_name",
-        "name": "recipe_name",
         "calories_per_serving": "calories",
-        "reported_calories": "calories",
+        "calories per serving": "calories",
         "protein(g)": "protein_g",
-        "protein_g_per_serving": "protein_g",
+        "protein": "protein_g",
         "carbs(g)": "carbs_g",
-        "carbohydrates (g)": "carbs_g",
-        "carbs_g_per_serving": "carbs_g",
+        "carbohydrates": "carbs_g",
         "fat(g)": "fat_g",
-        "fats (g)": "fat_g",
-        "fat_g_per_serving": "fat_g",
-        "meal type": "meal_type",
-        "cuisine_type": "cuisine",
+        "fat": "fat_g",
         "cuisine type": "cuisine",
+        "cuisine_type": "cuisine",
+        "meal type": "meal_type",
     }
 
-    df = df.rename(
-        columns={
-            old: new
-            for old, new in rename_map.items()
-            if old in df.columns
-        }
-    )
-
-    for col in ["calories", "protein_g", "carbs_g", "fat_g"]:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+    for old, new in rename.items():
+        if old in df.columns:
+            df = df.rename(columns={old: new})
 
     defaults = {
-        "recipe_name": "Unnamed Recipe",
-        "cuisine": "Unspecified",
+        "recipe_name": "Recipe",
         "meal_type": "Main",
+        "cuisine": "Mixed",
         "ingredients": "",
         "steps": "",
         "allergens": "",
         "tags": "",
+        "calories": 0,
+        "protein_g": 0,
+        "carbs_g": 0,
+        "fat_g": 0,
     }
 
-    for col, default in defaults.items():
-        if col not in df.columns:
-            df[col] = default
+    for column, default in defaults.items():
+        if column not in df.columns:
+            df[column] = default
+
+    for column in [
+        "calories",
+        "protein_g",
+        "carbs_g",
+        "fat_g",
+    ]:
+        df[column] = pd.to_numeric(
+            df[column],
+            errors="coerce"
+        ).fillna(0)
 
     return df, path
 
 
-recipes_df, recipe_source = load_recipes()
+recipes, dataset_path = load_recipes()
 
 
 # =========================================================
-# AI
+# SESSION STATE
 # =========================================================
 
-def get_secret(name):
-    try:
-        if name in st.secrets:
-            return st.secrets[name]
-    except Exception:
-        pass
+if "page" not in st.session_state:
+    st.session_state.page = "Dashboard"
 
-    return os.environ.get(name)
+if "family" not in st.session_state:
+    st.session_state.family = []
 
+if "pantry" not in st.session_state:
+    st.session_state.pantry = []
 
-@st.cache_resource(show_spinner=False)
-def get_client():
-    key = get_secret("GROQ_API_KEY")
+if "favorites" not in st.session_state:
+    st.session_state.favorites = []
 
-    if key and Groq:
-        try:
-            return Groq(api_key=key)
-        except Exception:
-            return None
+if "shopping_list" not in st.session_state:
+    st.session_state.shopping_list = []
 
-    return None
+if "progress_logs" not in st.session_state:
+    st.session_state.progress_logs = []
 
+if "meal_plan" not in st.session_state:
+    st.session_state.meal_plan = None
 
-client = get_client()
+if "workout_plan" not in st.session_state:
+    st.session_state.workout_plan = {}
+
+if "budget_period" not in st.session_state:
+    st.session_state.budget_period = "Monthly"
+
+if "budget_amount" not in st.session_state:
+    st.session_state.budget_amount = 30000
 
 
 # =========================================================
-# NUTRITION ENGINE
+# NAVIGATION
 # =========================================================
 
-def calculate_nutrition(age, sex, height_cm, weight_kg, activity, goal):
+def navigate(page_name):
+    st.session_state.page = page_name
+    st.rerun()
 
-    if sex.lower() == "male":
+
+def back_button():
+
+    if st.session_state.page != "Dashboard":
+
+        if st.button(
+            "← Back to Dashboard",
+            key="back_to_dashboard"
+        ):
+            navigate("Dashboard")
+
+
+# =========================================================
+# NUTRITION CALCULATOR
+# =========================================================
+
+def calculate_nutrition(
+    age,
+    sex,
+    height_cm,
+    weight_kg,
+    activity,
+    goal
+):
+
+    if sex == "Male":
+
         bmr = (
             10 * weight_kg
             + 6.25 * height_cm
             - 5 * age
             + 5
         )
+
     else:
+
         bmr = (
             10 * weight_kg
             + 6.25 * height_cm
@@ -521,124 +552,166 @@ def calculate_nutrition(age, sex, height_cm, weight_kg, activity, goal):
             - 161
         )
 
-    multipliers = {
-        "sedentary": 1.20,
-        "light": 1.375,
-        "moderate": 1.55,
-        "active": 1.725,
-        "very_active": 1.90,
+    activity_factor = {
+        "Sedentary": 1.20,
+        "Light": 1.375,
+        "Moderate": 1.55,
+        "Active": 1.725,
+        "Very Active": 1.90,
     }
 
-    tdee = bmr * multipliers.get(activity, 1.55)
+    tdee = (
+        bmr
+        * activity_factor.get(
+            activity,
+            1.55
+        )
+    )
 
-    if goal == "weight_loss":
-        target = tdee - 400
-    elif goal == "weight_gain":
-        target = tdee + 300
+    if goal == "Weight Loss":
+        calories = tdee - 400
+
+    elif goal == "Weight Gain":
+        calories = tdee + 300
+
     else:
-        target = tdee
+        calories = tdee
 
-    target = max(target, 1200)
+    calories = max(
+        calories,
+        1200
+    )
+
+    bmi = weight_kg / (
+        (height_cm / 100) ** 2
+    )
+
+    protein = calories * 0.25 / 4
+    carbs = calories * 0.50 / 4
+    fat = calories * 0.25 / 9
 
     return {
-        "BMI": round(
-            weight_kg / ((height_cm / 100) ** 2),
-            1
-        ),
+        "BMI": round(bmi, 1),
         "BMR": round(bmr),
         "TDEE": round(tdee),
-        "Target": round(target),
-        "Protein": round(target * .25 / 4),
-        "Carbs": round(target * .50 / 4),
-        "Fat": round(target * .25 / 9),
+        "Calories": round(calories),
+        "Protein": round(protein),
+        "Carbs": round(carbs),
+        "Fat": round(fat),
         "Fiber": 30,
     }
 
 
 # =========================================================
-# ALLERGY ENGINE
+# ALLERGY FILTER
 # =========================================================
 
-ALLERGY_KEYWORDS = {
-    "nuts": [
-        "nut", "almond", "peanut", "cashew",
-        "walnut", "pistachio"
+ALLERGY_WORDS = {
+    "Nuts": [
+        "nut",
+        "almond",
+        "peanut",
+        "cashew",
+        "walnut",
+        "pistachio",
     ],
-    "dairy": [
-        "milk", "cheese", "yogurt",
-        "cream", "butter", "paneer"
+    "Dairy": [
+        "milk",
+        "cheese",
+        "yogurt",
+        "cream",
+        "butter",
+        "paneer",
     ],
-    "gluten": [
-        "wheat", "flour", "bread",
-        "roti", "chapati", "pasta", "barley"
+    "Gluten": [
+        "wheat",
+        "flour",
+        "bread",
+        "roti",
+        "chapati",
+        "pasta",
+        "barley",
     ],
-    "egg": [
-        "egg", "eggs"
+    "Egg": [
+        "egg",
+        "eggs",
     ],
-    "seafood": [
-        "fish", "prawn", "shrimp",
-        "seafood", "tuna", "salmon"
+    "Seafood": [
+        "fish",
+        "prawn",
+        "shrimp",
+        "seafood",
+        "tuna",
+        "salmon",
     ],
 }
 
 
-def safe_for_family(df, family):
+def family_allergies():
 
-    if df.empty or not family:
-        return df.copy()
+    allergies = []
 
-    blocked = []
+    for member in st.session_state.family:
 
-    for member in family:
+        for allergy in member.get(
+            "allergies",
+            []
+        ):
 
-        for allergy in member.get("allergies", []):
-
-            if allergy != "none":
-                blocked.extend(
-                    ALLERGY_KEYWORDS.get(
-                        allergy,
-                        [allergy]
-                    )
+            if allergy != "None":
+                allergies.append(
+                    allergy
                 )
 
-    if not blocked:
-        return df.copy()
-
-    text = (
-        df["ingredients"]
-        .fillna("")
-        .astype(str)
-        + " "
-        + df["recipe_name"]
-        .fillna("")
-        .astype(str)
-        + " "
-        + df["allergens"]
-        .fillna("")
-        .astype(str)
-    ).str.lower()
-
-    mask = ~text.apply(
-        lambda x: any(
-            word in x for word in blocked
-        )
+    return list(
+        set(allergies)
     )
 
-    return df[mask].copy()
+
+def allergy_safe(row):
+
+    allergies = family_allergies()
+
+    if not allergies:
+        return True
+
+    text = (
+        str(row.get("recipe_name", ""))
+        + " "
+        + str(row.get("ingredients", ""))
+        + " "
+        + str(row.get("allergens", ""))
+    ).lower()
+
+    for allergy in allergies:
+
+        words = ALLERGY_WORDS.get(
+            allergy,
+            [allergy.lower()]
+        )
+
+        for word in words:
+
+            if word in text:
+                return False
+
+    return True
 
 
 # =========================================================
-# PARSERS
+# LIST PARSER
 # =========================================================
 
-def parse_listish(value):
+def parse_list(value):
 
     if value is None:
         return []
 
     try:
+
         if pd.isna(value):
             return []
+
     except Exception:
         pass
 
@@ -655,111 +728,255 @@ def parse_listish(value):
         return []
 
     try:
+
         parsed = ast.literal_eval(text)
 
         if isinstance(parsed, list):
+
             return [
                 str(x).strip()
                 for x in parsed
                 if str(x).strip()
             ]
+
     except Exception:
         pass
 
     return [
         x.strip()
-        for x in re.split(r",|;|\||\n", text)
+        for x in re.split(
+            r"[,;|\n]",
+            text
+        )
         if x.strip()
     ]
 
 
-def normalize_text(value):
+def normalize(text):
+
     return re.sub(
         r"[^a-z0-9 ]",
         " ",
-        str(value).lower()
-    )
+        str(text).lower()
+    ).strip()
 
 
 # =========================================================
-# CUISINES
+# PANTRY MATCH
 # =========================================================
 
-CUISINE_MAP = {
-    "Desi / Pakistani": [
-        "pakistani",
-        "desi",
-        "indian",
-        "south asian",
-        "home-style",
-    ],
-    "Chinese": [
-        "chinese",
-        "asian",
-    ],
-    "Italian": [
-        "italian",
-    ],
-    "Continental": [
-        "continental",
-        "european",
-        "american",
-        "western",
-        "international",
-    ],
-}
+def pantry_match(row):
 
-
-def get_cuisine_recipes(
-    df,
-    selected_cuisines,
-    family=None
-):
-
-    if df.empty:
-        return pd.DataFrame()
-
-    data = safe_for_family(
-        df,
-        family or []
+    ingredients = parse_list(
+        row.get("ingredients", "")
     )
 
-    if not selected_cuisines:
-        return data.reset_index(drop=True)
+    if not ingredients:
+        return 0, [], []
 
-    if "Mixed" in selected_cuisines:
-        return data.reset_index(drop=True)
+    pantry = [
+        normalize(item)
+        for item in st.session_state.pantry
+    ]
 
-    keywords = []
+    matched = []
+    missing = []
 
-    for cuisine in selected_cuisines:
-        keywords.extend(
-            CUISINE_MAP.get(
-                cuisine,
-                [cuisine.lower()]
+    for ingredient in ingredients:
+
+        ingredient_normalized = normalize(
+            ingredient
+        )
+
+        found = False
+
+        for pantry_item in pantry:
+
+            if (
+                pantry_item in ingredient_normalized
+                or ingredient_normalized in pantry_item
+            ):
+
+                found = True
+                break
+
+        if found:
+            matched.append(
+                ingredient
             )
-        )
+        else:
+            missing.append(
+                ingredient
+            )
 
-    mask = data["cuisine"].fillna("").astype(str).str.lower().apply(
-        lambda x: any(
-            keyword in x
-            for keyword in keywords
-        )
+    percentage = round(
+        (
+            len(matched)
+            / max(len(ingredients), 1)
+        ) * 100
     )
 
-    filtered = data[mask]
-
-    if filtered.empty:
-        return data.reset_index(drop=True)
-
-    return filtered.reset_index(drop=True)
+    return (
+        percentage,
+        matched,
+        missing
+    )
 
 
 # =========================================================
-# PANTRY ENGINE
+# GROQ
 # =========================================================
 
-PANTRY_CATEGORIES = {
+def get_groq_client():
+
+    if Groq is None:
+        return None
+
+    try:
+
+        api_key = st.secrets.get(
+            "GROQ_API_KEY"
+        )
+
+    except Exception:
+
+        api_key = os.environ.get(
+            "GROQ_API_KEY"
+        )
+
+    if not api_key:
+        api_key = os.environ.get(
+            "GROQ_API_KEY"
+        )
+
+    if not api_key:
+        return None
+
+    try:
+        return Groq(
+            api_key=api_key
+        )
+    except Exception:
+        return None
+
+
+groq_client = get_groq_client()
+
+
+def extract_json(text):
+
+    if not text:
+        return None
+
+    text = str(text).strip()
+
+    if "```" in text:
+
+        parts = text.split("```")
+
+        text = max(
+            parts,
+            key=len
+        )
+
+        text = re.sub(
+            r"^json",
+            "",
+            text.strip(),
+            flags=re.IGNORECASE
+        )
+
+    start = text.find("{")
+    end = text.rfind("}")
+
+    if start == -1 or end == -1:
+        return None
+
+    try:
+
+        return json.loads(
+            text[start:end + 1]
+        )
+
+    except Exception:
+
+        return None
+
+
+# =========================================================
+# QUOTES
+# =========================================================
+
+QUOTES = [
+    (
+        "Small healthy choices today create a stronger tomorrow.",
+        "Healthy Living 🌱"
+    ),
+    (
+        "Consistency is more powerful than perfection.",
+        "Motivation 💚"
+    ),
+    (
+        "Eat well, move often, rest deeply.",
+        "Wellness 🌿"
+    ),
+    (
+        "Your health is one of your greatest investments.",
+        "Health ❤️"
+    ),
+    (
+        "Every workout is a vote for the person you want to become.",
+        "Fitness 💪"
+    ),
+    (
+        "A healthy family grows through healthy habits together.",
+        "Family Wellness 👨‍👩‍👧‍👦"
+    ),
+    (
+        "Nourish your body with food that helps you thrive.",
+        "Nutrition 🥗"
+    ),
+    (
+        "You do not need to be perfect. Keep moving forward.",
+        "Mindset ✨"
+    ),
+    (
+        "Progress may be slow, but it is still progress.",
+        "Motivation 🔥"
+    ),
+    (
+        "Healthy habits become easier when the whole family joins in.",
+        "Family Health 🏡"
+    ),
+]
+
+
+def show_quote():
+
+    text, category = random.choice(
+        QUOTES
+    )
+
+    st.markdown(
+        f"""
+        <div class="quote-card">
+            <div class="quote">
+                “{text}”
+            </div>
+            <div class="quote-category">
+                {category}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# =========================================================
+# PANTRY ITEMS
+# =========================================================
+
+PANTRY = {
     "🥩 Proteins": [
         "Chicken",
         "Beef",
@@ -829,271 +1046,34 @@ PANTRY_CATEGORIES = {
 }
 
 
-def pantry_match(recipe, pantry):
-
-    pantry_normalized = [
-        normalize_text(x)
-        for x in pantry
-    ]
-
-    ingredients = parse_listish(
-        recipe.get("ingredients", "")
-    )
-
-    if not ingredients:
-        return 0, [], []
-
-    matched = []
-    missing = []
-
-    for ingredient in ingredients:
-
-        ing = normalize_text(
-            ingredient
-        )
-
-        found = False
-
-        for pantry_item in pantry_normalized:
-
-            if (
-                pantry_item in ing
-                or ing in pantry_item
-            ):
-                found = True
-                break
-
-        if found:
-            matched.append(
-                ingredient
-            )
-        else:
-            missing.append(
-                ingredient
-            )
-
-    percentage = round(
-        len(matched) /
-        max(len(ingredients), 1)
-        * 100
-    )
-
-    return percentage, matched, missing
-
-
-def smart_recipe_matches(
-    df,
-    pantry,
-    family=None,
-    limit=12
-):
-
-    if df.empty:
-        return pd.DataFrame()
-
-    safe_df = safe_for_family(
-        df,
-        family or []
-    )
-
-    rows = []
-
-    for _, row in safe_df.iterrows():
-
-        match, matched, missing = pantry_match(
-            row,
-            pantry
-        )
-
-        item = row.to_dict()
-
-        item["pantry_match"] = match
-        item["matched_items"] = matched
-        item["missing_items"] = missing
-
-        rows.append(item)
-
-    result = pd.DataFrame(rows)
-
-    if result.empty:
-        return result
-
-    return result.sort_values(
-        by=["pantry_match"],
-        ascending=False
-    ).head(limit)
-
-
-# =========================================================
-# AI JSON
-# =========================================================
-
-def extract_json(text):
-
-    if not text:
-        return None
-
-    cleaned = text.strip()
-
-    if "```" in cleaned:
-
-        parts = cleaned.split("```")
-
-        cleaned = max(
-            parts,
-            key=len
-        )
-
-        cleaned = re.sub(
-            r"^json",
-            "",
-            cleaned,
-            flags=re.I
-        ).strip()
-
-    start = cleaned.find("{")
-    end = cleaned.rfind("}") + 1
-
-    if start < 0 or end <= start:
-        return None
-
-    try:
-        return json.loads(
-            cleaned[start:end]
-        )
-    except Exception:
-        return None
-
-
-# =========================================================
-# SESSION STATE
-# =========================================================
-
-DEFAULTS = {
-    "page": "Dashboard",
-    "family": [],
-    "logs": [],
-    "meal_plan": None,
-    "workouts": {},
-    "pantry": [],
-    "shopping_list": [],
-    "favorites": [],
-    "budget": {
-        "period": "Monthly",
-        "amount": 30000,
-    },
-}
-
-for key, value in DEFAULTS.items():
-
-    if key not in st.session_state:
-        st.session_state[key] = value
-
-
-# =========================================================
-# NAVIGATION
-# =========================================================
-
-def go(page):
-    st.session_state.page = page
-    st.rerun()
-
-
-def page_back():
-    if st.session_state.page != "Dashboard":
-        if st.button(
-            "← Back to Dashboard",
-            key="back_dashboard"
-        ):
-            go("Dashboard")
-
-
-# =========================================================
-# QUOTES
-# =========================================================
-
-QUOTES = [
-    (
-        "Small steps every day lead to big changes.",
-        "Daily Motivation 🌱"
-    ),
-    (
-        "Consistency beats perfection.",
-        "Fitness Mindset 💪"
-    ),
-    (
-        "Your health is an investment, not an expense.",
-        "Wellness Reminder ❤️"
-    ),
-    (
-        "Eat well. Move often. Rest deeply.",
-        "Healthy Living 🥗"
-    ),
-    (
-        "A healthy family is built one good choice at a time.",
-        "Family Wellness 👨‍👩‍👧‍👦"
-    ),
-    (
-        "Progress may be slow, but every healthy choice counts.",
-        "Motivation ✨"
-    ),
-    (
-        "Nourish your body with food that makes you feel good.",
-        "Nutrition Tip 🍎"
-    ),
-    (
-        "You do not need to be perfect. You just need to keep going.",
-        "Fitness Mindset 🔥"
-    ),
-    (
-        "Take care of your body. It is the only place you have to live.",
-        "Health Reminder 💚"
-    ),
-    (
-        "Healthy habits create a healthier future.",
-        "Wellness 🌿"
-    ),
-]
-
-
-def random_quote():
-
-    return random.choice(
-        QUOTES
-    )
-
-
 # =========================================================
 # DASHBOARD
 # =========================================================
 
 def dashboard():
 
-    quote, category = random_quote()
-
     st.markdown(
         """
         <div class="hero">
-            <div class="hero-kicker">
+
+            <span class="hero-badge">
                 SMART FAMILY WELLNESS
-            </div>
+            </span>
 
             <div class="hero-title">
                 Welcome to NutriNest 🥗
             </div>
 
-            <p class="hero-sub">
-                Your family's friendly nutrition, meal-planning,
-                pantry, fitness and progress companion — all in one place.
-            </p>
+            <div class="hero-subtitle">
+                Your family's nutrition, meal planning,
+                pantry, fitness and progress companion —
+                beautifully organized in one place.
+            </div>
+
         </div>
         """,
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
-
-    # -----------------------------------------------------
-    # SLIDESHOW
-    # -----------------------------------------------------
 
     st.markdown(
         """
@@ -1102,82 +1082,57 @@ def dashboard():
             <div class="slide">
                 <h2>🥗 Personalized Nutrition</h2>
                 <p>
-                    Understand your family's calorie and macro targets
-                    and make healthier everyday choices.
+                    Understand calories, protein, carbohydrates,
+                    fats and personal nutrition targets.
                 </p>
             </div>
 
             <div class="slide">
-                <h2>🍛 Smart Family Meals</h2>
+                <h2>🍛 Smart Family Meal Planning</h2>
                 <p>
-                    Create practical meals with individual portions,
-                    nutrition goals and family preferences in mind.
+                    Create practical meals for the whole family
+                    while keeping individual portions in mind.
                 </p>
             </div>
 
             <div class="slide">
-                <h2>🧺 Cook What You Have</h2>
+                <h2>🧺 Cook From Your Pantry</h2>
                 <p>
-                    Select ingredients already in your pantry and
-                    discover recipes you can make right now.
+                    Select what you already have and discover
+                    recipes you can make right now.
                 </p>
             </div>
 
             <div class="slide">
-                <h2>💪 Move & Track Progress</h2>
+                <h2>💪 Fitness & Progress</h2>
                 <p>
-                    Build weekly workouts and visualize your health
-                    and fitness journey over time.
+                    Build weekly workouts and visualize your
+                    health journey through meaningful graphs.
                 </p>
             </div>
 
         </div>
         """,
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
 
-    # -----------------------------------------------------
-    # QUOTE
-    # -----------------------------------------------------
-
-    st.markdown(
-        f"""
-        <div class="quote-card">
-            <div class="quote-text">
-                “{quote}”
-            </div>
-            <div class="quote-author">
-                {category}
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # -----------------------------------------------------
-    # QUICK STATS
-    # -----------------------------------------------------
+    show_quote()
 
     total_calories = sum(
-        m["nutrition"]["Target"]
-        for m in st.session_state.family
+        member["nutrition"]["Calories"]
+        for member in st.session_state.family
     )
 
-    daily_budget = (
-        st.session_state.budget["amount"]
-        if st.session_state.budget["period"] == "Daily"
-        else 0
-    )
+    budget = st.session_state.budget_amount
 
-    if st.session_state.budget["period"] == "Weekly":
-        daily_budget = (
-            st.session_state.budget["amount"] / 7
-        )
+    if st.session_state.budget_period == "Weekly":
+        daily_budget = budget / 7
 
-    elif st.session_state.budget["period"] == "Monthly":
-        daily_budget = (
-            st.session_state.budget["amount"] / 30
-        )
+    elif st.session_state.budget_period == "Monthly":
+        daily_budget = budget / 30
+
+    else:
+        daily_budget = budget
 
     c1, c2, c3, c4 = st.columns(4)
 
@@ -1201,138 +1156,147 @@ def dashboard():
         f"Rs {daily_budget:,.0f}"
     )
 
-    # -----------------------------------------------------
-    # FEATURE CARDS
-    # -----------------------------------------------------
-
     st.markdown(
-        '<div class="section-heading">Everything your family needs 💚</div>',
-        unsafe_allow_html=True,
+        '<div class="section-title">Your NutriNest modules 💚</div>',
+        unsafe_allow_html=True
     )
 
-    features = [
+    modules = [
         (
             "👨‍👩‍👧‍👦",
             "Family Profiles",
-            "Members, goals, BMI, BMR, TDEE and personalized nutrition targets.",
+            "Manage members, goals and personalized nutrition.",
             "Family Profiles",
         ),
         (
             "🍽️",
-            "Smart Meal Planner",
-            "Create a complete family-friendly 7-day meal plan.",
+            "Meal Planner",
+            "Build a smart 7-day family meal plan.",
             "Meal Planner",
         ),
         (
             "🧺",
             "Smart Pantry",
-            "Select what you already have and discover meals you can cook.",
+            "Choose ingredients and find meals you can cook.",
             "Smart Pantry",
         ),
         (
             "🍛",
             "Recipe Explorer",
-            "Explore recipes by cuisine, meal type, nutrition and pantry match.",
+            "Search recipes by cuisine, nutrition and pantry match.",
             "Recipe Explorer",
         ),
         (
             "💰",
             "Budget & Shopping",
-            "Manage household or individual budgets and smart shopping lists.",
+            "Manage household budgets and shopping lists.",
             "Budget & Shopping",
         ),
         (
             "💪",
             "Workout Planner",
-            "Build a personalized 7-day workout routine around goals and equipment.",
+            "Create personalized weekly workouts.",
             "Workout Planner",
         ),
         (
             "📊",
-            "Progress",
-            "Track weight, BMI, meals, calories and workout consistency.",
+            "Progress Tracker",
+            "Track weight, calories, protein and workouts.",
             "Progress",
         ),
         (
             "❤️",
             "Favorites",
-            "Keep your favorite recipes together for quick access.",
+            "Keep your favorite recipes together.",
             "Favorites",
         ),
     ]
 
-    for start in range(0, len(features), 4):
+    for start in range(
+        0,
+        len(modules),
+        4
+    ):
 
-        row = features[start:start + 4]
+        row = modules[
+            start:start + 4
+        ]
 
-        cols = st.columns(4)
+        columns = st.columns(4)
 
-        for col, feature in zip(cols, row):
+        for column, module in zip(
+            columns,
+            row
+        ):
 
-            icon, title, desc, destination = feature
+            icon, title, description, page = module
 
-            with col:
+            with column:
 
                 st.markdown(
                     f"""
                     <div class="feature-card">
+
                         <div class="feature-icon">
                             {icon}
                         </div>
+
                         <div class="feature-title">
                             {title}
                         </div>
-                        <div class="feature-desc">
-                            {desc}
+
+                        <div class="feature-description">
+                            {description}
                         </div>
+
                     </div>
                     """,
-                    unsafe_allow_html=True,
+                    unsafe_allow_html=True
                 )
 
                 if st.button(
                     f"Open {title} →",
                     key=f"dashboard_{title}",
-                    use_container_width=True,
+                    use_container_width=True
                 ):
-                    go(destination)
+                    navigate(page)
 
     # -----------------------------------------------------
-    # DASHBOARD GRAPHS
+    # FAMILY DASHBOARD GRAPH
     # -----------------------------------------------------
 
     if st.session_state.family:
 
         st.markdown(
-            '<div class="section-heading">Family nutrition overview 📊</div>',
-            unsafe_allow_html=True,
+            '<div class="section-title">Family nutrition overview 📊</div>',
+            unsafe_allow_html=True
         )
 
-        nutrition_rows = []
+        rows = []
 
         for member in st.session_state.family:
 
-            n = member["nutrition"]
+            nutrition = member["nutrition"]
 
-            nutrition_rows.append(
+            rows.append(
                 {
                     "Member": member["name"],
-                    "Calories": n["Target"],
-                    "Protein": n["Protein"],
-                    "Carbs": n["Carbs"],
-                    "Fat": n["Fat"],
+                    "Calories": nutrition["Calories"],
+                    "Protein": nutrition["Protein"],
+                    "Carbs": nutrition["Carbs"],
+                    "Fat": nutrition["Fat"],
                 }
             )
 
         nutrition_df = pd.DataFrame(
-            nutrition_rows
+            rows
         )
 
         c1, c2 = st.columns(2)
 
         with c1:
 
-            fig = px.bar(
+            figure = px.bar(
                 nutrition_df,
                 x="Member",
                 y=[
@@ -1341,47 +1305,35 @@ def dashboard():
                     "Fat"
                 ],
                 barmode="group",
-                title="Daily macro targets",
+                title="Daily Macronutrient Targets"
             )
 
-            fig.update_layout(
+            figure.update_layout(
                 paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                margin=dict(
-                    l=10,
-                    r=10,
-                    t=50,
-                    b=10
-                ),
+                plot_bgcolor="rgba(0,0,0,0)"
             )
 
             st.plotly_chart(
-                fig,
+                figure,
                 use_container_width=True
             )
 
         with c2:
 
-            fig = px.bar(
+            figure = px.bar(
                 nutrition_df,
                 x="Member",
                 y="Calories",
-                title="Daily calorie targets",
+                title="Daily Calorie Targets"
             )
 
-            fig.update_layout(
+            figure.update_layout(
                 paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                margin=dict(
-                    l=10,
-                    r=10,
-                    t=50,
-                    b=10
-                ),
+                plot_bgcolor="rgba(0,0,0,0)"
             )
 
             st.plotly_chart(
-                fig,
+                figure,
                 use_container_width=True
             )
 
@@ -1392,27 +1344,28 @@ def dashboard():
 
 def family_profiles():
 
-    page_back()
+    back_button()
 
     st.markdown(
         """
         <div class="page-header">
+
             <h1>👨‍👩‍👧‍👦 Family Profiles</h1>
+
             <p>
-                Add each family member so NutriNest can personalize
-                nutrition, portions, workouts and recommendations.
+                Add your family members to personalize nutrition,
+                meals, portions and fitness.
             </p>
+
         </div>
         """,
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
 
     with st.form(
         "family_form",
         clear_on_submit=True
     ):
-
-        st.markdown("### Add / update member")
 
         c1, c2 = st.columns(2)
 
@@ -1432,7 +1385,10 @@ def family_profiles():
 
             sex = st.selectbox(
                 "Sex",
-                ["male", "female"]
+                [
+                    "Male",
+                    "Female"
+                ]
             )
 
             height = st.number_input(
@@ -1444,190 +1400,197 @@ def family_profiles():
 
             weight = st.number_input(
                 "Weight (kg)",
-                min_value=25,
-                max_value=250,
-                value=70
+                min_value=25.0,
+                max_value=250.0,
+                value=70.0,
+                step=0.5
             )
 
         with c2:
 
             goal = st.selectbox(
-                "Main goal",
+                "Goal",
                 [
-                    "weight_loss",
-                    "maintenance",
-                    "weight_gain",
-                ],
-                format_func=lambda x:
-                    x.replace("_", " ").title()
+                    "Weight Loss",
+                    "Maintenance",
+                    "Weight Gain",
+                ]
             )
 
             activity = st.selectbox(
-                "Activity level",
+                "Activity Level",
                 [
-                    "sedentary",
-                    "light",
-                    "moderate",
-                    "active",
-                    "very_active",
-                ],
-                index=2,
-                format_func=lambda x:
-                    x.replace("_", " ").title()
+                    "Sedentary",
+                    "Light",
+                    "Moderate",
+                    "Active",
+                    "Very Active",
+                ]
             )
 
             allergies = st.multiselect(
-                "Food allergies",
+                "Food Allergies",
                 [
-                    "none",
-                    "nuts",
-                    "dairy",
-                    "gluten",
-                    "egg",
-                    "seafood",
+                    "None",
+                    "Nuts",
+                    "Dairy",
+                    "Gluten",
+                    "Egg",
+                    "Seafood",
                 ],
-                default=["none"]
+                default=["None"]
             )
 
             medical = st.multiselect(
-                "Health considerations",
+                "Health Considerations",
                 [
-                    "none",
-                    "diabetes",
-                    "hypertension",
-                    "thyroid",
-                    "pcos",
+                    "None",
+                    "Diabetes",
+                    "Hypertension",
+                    "Thyroid",
+                    "PCOS",
                 ],
-                default=["none"]
+                default=["None"]
             )
 
             workout_location = st.selectbox(
-                "Workout location",
-                ["home", "gym"]
+                "Workout Location",
+                [
+                    "Home",
+                    "Gym"
+                ]
             )
 
             equipment = st.multiselect(
-                "Available equipment",
+                "Available Equipment",
                 [
-                    "none",
-                    "yoga_mat",
-                    "dumbbells",
-                    "resistance_bands",
-                    "bench",
-                    "full_gym",
+                    "None",
+                    "Yoga Mat",
+                    "Dumbbells",
+                    "Resistance Bands",
+                    "Bench",
+                    "Full Gym",
                 ],
-                default=["yoga_mat"]
+                default=["Yoga Mat"]
             )
 
-        save = st.form_submit_button(
-            "Save family member",
+        submit = st.form_submit_button(
+            "Save Family Member",
             use_container_width=True
         )
 
-    if save:
+    if submit:
 
-        clean_name = (
-            name.strip()
-            or "Member"
-        )
+        member_name = name.strip()
 
-        nutrition = calculate_nutrition(
-            age,
-            sex,
-            height,
-            weight,
-            activity,
-            goal
-        )
+        if not member_name:
 
-        member = {
-            "name": clean_name,
-            "age": int(age),
-            "sex": sex,
-            "height_cm": float(height),
-            "weight_kg": float(weight),
-            "goal": goal,
-            "activity_level": activity,
-            "allergies": allergies,
-            "medical": medical,
-            "workout_location": workout_location,
-            "equipment": equipment,
-            "nutrition": nutrition,
-        }
+            st.error(
+                "Please enter a name."
+            )
 
-        st.session_state.family = [
-            m
-            for m in st.session_state.family
-            if m["name"].casefold()
-            != clean_name.casefold()
-        ]
+        else:
 
-        st.session_state.family.append(
-            member
-        )
+            nutrition = calculate_nutrition(
+                age,
+                sex,
+                height,
+                weight,
+                activity,
+                goal
+            )
 
-        st.success(
-            f"{clean_name} saved successfully."
-        )
+            member = {
+                "name": member_name,
+                "age": int(age),
+                "sex": sex,
+                "height": float(height),
+                "weight": float(weight),
+                "goal": goal,
+                "activity": activity,
+                "allergies": allergies,
+                "medical": medical,
+                "workout_location": workout_location,
+                "equipment": equipment,
+                "nutrition": nutrition,
+            }
 
-        st.rerun()
+            st.session_state.family = [
+                old_member
+                for old_member in st.session_state.family
+                if old_member["name"].lower()
+                != member_name.lower()
+            ]
+
+            st.session_state.family.append(
+                member
+            )
+
+            st.success(
+                f"{member_name} has been saved successfully."
+            )
+
+            st.rerun()
 
     if st.session_state.family:
 
         st.markdown(
-            '<div class="section-heading">Family overview</div>',
+            '<div class="section-title">Family Overview</div>',
             unsafe_allow_html=True
         )
 
-        cols = st.columns(
+        columns = st.columns(
             min(
                 3,
                 len(st.session_state.family)
             )
         )
 
-        for i, member in enumerate(
+        for index, member in enumerate(
             st.session_state.family
         ):
 
-            n = member["nutrition"]
+            nutrition = member["nutrition"]
 
-            with cols[i % len(cols)]:
+            with columns[
+                index % len(columns)
+            ]:
 
                 st.markdown(
                     f"""
                     <div class="member-card">
+
                         <span class="pill">
-                            {member['goal'].replace('_',' ').title()}
+                            {member['goal']}
                         </span>
 
                         <h3>
-                            {member['name']}
+                            👤 {member['name']}
                         </h3>
 
                         <p>
-                            BMI {n['BMI']} ·
-                            {member['activity_level'].replace('_',' ').title()}
+                            BMI: {nutrition['BMI']}
                         </p>
 
                         <div class="big-number">
-                            {n['Target']}
-                            <span style="font-size:.8rem">
+                            {nutrition['Calories']}
+                            <span style="font-size:.8rem;">
                                 kcal/day
                             </span>
                         </div>
 
-                        <span class="macro-chip">
-                            Protein {n['Protein']}g
+                        <span class="macro">
+                            Protein {nutrition['Protein']}g
                         </span>
 
-                        <span class="macro-chip">
-                            Carbs {n['Carbs']}g
+                        <span class="macro">
+                            Carbs {nutrition['Carbs']}g
                         </span>
 
-                        <span class="macro-chip">
-                            Fat {n['Fat']}g
+                        <span class="macro">
+                            Fat {nutrition['Fat']}g
                         </span>
+
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -1635,16 +1598,13 @@ def family_profiles():
 
                 if st.button(
                     f"Remove {member['name']}",
-                    key=f"remove_member_{member['name']}",
+                    key=f"remove_{index}",
                     use_container_width=True
                 ):
 
-                    st.session_state.family = [
-                        m
-                        for m in st.session_state.family
-                        if m["name"]
-                        != member["name"]
-                    ]
+                    st.session_state.family.pop(
+                        index
+                    )
 
                     st.rerun()
 
@@ -1655,16 +1615,19 @@ def family_profiles():
 
 def smart_pantry():
 
-    page_back()
+    back_button()
 
     st.markdown(
         """
         <div class="page-header">
+
             <h1>🧺 Smart Pantry</h1>
+
             <p>
-                Tick the ingredients you already have.
-                NutriNest will find recipes that use them.
+                Select ingredients you already have.
+                NutriNest will show recipes you can make now.
             </p>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -1672,23 +1635,28 @@ def smart_pantry():
 
     selected = []
 
-    for category, items in PANTRY_CATEGORIES.items():
+    for category, items in PANTRY.items():
 
         with st.expander(
             category,
             expanded=True
         ):
 
-            cols = st.columns(4)
+            columns = st.columns(4)
 
-            for i, item in enumerate(items):
+            for index, item in enumerate(items):
 
-                with cols[i % 4]:
+                with columns[
+                    index % 4
+                ]:
 
                     checked = st.checkbox(
                         item,
-                        value=item in st.session_state.pantry,
-                        key=f"pantry_{item}"
+                        value=(
+                            item
+                            in st.session_state.pantry
+                        ),
+                        key=f"pantry_{category}_{item}"
                     )
 
                     if checked:
@@ -1699,162 +1667,154 @@ def smart_pantry():
     st.session_state.pantry = selected
 
     st.markdown(
-        '<div class="section-heading">Your pantry</div>',
+        '<div class="section-title">Current Pantry</div>',
         unsafe_allow_html=True
     )
 
     if selected:
 
-        st.write(
+        st.success(
             " · ".join(
-                f"🌿 {x}"
-                for x in selected
+                selected
             )
         )
 
     else:
 
         st.info(
-            "Select ingredients above to build your pantry."
+            "Select some ingredients above."
         )
 
-    # -----------------------------------------------------
-    # SMART MATCHES
-    # -----------------------------------------------------
-
-    if selected and not recipes_df.empty:
+    if (
+        selected
+        and not recipes.empty
+    ):
 
         st.markdown(
-            '<div class="section-heading">✨ What can I cook now?</div>',
+            '<div class="section-title">✨ What Can I Cook Now?</div>',
             unsafe_allow_html=True
         )
 
-        matches = smart_recipe_matches(
-            recipes_df,
-            selected,
-            st.session_state.family,
-            limit=12
-        )
+        safe_recipes = recipes[
+            recipes.apply(
+                allergy_safe,
+                axis=1
+            )
+        ]
 
-        if matches.empty:
+        results = []
 
-            st.info(
-                "No suitable recipes found."
+        for _, row in safe_recipes.iterrows():
+
+            match, matched, missing = pantry_match(
+                row
             )
 
-        else:
+            results.append(
+                {
+                    "row": row,
+                    "match": match,
+                    "matched": matched,
+                    "missing": missing,
+                }
+            )
 
-            for idx, row in matches.iterrows():
+        results.sort(
+            key=lambda item: item["match"],
+            reverse=True
+        )
 
-                name = row.get(
-                    "recipe_name",
-                    "Recipe"
+        for index, result in enumerate(
+            results[:15]
+        ):
+
+            row = result["row"]
+
+            name = row["recipe_name"]
+
+            st.markdown(
+                f"""
+                <div class="recipe-card">
+
+                    <h3>
+                        🍛 {name}
+                    </h3>
+
+                    <span class="pill">
+                        🟢 {result['match']}% Pantry Match
+                    </span>
+
+                    <span class="pill">
+                        🔥 {row['calories']:.0f} kcal
+                    </span>
+
+                    <span class="pill">
+                        💪 {row['protein_g']:.0f}g Protein
+                    </span>
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            c1, c2 = st.columns(2)
+
+            with c1:
+
+                st.markdown(
+                    "**Already available:**"
                 )
 
-                match = int(
-                    row.get(
-                        "pantry_match",
-                        0
+                if result["matched"]:
+
+                    st.write(
+                        ", ".join(
+                            result["matched"][:10]
+                        )
                     )
-                )
 
-                calories = row.get(
-                    "calories"
-                )
+                else:
 
-                protein = row.get(
-                    "protein_g"
-                )
-
-                missing = row.get(
-                    "missing_items",
-                    []
-                )
-
-                matched = row.get(
-                    "matched_items",
-                    []
-                )
-
-                with st.container():
-
-                    st.markdown(
-                        f"""
-                        <div class="recipe-card">
-                            <h3>
-                                🍛 {name}
-                            </h3>
-
-                            <span class="pill">
-                                🟢 {match}% pantry match
-                            </span>
-
-                            <span class="pill">
-                                🔥 {round(float(calories)) if pd.notna(calories) else '—'} kcal
-                            </span>
-
-                            <span class="pill">
-                                💪 {float(protein):g}g protein
-                            </span>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
+                    st.caption(
+                        "No direct matches."
                     )
 
-                    a, b = st.columns(2)
+            with c2:
 
-                    with a:
+                st.markdown(
+                    "**Missing:**"
+                )
 
-                        st.markdown(
-                            "**Available from pantry**"
+                if result["missing"]:
+
+                    st.write(
+                        ", ".join(
+                            result["missing"][:10]
+                        )
+                    )
+
+                    if st.button(
+                        "🛒 Add Missing Items",
+                        key=f"pantry_shop_{index}"
+                    ):
+
+                        for item in result["missing"]:
+
+                            if item not in st.session_state.shopping_list:
+
+                                st.session_state.shopping_list.append(
+                                    item
+                                )
+
+                        st.success(
+                            "Items added to shopping list."
                         )
 
-                        if matched:
-                            st.write(
-                                " · ".join(
-                                    matched[:12]
-                                )
-                            )
-                        else:
-                            st.caption(
-                                "No exact pantry match."
-                            )
+                else:
 
-                    with b:
-
-                        st.markdown(
-                            "**Still needed**"
-                        )
-
-                        if missing:
-
-                            st.write(
-                                " · ".join(
-                                    missing[:10]
-                                )
-                            )
-
-                            if st.button(
-                                "🛒 Add missing ingredients",
-                                key=f"shopping_{idx}"
-                            ):
-
-                                for item in missing:
-
-                                    if item not in st.session_state.shopping_list:
-                                        st.session_state.shopping_list.append(
-                                            item
-                                        )
-
-                                st.success(
-                                    "Missing ingredients added to shopping list."
-                                )
-
-                        else:
-
-                            st.success(
-                                "You have everything needed! 🎉"
-                            )
+                    st.success(
+                        "You have everything needed! 🎉"
+                    )
 
 
 # =========================================================
@@ -1863,25 +1823,32 @@ def smart_pantry():
 
 def recipe_explorer():
 
-    page_back()
+    back_button()
 
     st.markdown(
         """
         <div class="page-header">
+
             <h1>🍛 Recipe Explorer</h1>
+
             <p>
-                Discover recipes by cuisine, meal type, nutrition,
-                ingredients and pantry availability.
+                Search recipes by name, meal type, cuisine,
+                calories, protein and pantry availability.
             </p>
+
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    if recipes_df.empty:
+    if recipes.empty:
 
         st.error(
-            "Recipe CSV could not be found."
+            "Recipe dataset was not found."
+        )
+
+        st.code(
+            "data/nutrinest_recipes_clean.csv"
         )
 
         return
@@ -1891,14 +1858,14 @@ def recipe_explorer():
     with c1:
 
         search = st.text_input(
-            "🔎 Search",
-            placeholder="Chicken, rice, daal..."
+            "🔎 Search Recipe",
+            placeholder="Chicken, rice, pasta..."
         )
 
     with c2:
 
         meal_type = st.selectbox(
-            "Meal type",
+            "Meal Type",
             [
                 "All",
                 "Breakfast",
@@ -1911,65 +1878,74 @@ def recipe_explorer():
 
     with c3:
 
-        cuisine_options = [
-            "All"
-        ] + sorted(
-            recipes_df["cuisine"]
-            .dropna()
-            .astype(str)
-            .unique()
-            .tolist()
-        )
-
         cuisine = st.selectbox(
             "Cuisine",
-            cuisine_options
+            [
+                "All"
+            ]
+            + sorted(
+                recipes["cuisine"]
+                .dropna()
+                .astype(str)
+                .unique()
+                .tolist()
+            )
         )
 
     c1, c2, c3 = st.columns(3)
 
     with c1:
 
-        max_cal = st.slider(
-            "Maximum calories",
+        max_calories = st.slider(
+            "Maximum Calories",
             100,
-            1200,
+            1500,
             800
         )
 
     with c2:
 
         min_protein = st.slider(
-            "Minimum protein (g)",
+            "Minimum Protein",
             0,
-            80,
+            100,
             0
         )
 
     with c3:
 
-        pantry_only = st.checkbox(
-            "Prioritize pantry matches"
+        pantry_priority = st.checkbox(
+            "Prioritize Pantry Matches"
         )
 
-    data = safe_for_family(
-        recipes_df,
-        st.session_state.family
-    ).copy()
+    data = recipes[
+        recipes.apply(
+            allergy_safe,
+            axis=1
+        )
+    ].copy()
 
     if search.strip():
 
-        haystack = (
-            data["recipe_name"].fillna("").astype(str)
+        searchable = (
+            data["recipe_name"]
+            .fillna("")
+            .astype(str)
             + " "
-            + data["ingredients"].fillna("").astype(str)
+            + data["ingredients"]
+            .fillna("")
+            .astype(str)
             + " "
-            + data["tags"].fillna("").astype(str)
+            + data["tags"]
+            .fillna("")
+            .astype(str)
         ).str.lower()
 
         data = data[
-            haystack.str.contains(
-                re.escape(search.lower()),
+            searchable.str.contains(
+                re.escape(
+                    search.lower()
+                ),
                 na=False
             )
         ]
@@ -1978,7 +1954,6 @@ def recipe_explorer():
 
         data = data[
             data["meal_type"]
-            .fillna("")
             .astype(str)
             .str.lower()
             .str.contains(
@@ -1991,118 +1966,87 @@ def recipe_explorer():
 
         data = data[
             data["cuisine"]
-            .fillna("")
             .astype(str)
-            .str.casefold()
-            == cuisine.casefold()
+            .str.lower()
+            == cuisine.lower()
         ]
 
-    if "calories" in data.columns:
+    data = data[
+        data["calories"]
+        <= max_calories
+    ]
 
-        data = data[
-            data["calories"].isna()
-            | (
-                data["calories"]
-                <= max_cal
-            )
-        ]
+    data = data[
+        data["protein_g"]
+        >= min_protein
+    ]
 
-    if "protein_g" in data.columns:
-
-        data = data[
-            data["protein_g"].isna()
-            | (
-                data["protein_g"]
-                >= min_protein
-            )
-        ]
-
-    if pantry_only and st.session_state.pantry:
-
-        scored = smart_recipe_matches(
-            data,
-            st.session_state.pantry,
-            st.session_state.family,
-            limit=100
-        )
-
-        data = scored
-
-    st.caption(
-        f"{len(data)} recipes found"
-    )
-
-    for idx, (_, row) in enumerate(
-        data.head(40).iterrows()
+    if (
+        pantry_priority
+        and st.session_state.pantry
     ):
 
-        name = row.get(
-            "recipe_name",
-            "Recipe"
+        data["_pantry_match"] = data.apply(
+            lambda row: pantry_match(row)[0],
+            axis=1
         )
 
-        calories = row.get(
-            "calories"
+        data = data.sort_values(
+            "_pantry_match",
+            ascending=False
         )
 
-        protein = row.get(
-            "protein_g"
-        )
+    st.caption(
+        f"{len(data)} recipes found."
+    )
 
-        is_favorite = (
-            name in
-            st.session_state.favorites
+    for index, (_, row) in enumerate(
+        data.head(50).iterrows()
+    ):
+
+        recipe_name = row["recipe_name"]
+
+        favorite = (
+            recipe_name
+            in st.session_state.favorites
         )
 
         with st.expander(
-            f"🍽️ {name}"
-            f"  ·  "
-            f"{'⭐ Favorite' if is_favorite else '♡'}"
+            f"{'❤️' if favorite else '🍽️'} {recipe_name}"
         ):
 
             c1, c2, c3, c4 = st.columns(4)
 
             c1.metric(
                 "Calories",
-                "—"
-                if pd.isna(calories)
-                else f"{float(calories):.0f}"
+                f"{row['calories']:.0f}"
             )
 
             c2.metric(
                 "Protein",
-                "—"
-                if pd.isna(protein)
-                else f"{float(protein):g}g"
+                f"{row['protein_g']:.0f}g"
             )
 
             c3.metric(
                 "Carbs",
-                "—"
-                if pd.isna(row.get("carbs_g"))
-                else f"{float(row.get('carbs_g')):g}g"
+                f"{row['carbs_g']:.0f}g"
             )
 
             c4.metric(
                 "Fat",
-                "—"
-                if pd.isna(row.get("fat_g"))
-                else f"{float(row.get('fat_g')):g}g"
+                f"{row['fat_g']:.0f}g"
             )
 
             st.write(
-                f"**Cuisine:** {row.get('cuisine','Unspecified')}"
+                f"**Cuisine:** {row['cuisine']}"
             )
 
             st.write(
-                f"**Meal:** {row.get('meal_type','Main')}"
+                f"**Meal:** {row['meal_type']}"
             )
 
-            ingredients = parse_listish(
-                row.get(
-                    "ingredients",
-                    ""
-                )
+            ingredients = parse_list(
+                row["ingredients"]
             )
 
             if ingredients:
@@ -2113,35 +2057,36 @@ def recipe_explorer():
 
                 st.write(
                     " · ".join(
-                        ingredients[:30]
+                        ingredients
                     )
                 )
 
-            steps = row.get(
-                "steps",
-                ""
+            steps = str(
+                row.get(
+                    "steps",
+                    ""
+                )
             )
 
-            if pd.notna(steps) and str(steps).strip():
+            if steps.strip():
 
                 st.markdown(
-                    "**Method**"
+                    "**Preparation**"
                 )
 
                 st.write(
-                    str(steps)
+                    steps
                 )
 
             if st.session_state.pantry:
 
                 match, matched, missing = pantry_match(
-                    row,
-                    st.session_state.pantry
+                    row
                 )
 
                 st.progress(
                     match / 100,
-                    text=f"Pantry match: {match}%"
+                    text=f"Pantry Match: {match}%"
                 )
 
                 if missing:
@@ -2153,27 +2098,27 @@ def recipe_explorer():
                         )
                     )
 
-            fav_label = (
+            button_text = (
                 "☆ Remove Favorite"
-                if is_favorite
+                if favorite
                 else "⭐ Add Favorite"
             )
 
             if st.button(
-                fav_label,
-                key=f"favorite_{idx}_{name}"
+                button_text,
+                key=f"favorite_{index}"
             ):
 
-                if is_favorite:
+                if favorite:
 
                     st.session_state.favorites.remove(
-                        name
+                        recipe_name
                     )
 
                 else:
 
                     st.session_state.favorites.append(
-                        name
+                        recipe_name
                     )
 
                 st.rerun()
@@ -2183,18 +2128,21 @@ def recipe_explorer():
 # BUDGET & SHOPPING
 # =========================================================
 
-def budget_shopping():
+def budget_page():
 
-    page_back()
+    back_button()
 
     st.markdown(
         """
         <div class="page-header">
-            <h1>💰 Budget & Shopping</h1>
+
+            <h1>💰 Budget & Smart Shopping</h1>
+
             <p>
-                Plan food spending and keep your shopping list
-                connected to your meal and pantry choices.
+                Manage daily, weekly or monthly household food
+                spending and keep your shopping list organized.
             </p>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -2205,7 +2153,7 @@ def budget_shopping():
     with c1:
 
         period = st.selectbox(
-            "Budget period",
+            "Budget Period",
             [
                 "Daily",
                 "Weekly",
@@ -2216,65 +2164,64 @@ def budget_shopping():
                 "Weekly",
                 "Monthly",
             ].index(
-                st.session_state.budget["period"]
+                st.session_state.budget_period
             )
         )
 
     with c2:
 
         amount = st.number_input(
-            f"{period} household budget (PKR)",
+            "Household Budget (PKR)",
             min_value=500,
             max_value=1000000,
             value=int(
-                st.session_state.budget["amount"]
+                st.session_state.budget_amount
             ),
             step=500
         )
 
-    st.session_state.budget = {
-        "period": period,
-        "amount": amount
-    }
+    st.session_state.budget_period = period
+    st.session_state.budget_amount = amount
 
-    st.markdown(
-        '<div class="section-heading">Budget snapshot</div>',
-        unsafe_allow_html=True
-    )
+    if period == "Daily":
 
-    daily_equivalent = amount
+        daily = amount
+        weekly = amount * 7
+        monthly = amount * 30
 
-    if period == "Weekly":
-        daily_equivalent = amount / 7
+    elif period == "Weekly":
 
-    elif period == "Monthly":
-        daily_equivalent = amount / 30
+        daily = amount / 7
+        weekly = amount
+        monthly = amount * 4.33
+
+    else:
+
+        daily = amount / 30
+        weekly = amount / 4.33
+        monthly = amount
 
     c1, c2, c3 = st.columns(3)
 
     c1.metric(
-        "Household Budget",
-        f"Rs {amount:,}"
+        "Daily",
+        f"Rs {daily:,.0f}"
     )
 
     c2.metric(
-        "Approx. Daily",
-        f"Rs {daily_equivalent:,.0f}"
+        "Weekly",
+        f"Rs {weekly:,.0f}"
     )
 
     c3.metric(
-        "Pantry Items",
-        len(st.session_state.pantry)
+        "Monthly",
+        f"Rs {monthly:,.0f}"
     )
-
-    # -----------------------------------------------------
-    # INDIVIDUAL ALLOCATION
-    # -----------------------------------------------------
 
     if st.session_state.family:
 
         st.markdown(
-            '<div class="section-heading">Optional individual allocations</div>',
+            '<div class="section-title">Individual Allocations</div>',
             unsafe_allow_html=True
         )
 
@@ -2282,16 +2229,16 @@ def budget_shopping():
 
         for member in st.session_state.family:
 
-            value = st.number_input(
-                f"{member['name']} allocation (PKR)",
+            allocation = st.number_input(
+                f"{member['name']} Allocation",
                 min_value=0,
                 max_value=int(amount),
                 value=0,
                 step=500,
-                key=f"budget_{member['name']}"
+                key=f"allocation_{member['name']}"
             )
 
-            allocation_total += value
+            allocation_total += allocation
 
         if allocation_total > amount:
 
@@ -2301,31 +2248,32 @@ def budget_shopping():
 
         else:
 
-            st.success(
-                f"Allocated: Rs {allocation_total:,} · "
-                f"Unallocated: Rs {amount-allocation_total:,}"
+            remaining = (
+                amount
+                - allocation_total
             )
 
-    # -----------------------------------------------------
-    # SHOPPING
-    # -----------------------------------------------------
+            st.success(
+                f"Allocated: Rs {allocation_total:,} | "
+                f"Remaining: Rs {remaining:,}"
+            )
 
     st.markdown(
-        '<div class="section-heading">🛒 Smart Shopping List</div>',
+        '<div class="section-title">🛒 Smart Shopping List</div>',
         unsafe_allow_html=True
     )
 
     with st.form(
-        "manual_shopping"
+        "shopping_form"
     ):
 
         item = st.text_input(
-            "Add item",
-            placeholder="e.g. yogurt, tomatoes..."
+            "Add an item",
+            placeholder="e.g. Tomatoes"
         )
 
         add = st.form_submit_button(
-            "Add item",
+            "Add to Shopping List",
             use_container_width=True
         )
 
@@ -2339,9 +2287,11 @@ def budget_shopping():
                 item
             )
 
+        st.rerun()
+
     if st.session_state.shopping_list:
 
-        for i, item in enumerate(
+        for index, item in enumerate(
             st.session_state.shopping_list
         ):
 
@@ -2351,25 +2301,25 @@ def budget_shopping():
 
             with c1:
 
-                st.markdown(
-                    f"🛒 **{item}**"
+                st.write(
+                    f"🛒 {item}"
                 )
 
             with c2:
 
                 if st.button(
                     "×",
-                    key=f"remove_shop_{i}"
+                    key=f"delete_shop_{index}"
                 ):
 
                     st.session_state.shopping_list.pop(
-                        i
+                        index
                     )
 
                     st.rerun()
 
         if st.button(
-            "Clear shopping list"
+            "Clear Shopping List"
         ):
 
             st.session_state.shopping_list = []
@@ -2389,16 +2339,19 @@ def budget_shopping():
 
 def meal_planner():
 
-    page_back()
+    back_button()
 
     st.markdown(
         """
         <div class="page-header">
+
             <h1>🍽️ Smart Family Meal Planner</h1>
+
             <p>
-                Build a practical 7-day plan using family goals,
-                allergies, pantry ingredients, cuisine and budget preferences.
+                Create a 7-day family plan using goals, allergies,
+                pantry ingredients, cuisine preferences and nutrition targets.
             </p>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -2407,13 +2360,15 @@ def meal_planner():
     if not st.session_state.family:
 
         st.warning(
-            "Add at least one family member first."
+            "Please add at least one family member first."
         )
 
         if st.button(
             "Add Family Member →"
         ):
-            go("Family Profiles")
+            navigate(
+                "Family Profiles"
+            )
 
         return
 
@@ -2422,211 +2377,185 @@ def meal_planner():
     with c1:
 
         cuisines = st.multiselect(
-            "Preferred cuisines",
+            "Preferred Cuisine",
             [
-                "Desi / Pakistani",
+                "Pakistani / Desi",
+                "Indian",
                 "Chinese",
                 "Italian",
                 "Continental",
                 "Mixed",
             ],
-            default=["Desi / Pakistani"]
+            default=[
+                "Pakistani / Desi"
+            ]
         )
 
     with c2:
 
         preferences = st.multiselect(
-            "Meal preferences",
+            "Preferences",
             [
-                "Less oil",
-                "High protein",
-                "More fiber",
-                "Vegetarian options",
-                "Quick to cook",
-                "Budget friendly",
-                "Pantry first",
+                "High Protein",
+                "High Fiber",
+                "Less Oil",
+                "Budget Friendly",
+                "Quick Meals",
+                "Vegetarian",
+                "Pantry First",
             ],
             default=[
-                "Less oil",
-                "High protein"
+                "High Protein",
+                "Less Oil"
             ]
         )
 
-    use_pantry = (
-        "Pantry first" in preferences
-        and bool(st.session_state.pantry)
-    )
-
-    if use_pantry:
+    if (
+        "Pantry First" in preferences
+        and st.session_state.pantry
+    ):
 
         st.success(
-            f"🧺 Pantry-first planning enabled — "
-            f"{len(st.session_state.pantry)} ingredients available."
+            "🧺 Pantry-first planning is enabled."
         )
 
     if st.button(
-        "✨ Generate 7-Day Family Meal Plan",
-        type="primary",
+        "✨ Generate 7-Day Meal Plan",
         use_container_width=True
     ):
 
-        safe_df = get_cuisine_recipes(
-            recipes_df,
+        plan = generate_meal_plan(
             cuisines,
-            st.session_state.family
+            preferences
         )
 
-        if safe_df.empty:
+        st.session_state.meal_plan = plan
 
-            st.error(
-                "No suitable recipes found."
-            )
+        st.success(
+            "Your family meal plan is ready! 🎉"
+        )
 
-            return
+    if st.session_state.meal_plan:
 
-        # -------------------------------------------------
-        # PANTRY PRIORITY
-        # -------------------------------------------------
+        st.markdown(
+            '<div class="section-title">📅 Weekly Family Plan</div>',
+            unsafe_allow_html=True
+        )
 
-        if use_pantry:
+        for day in st.session_state.meal_plan:
 
-            scored = smart_recipe_matches(
-                safe_df,
-                st.session_state.pantry,
-                st.session_state.family,
-                limit=100
-            )
-
-            if not scored.empty:
-
-                safe_df = scored
-
-        # -------------------------------------------------
-        # FALLBACK PLAN
-        # -------------------------------------------------
-
-        fallback_meals = [
-            (
-                "Breakfast",
-                "Vegetable Omelette + Whole Wheat Roti",
-                380,
-                22
-            ),
-            (
-                "Lunch",
-                "Chicken Karahi + Brown Rice",
-                520,
-                38
-            ),
-            (
-                "Evening Snack",
-                "Chana Chaat",
-                240,
-                11
-            ),
-            (
-                "Dinner",
-                "Dal + Whole Wheat Roti + Salad",
-                470,
-                22
-            ),
-        ]
-
-        fallback = []
-
-        for day in range(1, 8):
-
-            daily = []
-
-            for meal, main, cal, protein in fallback_meals:
-
-                portions = {}
-
-                for member in st.session_state.family:
-
-                    if member["goal"] == "weight_loss":
-                        portions[
-                            member["name"]
-                        ] = "0.85 serving"
-
-                    elif member["goal"] == "weight_gain":
-                        portions[
-                            member["name"]
-                        ] = "1.15 servings"
-
-                    else:
-                        portions[
-                            member["name"]
-                        ] = "1 serving"
-
-                daily.append(
-                    {
-                        "meal": meal,
-                        "main": main,
-                        "calories": cal,
-                        "protein": protein,
-                        "portions": portions,
-                    }
+            with st.expander(
+                f"Day {day['day']}",
+                expanded=(
+                    day["day"] == 1
                 )
+            ):
 
-            fallback.append(
+                for meal in day["meals"]:
+
+                    st.markdown(
+                        f"""
+                        <div class="soft-card">
+
+                            <h3>
+                                {meal['meal']} · {meal['name']}
+                            </h3>
+
+                            <span class="macro">
+                                🔥 {meal['calories']} kcal
+                            </span>
+
+                            <span class="macro">
+                                💪 {meal['protein']}g protein
+                            </span>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                    for member, portion in meal[
+                        "portions"
+                    ].items():
+
+                        st.write(
+                            f"👤 **{member}:** {portion}"
+                        )
+
+
+def generate_meal_plan(
+    cuisines,
+    preferences
+):
+
+    # -----------------------------------------------------
+    # AI PLAN
+    # -----------------------------------------------------
+
+    if groq_client is not None:
+
+        family_data = []
+
+        for member in st.session_state.family:
+
+            family_data.append(
                 {
-                    "day": day,
-                    "meals": daily
+                    "name": member["name"],
+                    "goal": member["goal"],
+                    "calories": member[
+                        "nutrition"
+                    ]["Calories"],
+                    "protein": member[
+                        "nutrition"
+                    ]["Protein"],
+                    "allergies": member[
+                        "allergies"
+                    ],
                 }
             )
 
-        plan = {
-            "days": fallback,
-            "notes": (
-                "Family plan generated with allergy-aware "
-                "and nutrition-aware defaults."
-            )
-        }
+        recipe_data = []
 
-        # -------------------------------------------------
-        # GROQ AI
-        # -------------------------------------------------
+        if not recipes.empty:
 
-        if client:
+            safe = recipes[
+                recipes.apply(
+                    allergy_safe,
+                    axis=1
+                )
+            ]
 
-            family_info = []
+            for _, row in safe.head(
+                40
+            ).iterrows():
 
-            for member in st.session_state.family:
-
-                family_info.append(
+                recipe_data.append(
                     {
-                        "name": member["name"],
-                        "goal": member["goal"],
-                        "target_calories": member["nutrition"]["Target"],
-                        "protein": member["nutrition"]["Protein"],
-                        "allergies": member["allergies"],
-                        "medical": member["medical"],
+                        "name": row[
+                            "recipe_name"
+                        ],
+                        "meal_type": row[
+                            "meal_type"
+                        ],
+                        "calories": row[
+                            "calories"
+                        ],
+                        "protein": row[
+                            "protein_g"
+                        ],
+                        "ingredients": row[
+                            "ingredients"
+                        ],
                     }
                 )
 
-            recipe_sample = (
-                safe_df[
-                    [
-                        "recipe_name",
-                        "meal_type",
-                        "calories",
-                        "protein_g",
-                        "ingredients",
-                    ]
-                ]
-                .head(40)
-                .fillna("")
-                .to_dict("records")
-            )
-
-            prompt = f"""
-Create a practical 7-day shared family meal plan.
+        prompt = f"""
+Create a realistic 7-day family meal plan.
 
 Family:
-{json.dumps(family_info)}
+{json.dumps(family_data)}
 
-Cuisines:
+Cuisine:
 {json.dumps(cuisines)}
 
 Preferences:
@@ -2635,185 +2564,175 @@ Preferences:
 Pantry:
 {json.dumps(st.session_state.pantry)}
 
-Available recipes:
-{json.dumps(recipe_sample)}
+Recipes:
+{json.dumps(recipe_data)}
 
 Requirements:
-- Exactly 7 days.
-- Each day must have Breakfast, Lunch,
-  Evening Snack and Dinner.
-- Shared meals should be family-friendly.
-- Individual portions can differ.
-- Respect allergies.
-- Prefer pantry ingredients.
-- Prefer reasonable calorie and protein targets.
-- Avoid extreme dieting.
-- Keep meals realistic for a household.
-- Do not provide medical treatment.
+- 7 days
+- Breakfast
+- Lunch
+- Snack
+- Dinner
+- Respect allergies
+- Use pantry items where possible
+- Individual portions may differ
+- Keep meals practical
+- Do not give medical treatment advice
 
-Return ONLY valid JSON:
+Return ONLY JSON in this format:
 
 {{
-  "days": [
-    {{
-      "day": 1,
-      "meals": [
+    "days": [
         {{
-          "meal": "Breakfast",
-          "main": "Recipe",
-          "calories": 400,
-          "protein": 25,
-          "portions": {{
-             "Member": "1 serving"
-          }}
+            "day": 1,
+            "meals": [
+                {{
+                    "meal": "Breakfast",
+                    "name": "Recipe name",
+                    "calories": 400,
+                    "protein": 20,
+                    "portions": {{
+                        "Member": "1 serving"
+                    }}
+                }}
+            ]
         }}
-      ]
-    }}
-  ],
-  "notes": "..."
+    ]
 }}
 """
 
-            try:
+        try:
 
-                response = client.chat.completions.create(
-                    model="openai/gpt-oss-120b",
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "Return valid JSON only."
-                        },
-                        {
-                            "role": "user",
-                            "content": prompt
-                        },
-                    ],
-                    temperature=.35,
-                    max_tokens=5000,
-                )
-
-                ai_plan = extract_json(
-                    response.choices[0].message.content
-                )
-
-                if (
-                    isinstance(ai_plan, dict)
-                    and ai_plan.get("days")
-                ):
-
-                    plan = ai_plan
-
-            except Exception:
-                pass
-
-        st.session_state.meal_plan = plan
-
-        st.success(
-            "Your 7-day family plan is ready! 🎉"
-        )
-
-    # -----------------------------------------------------
-    # DISPLAY PLAN
-    # -----------------------------------------------------
-
-    if st.session_state.meal_plan:
-
-        plan = st.session_state.meal_plan
-
-        st.markdown(
-            '<div class="section-heading">Your weekly plan 📅</div>',
-            unsafe_allow_html=True
-        )
-
-        for day in plan.get(
-            "days",
-            []
-        ):
-
-            day_num = day.get(
-                "day",
-                "?"
+            response = groq_client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are a nutrition meal planning "
+                            "assistant. Return valid JSON only."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    },
+                ],
+                temperature=0.3,
+                max_tokens=5000,
             )
 
-            with st.expander(
-                f"Day {day_num}",
-                expanded=(day_num == 1)
+            result = extract_json(
+                response.choices[0].message.content
+            )
+
+            if (
+                isinstance(result, dict)
+                and "days" in result
             ):
 
-                for meal in day.get(
-                    "meals",
-                    []
-                ):
+                return result["days"]
 
-                    name = meal.get(
-                        "main",
-                        "Meal"
-                    )
+        except Exception:
+            pass
 
-                    st.markdown(
-                        f"""
-                        <div class="soft-card">
-                            <h3>
-                                {meal.get('meal','Meal')}
-                                · {name}
-                            </h3>
+    # -----------------------------------------------------
+    # FALLBACK PLAN
+    # -----------------------------------------------------
 
-                            <span class="macro-chip">
-                                🔥 {meal.get('calories','—')} kcal
-                            </span>
+    base_meals = [
+        (
+            "Breakfast",
+            "Egg & Vegetable Breakfast",
+            380,
+            22,
+        ),
+        (
+            "Lunch",
+            "Chicken Rice Bowl",
+            520,
+            35,
+        ),
+        (
+            "Snack",
+            "Chana Chaat",
+            230,
+            10,
+        ),
+        (
+            "Dinner",
+            "Daal, Roti & Salad",
+            460,
+            22,
+        ),
+    ]
 
-                            <span class="macro-chip">
-                                💪 {meal.get('protein','—')}g protein
-                            </span>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+    weekly_plan = []
 
-                    portions = meal.get(
-                        "portions",
-                        {}
-                    )
+    for day_number in range(1, 8):
 
-                    if portions:
+        meals = []
 
-                        st.markdown(
-                            "**Individual portions**"
-                        )
+        for meal_name, meal_title, calories, protein in base_meals:
 
-                        for member, portion in portions.items():
+            portions = {}
 
-                            st.write(
-                                f"👤 **{member}:** {portion}"
-                            )
+            for member in st.session_state.family:
 
-        notes = plan.get(
-            "notes"
+                goal = member["goal"]
+
+                if goal == "Weight Loss":
+                    portion = "0.8 serving"
+
+                elif goal == "Weight Gain":
+                    portion = "1.2 servings"
+
+                else:
+                    portion = "1 serving"
+
+                portions[
+                    member["name"]
+                ] = portion
+
+            meals.append(
+                {
+                    "meal": meal_name,
+                    "name": meal_title,
+                    "calories": calories,
+                    "protein": protein,
+                    "portions": portions,
+                }
+            )
+
+        weekly_plan.append(
+            {
+                "day": day_number,
+                "meals": meals,
+            }
         )
 
-        if notes:
-
-            st.info(
-                f"💡 {notes}"
-            )
+    return weekly_plan
 
 
 # =========================================================
-# WORKOUT
+# WORKOUT PLANNER
 # =========================================================
 
 def workout_planner():
 
-    page_back()
+    back_button()
 
     st.markdown(
         """
         <div class="page-header">
+
             <h1>💪 Workout Planner</h1>
+
             <p>
-                Create a simple weekly fitness routine based on
-                your goal, activity level, location and equipment.
+                Create a simple personalized 7-day routine
+                based on your fitness goal and available equipment.
             </p>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -2828,36 +2747,38 @@ def workout_planner():
         return
 
     names = [
-        m["name"]
-        for m in st.session_state.family
+        member["name"]
+        for member in st.session_state.family
     ]
 
-    selected = st.selectbox(
-        "Select member",
+    selected_name = st.selectbox(
+        "Select Member",
         names
     )
 
     member = next(
-        m
-        for m in st.session_state.family
-        if m["name"] == selected
+        member
+        for member in st.session_state.family
+        if member["name"] == selected_name
     )
 
     st.markdown(
         f"""
         <div class="soft-card">
+
             <span class="pill">
-                {member['goal'].replace('_',' ').title()}
+                {member['goal']}
             </span>
 
             <span class="pill">
-                {member['workout_location'].title()}
+                {member['workout_location']}
             </span>
 
             <p>
-                <b>Equipment:</b>
-                {', '.join(member['equipment']).replace('_',' ')}
+                Equipment:
+                {", ".join(member["equipment"])}
             </p>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -2865,277 +2786,224 @@ def workout_planner():
 
     if st.button(
         "🏃 Generate 7-Day Workout",
-        type="primary",
         use_container_width=True
     ):
 
-        fallback = {
-            "member": selected,
-            "week": [
-                {
-                    "day": 1,
-                    "focus": "Full Body",
-                    "exercises": [
-                        {
-                            "name": "Bodyweight Squats",
-                            "sets": "3",
-                            "reps": "12"
-                        },
-                        {
-                            "name": "Incline Push-ups",
-                            "sets": "3",
-                            "reps": "10"
-                        },
-                        {
-                            "name": "Brisk Walk",
-                            "duration": "20 min"
-                        }
-                    ]
-                },
-                {
-                    "day": 2,
-                    "focus": "Recovery",
-                    "exercises": [
-                        {
-                            "name": "Gentle Stretching",
-                            "duration": "15 min"
-                        }
-                    ]
-                },
-                {
-                    "day": 3,
-                    "focus": "Lower Body",
-                    "exercises": [
-                        {
-                            "name": "Lunges",
-                            "sets": "3",
-                            "reps": "10 each"
-                        },
-                        {
-                            "name": "Glute Bridges",
-                            "sets": "3",
-                            "reps": "15"
-                        }
-                    ]
-                },
-                {
-                    "day": 4,
-                    "focus": "Rest",
-                    "exercises": []
-                },
-                {
-                    "day": 5,
-                    "focus": "Upper Body + Core",
-                    "exercises": [
-                        {
-                            "name": "Wall Push-ups",
-                            "sets": "3",
-                            "reps": "12"
-                        },
-                        {
-                            "name": "Plank",
-                            "duration": "30 sec"
-                        }
-                    ]
-                },
-                {
-                    "day": 6,
-                    "focus": "Cardio",
-                    "exercises": [
-                        {
-                            "name": "Brisk Walking",
-                            "duration": "30 min"
-                        }
-                    ]
-                },
-                {
-                    "day": 7,
-                    "focus": "Recovery",
-                    "exercises": [
-                        {
-                            "name": "Gentle Stretching",
-                            "duration": "15 min"
-                        }
-                    ]
-                }
-            ]
-        }
+        plan = generate_workout(
+            member
+        )
 
-        plan = fallback
-
-        if client:
-
-            prompt = f"""
-Create a practical beginner-friendly 7-day workout plan.
-
-Person:
-{member['name']}
-
-Goal:
-{member['goal']}
-
-Activity:
-{member['activity_level']}
-
-Location:
-{member['workout_location']}
-
-Equipment:
-{member['equipment']}
-
-Return ONLY JSON:
-
-{{
-  "member": "{member['name']}",
-  "week": [
-    {{
-      "day": 1,
-      "focus": "Full Body",
-      "exercises": [
-        {{
-          "name": "Exercise",
-          "sets": "3",
-          "reps": "10"
-        }}
-      ]
-    }}
-  ]
-}}
-
-Keep it general and safe.
-Do not present it as medical treatment.
-"""
-
-            try:
-
-                response = client.chat.completions.create(
-                    model="openai/gpt-oss-120b",
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "Return valid JSON only."
-                        },
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
-                    ],
-                    temperature=.3,
-                    max_tokens=2500
-                )
-
-                ai_plan = extract_json(
-                    response.choices[0].message.content
-                )
-
-                if (
-                    isinstance(ai_plan, dict)
-                    and ai_plan.get("week")
-                ):
-                    plan = ai_plan
-
-            except Exception:
-                pass
-
-        st.session_state.workouts[
-            selected
+        st.session_state.workout_plan[
+            selected_name
         ] = plan
 
         st.success(
-            "Workout plan created! 💪"
+            "Workout plan generated."
         )
 
-    current = st.session_state.workouts.get(
-        selected
+    plan = st.session_state.workout_plan.get(
+        selected_name
     )
 
-    if current:
+    if plan:
 
-        for day in current.get(
-            "week",
-            []
-        ):
+        completed_count = 0
 
-            day_num = day.get(
-                "day",
-                "?"
-            )
-
-            focus = day.get(
-                "focus",
-                "Workout"
-            )
-
-            exercises = day.get(
-                "exercises",
-                []
-            )
+        for day in plan:
 
             with st.expander(
-                f"Day {day_num} · {focus}",
-                expanded=(day_num == 1)
+                f"Day {day['day']} · {day['focus']}",
+                expanded=(
+                    day["day"] == 1
+                )
             ):
+
+                exercises = day[
+                    "exercises"
+                ]
 
                 if not exercises:
 
                     st.write(
-                        "🌙 Rest / recovery day"
+                        "🌙 Rest and recovery"
                     )
 
                 for exercise in exercises:
 
-                    if exercise.get(
-                        "duration"
-                    ):
-
-                        st.write(
-                            f"• **{exercise.get('name','Exercise')}** "
-                            f"— {exercise['duration']}"
-                        )
-
-                    else:
-
-                        st.write(
-                            f"• **{exercise.get('name','Exercise')}** "
-                            f"— {exercise.get('sets','')} × "
-                            f"{exercise.get('reps','')}"
-                        )
+                    st.write(
+                        f"• {exercise}"
+                    )
 
                 completed = st.checkbox(
-                    "Mark this day complete",
-                    key=f"complete_{selected}_{day_num}"
+                    "Mark day complete",
+                    key=(
+                        f"workout_{selected_name}_"
+                        f"{day['day']}"
+                    )
                 )
 
                 if completed:
+                    completed_count += 1
 
-                    st.session_state.logs.append(
-                        {
-                            "date": str(date.today()),
-                            "member": selected,
-                            "type": "workout",
-                            "item": focus,
-                            "minutes": 30,
-                            "status": "completed",
-                        }
-                    )
+        st.progress(
+            completed_count / 7,
+            text=(
+                f"Weekly completion: "
+                f"{completed_count}/7 days"
+            )
+        )
+
+
+def generate_workout(member):
+
+    if groq_client is not None:
+
+        prompt = f"""
+Create a safe general 7-day fitness plan.
+
+Person:
+{member["name"]}
+
+Goal:
+{member["goal"]}
+
+Activity:
+{member["activity"]}
+
+Location:
+{member["workout_location"]}
+
+Equipment:
+{member["equipment"]}
+
+Return ONLY JSON:
+
+{{
+    "week": [
+        {{
+            "day": 1,
+            "focus": "Full Body",
+            "exercises": [
+                "Exercise - 3 sets x 10 reps"
+            ]
+        }}
+    ]
+}}
+
+Include rest/recovery days.
+Do not provide medical treatment.
+"""
+
+        try:
+
+            response = groq_client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "Return valid JSON only."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    },
+                ],
+                temperature=0.3,
+                max_tokens=2500,
+            )
+
+            result = extract_json(
+                response.choices[0].message.content
+            )
+
+            if (
+                isinstance(result, dict)
+                and "week" in result
+            ):
+
+                return result["week"]
+
+        except Exception:
+            pass
+
+    return [
+        {
+            "day": 1,
+            "focus": "Full Body",
+            "exercises": [
+                "Bodyweight Squats - 3 x 12",
+                "Wall or Incline Push-ups - 3 x 10",
+                "Brisk Walk - 20 minutes",
+            ],
+        },
+        {
+            "day": 2,
+            "focus": "Recovery",
+            "exercises": [
+                "Gentle stretching - 15 minutes",
+            ],
+        },
+        {
+            "day": 3,
+            "focus": "Lower Body",
+            "exercises": [
+                "Lunges - 3 x 10 each side",
+                "Glute Bridges - 3 x 15",
+                "Calf Raises - 3 x 15",
+            ],
+        },
+        {
+            "day": 4,
+            "focus": "Rest",
+            "exercises": [],
+        },
+        {
+            "day": 5,
+            "focus": "Upper Body & Core",
+            "exercises": [
+                "Wall Push-ups - 3 x 12",
+                "Bird Dogs - 3 x 10",
+                "Plank - 3 x 20 seconds",
+            ],
+        },
+        {
+            "day": 6,
+            "focus": "Cardio",
+            "exercises": [
+                "Brisk Walking - 30 minutes",
+            ],
+        },
+        {
+            "day": 7,
+            "focus": "Recovery",
+            "exercises": [
+                "Gentle stretching - 15 minutes",
+            ],
+        },
+    ]
 
 
 # =========================================================
-# PROGRESS
+# PROGRESS TRACKER
 # =========================================================
 
 def progress_page():
 
-    page_back()
+    back_button()
 
     st.markdown(
         """
         <div class="page-header">
+
             <h1>📊 Progress Tracker</h1>
+
             <p>
-                Track your family's nutrition, weight, meals,
-                calories and fitness consistency.
+                Track weight, BMI, calories, protein and
+                fitness progress over time.
             </p>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -3150,27 +3018,23 @@ def progress_page():
         return
 
     names = [
-        m["name"]
-        for m in st.session_state.family
+        member["name"]
+        for member in st.session_state.family
     ]
 
-    selected = st.selectbox(
-        "Select member",
+    selected_name = st.selectbox(
+        "Select Member",
         names
     )
 
     member = next(
-        m
-        for m in st.session_state.family
-        if m["name"] == selected
+        member
+        for member in st.session_state.family
+        if member["name"] == selected_name
     )
 
-    # -----------------------------------------------------
-    # LOG PROGRESS
-    # -----------------------------------------------------
-
     st.markdown(
-        '<div class="section-heading">📝 Log today's progress</div>',
+        '<div class="section-title">📝 Log Today\'s Progress</div>',
         unsafe_allow_html=True
     )
 
@@ -3187,15 +3051,15 @@ def progress_page():
                 min_value=25.0,
                 max_value=250.0,
                 value=float(
-                    member["weight_kg"]
+                    member["weight"]
                 ),
-                step=.1
+                step=0.1
             )
 
         with c2:
 
             calories = st.number_input(
-                "Calories consumed",
+                "Calories Consumed",
                 min_value=0,
                 max_value=10000,
                 value=0,
@@ -3205,7 +3069,7 @@ def progress_page():
         with c3:
 
             protein = st.number_input(
-                "Protein consumed (g)",
+                "Protein Consumed (g)",
                 min_value=0,
                 max_value=500,
                 value=0,
@@ -3219,264 +3083,175 @@ def progress_page():
 
     if submit:
 
-        st.session_state.logs.append(
+        bmi = weight / (
+            (member["height"] / 100)
+            ** 2
+        )
+
+        st.session_state.progress_logs.append(
             {
                 "date": str(date.today()),
-                "member": selected,
-                "type": "progress",
+                "member": selected_name,
                 "weight": weight,
+                "bmi": round(bmi, 1),
                 "calories": calories,
                 "protein": protein,
             }
         )
 
         st.success(
-            "Progress saved! 🌱"
+            "Progress saved successfully."
         )
 
-    # -----------------------------------------------------
-    # LOG MEAL
-    # -----------------------------------------------------
-
-    with st.expander(
-        "🍽️ Log a meal"
-    ):
-
-        with st.form(
-            "meal_log"
-        ):
-
-            meal_name = st.text_input(
-                "Meal name",
-                "Breakfast"
-            )
-
-            status = st.selectbox(
-                "Status",
-                [
-                    "followed",
-                    "different",
-                    "skipped"
-                ]
-            )
-
-            submit_meal = st.form_submit_button(
-                "Log Meal"
-            )
-
-        if submit_meal:
-
-            st.session_state.logs.append(
-                {
-                    "date": str(date.today()),
-                    "member": selected,
-                    "type": "meal",
-                    "item": meal_name,
-                    "status": status,
-                }
-            )
-
-            st.success(
-                "Meal logged."
-            )
-
-    # -----------------------------------------------------
-    # ANALYTICS
-    # -----------------------------------------------------
-
-    progress_logs = [
-        x
-        for x in st.session_state.logs
-        if x.get("member") == selected
-        and x.get("type") == "progress"
+    member_logs = [
+        log
+        for log in st.session_state.progress_logs
+        if log["member"] == selected_name
     ]
 
-    if progress_logs:
+    if not member_logs:
 
-        df = pd.DataFrame(
-            progress_logs
+        st.info(
+            "Add your first progress entry to unlock your graphs."
         )
 
-        df["date"] = pd.to_datetime(
-            df["date"]
-        )
+        return
 
-        df = df.sort_values(
-            "date"
-        )
+    df = pd.DataFrame(
+        member_logs
+    )
 
-        latest_weight = df.iloc[-1]["weight"]
+    df["date"] = pd.to_datetime(
+        df["date"]
+    )
 
-        first_weight = df.iloc[0]["weight"]
+    df = df.sort_values(
+        "date"
+    )
 
-        weight_change = (
-            latest_weight
-            - first_weight
-        )
+    latest = df.iloc[-1]
 
-        target = member["nutrition"]["Target"]
+    first_weight = df.iloc[0]["weight"]
 
-        latest_calories = df.iloc[-1].get(
-            "calories",
-            0
-        )
+    weight_change = (
+        latest["weight"]
+        - first_weight
+    )
 
-        latest_protein = df.iloc[-1].get(
-            "protein",
-            0
-        )
+    c1, c2, c3, c4 = st.columns(4)
 
-        c1, c2, c3, c4 = st.columns(4)
+    c1.metric(
+        "Current Weight",
+        f"{latest['weight']:.1f} kg"
+    )
 
-        c1.metric(
-            "Current Weight",
-            f"{latest_weight:.1f} kg"
-        )
+    c2.metric(
+        "BMI",
+        f"{latest['bmi']:.1f}"
+    )
 
-        c2.metric(
-            "Weight Change",
-            f"{weight_change:+.1f} kg"
-        )
+    c3.metric(
+        "Weight Change",
+        f"{weight_change:+.1f} kg"
+    )
 
-        c3.metric(
-            "Latest Calories",
-            f"{latest_calories:,.0f}"
-        )
+    c4.metric(
+        "Calories",
+        f"{latest['calories']:,.0f}"
+    )
 
-        c4.metric(
-            "Latest Protein",
-            f"{latest_protein:,.0f} g"
-        )
+    c1, c2 = st.columns(2)
 
-        st.markdown(
-            '<div class="section-heading">📈 Weight trend</div>',
-            unsafe_allow_html=True
-        )
+    with c1:
 
-        fig = px.line(
+        figure = px.line(
             df,
             x="date",
             y="weight",
             markers=True,
-            title=f"{selected} — Weight Over Time"
+            title="Weight Trend"
         )
 
-        fig.update_layout(
+        figure.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)"
         )
 
         st.plotly_chart(
-            fig,
+            figure,
             use_container_width=True
         )
 
-        c1, c2 = st.columns(2)
+    with c2:
 
-        with c1:
-
-            fig = px.bar(
-                df,
-                x="date",
-                y="calories",
-                title="Calories consumed"
-            )
-
-            fig.add_hline(
-                y=target,
-                line_dash="dash",
-                annotation_text="Target"
-            )
-
-            fig.update_layout(
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-            )
-
-            st.plotly_chart(
-                fig,
-                use_container_width=True
-            )
-
-        with c2:
-
-            fig = px.line(
-                df,
-                x="date",
-                y="protein",
-                markers=True,
-                title="Protein intake"
-            )
-
-            fig.add_hline(
-                y=member["nutrition"]["Protein"],
-                line_dash="dash",
-                annotation_text="Target"
-            )
-
-            fig.update_layout(
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-            )
-
-            st.plotly_chart(
-                fig,
-                use_container_width=True
-            )
-
-    else:
-
-        st.info(
-            "Log your first progress entry to unlock your graphs. 📈"
-        )
-
-    # -----------------------------------------------------
-    # WORKOUT ANALYTICS
-    # -----------------------------------------------------
-
-    workout_logs = [
-        x
-        for x in st.session_state.logs
-        if x.get("member") == selected
-        and x.get("type") == "workout"
-    ]
-
-    if workout_logs:
-
-        workout_df = pd.DataFrame(
-            workout_logs
-        )
-
-        workout_df["date"] = pd.to_datetime(
-            workout_df["date"]
-        )
-
-        workout_summary = (
-            workout_df
-            .groupby("date")
-            .size()
-            .reset_index(name="Completed Workouts")
-        )
-
-        st.markdown(
-            '<div class="section-heading">💪 Workout consistency</div>',
-            unsafe_allow_html=True
-        )
-
-        fig = px.bar(
-            workout_summary,
+        figure = px.line(
+            df,
             x="date",
-            y="Completed Workouts",
-            title="Workout completion"
+            y="bmi",
+            markers=True,
+            title="BMI Trend"
         )
 
-        fig.update_layout(
+        figure.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)"
         )
 
         st.plotly_chart(
-            fig,
+            figure,
+            use_container_width=True
+        )
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+
+        figure = px.bar(
+            df,
+            x="date",
+            y="calories",
+            title="Calories Consumed"
+        )
+
+        figure.add_hline(
+            y=member["nutrition"]["Calories"],
+            line_dash="dash",
+            annotation_text="Target"
+        )
+
+        figure.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)"
+        )
+
+        st.plotly_chart(
+            figure,
+            use_container_width=True
+        )
+
+    with c2:
+
+        figure = px.line(
+            df,
+            x="date",
+            y="protein",
+            markers=True,
+            title="Protein Intake"
+        )
+
+        figure.add_hline(
+            y=member["nutrition"]["Protein"],
+            line_dash="dash",
+            annotation_text="Target"
+        )
+
+        figure.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)"
+        )
+
+        st.plotly_chart(
+            figure,
             use_container_width=True
         )
 
@@ -3487,15 +3262,18 @@ def progress_page():
 
 def favorites_page():
 
-    page_back()
+    back_button()
 
     st.markdown(
         """
         <div class="page-header">
+
             <h1>❤️ Favorite Recipes</h1>
+
             <p>
-                Your saved recipes in one convenient place.
+                Your saved recipes are available here for quick access.
             </p>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -3504,22 +3282,21 @@ def favorites_page():
     if not st.session_state.favorites:
 
         st.info(
-            "No favorites yet. Open Recipe Explorer and save your favorites ⭐"
+            "No favorites yet. Save recipes from Recipe Explorer."
         )
 
         return
 
-    if recipes_df.empty:
-
+    if recipes.empty:
         return
 
     for favorite in st.session_state.favorites:
 
-        matches = recipes_df[
-            recipes_df["recipe_name"]
+        matches = recipes[
+            recipes["recipe_name"]
             .astype(str)
-            .casefold()
-            == favorite.casefold()
+            .str.lower()
+            == favorite.lower()
         ]
 
         if matches.empty:
@@ -3531,20 +3308,25 @@ def favorites_page():
             f"❤️ {favorite}"
         ):
 
-            st.write(
-                f"**Cuisine:** {row.get('cuisine','Unspecified')}"
+            c1, c2, c3 = st.columns(3)
+
+            c1.metric(
+                "Calories",
+                f"{row['calories']:.0f}"
             )
 
-            st.write(
-                f"**Calories:** {row.get('calories','—')}"
+            c2.metric(
+                "Protein",
+                f"{row['protein_g']:.0f}g"
             )
 
-            st.write(
-                f"**Protein:** {row.get('protein_g','—')}g"
+            c3.metric(
+                "Fat",
+                f"{row['fat_g']:.0f}g"
             )
 
-            ingredients = parse_listish(
-                row.get("ingredients","")
+            ingredients = parse_list(
+                row["ingredients"]
             )
 
             if ingredients:
@@ -3552,13 +3334,13 @@ def favorites_page():
                 st.write(
                     "**Ingredients:** "
                     + ", ".join(
-                        ingredients[:20]
+                        ingredients
                     )
                 )
 
             if st.button(
                 "Remove Favorite",
-                key=f"remove_fav_{favorite}"
+                key=f"remove_favorite_{favorite}"
             ):
 
                 st.session_state.favorites.remove(
@@ -3572,48 +3354,45 @@ def favorites_page():
 # MAIN ROUTER
 # =========================================================
 
-page = st.session_state.page
-
-if page == "Dashboard":
+if st.session_state.page == "Dashboard":
 
     dashboard()
 
-elif page == "Family Profiles":
+elif st.session_state.page == "Family Profiles":
 
     family_profiles()
 
-elif page == "Meal Planner":
+elif st.session_state.page == "Meal Planner":
 
     meal_planner()
 
-elif page == "Smart Pantry":
+elif st.session_state.page == "Smart Pantry":
 
     smart_pantry()
 
-elif page == "Recipe Explorer":
+elif st.session_state.page == "Recipe Explorer":
 
     recipe_explorer()
 
-elif page == "Budget & Shopping":
+elif st.session_state.page == "Budget & Shopping":
 
-    budget_shopping()
+    budget_page()
 
-elif page == "Workout Planner":
+elif st.session_state.page == "Workout Planner":
 
     workout_planner()
 
-elif page == "Progress":
+elif st.session_state.page == "Progress":
 
     progress_page()
 
-elif page == "Favorites":
+elif st.session_state.page == "Favorites":
 
     favorites_page()
 
 else:
 
     st.session_state.page = "Dashboard"
-
     st.rerun()
 
 
@@ -3627,13 +3406,18 @@ st.markdown(
 
 <div style="
     text-align:center;
-    color:#7A847E;
     padding:1rem;
+    color:#758078;
     font-size:.82rem;
 ">
-    🥗 <b>NutriNest</b> · Smart Family Nutrition & Wellness
+
+    🥗 <b>NutriNest</b>
+    · Smart Family Nutrition & Wellness
+
     <br>
+
     Eat well · Move well · Live well 💚
+
 </div>
 """,
     unsafe_allow_html=True
